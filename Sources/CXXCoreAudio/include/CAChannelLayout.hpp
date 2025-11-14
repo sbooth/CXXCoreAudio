@@ -251,14 +251,14 @@ public:
 	}
 
 	/// Releases ownership of the object's internal AudioChannelLayout and returns it.
-	/// @note The caller assumes responsiblity for deallocating the returned AudioChannelLayout using std::free.
+	/// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout using std::free.
 	AudioChannelLayout * _Nullable Release() noexcept
 	{
 		return std::exchange(channelLayout_, nullptr);
 	}
 
 	/// Replaces the object's internal AudioChannelLayout with another AudioChannelLayout.
-	/// @note The object assumes responsiblity for deallocating the passed AudioChannelLayout using std::free.
+	/// @note The object assumes responsibility for deallocating the passed AudioChannelLayout using std::free.
 	void Reset(AudioChannelLayout * _Nullable channelLayout = nullptr) noexcept
 	{
 		if(channelLayout_ != channelLayout)
