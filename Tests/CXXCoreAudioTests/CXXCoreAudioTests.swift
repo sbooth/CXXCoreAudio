@@ -21,6 +21,10 @@ import Testing
 	}
 
 	@Test func channelLayout() async {
+		let empty = CoreAudio.CAChannelLayout()
+		#expect(empty.IsEmpty())
+		#expect(empty.Size() == 0)
+		#expect(empty.ChannelCount() == 0)
 		let stereo = CoreAudio.CAChannelLayout.Stereo
 		#expect(stereo.ChannelCount() == 2)
 	}
