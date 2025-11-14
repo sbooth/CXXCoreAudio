@@ -17,7 +17,7 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-namespace CoreAudio {
+namespace CXXCoreAudio {
 
 // MARK: AudioChannelLayout Helper Functions
 
@@ -369,4 +369,4 @@ private:
 	AudioChannelLayout * _Nullable channelLayout_{nullptr};
 };
 
-} /* namespace CoreAudio */
+} /* namespace CXXCoreAudio */

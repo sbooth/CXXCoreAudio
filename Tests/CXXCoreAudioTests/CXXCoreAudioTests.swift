@@ -3,14 +3,14 @@ import Testing
 
 @Suite struct CXXCoreAudioTests {
 	@Test func timeStamp() async {
-		let ts = CoreAudio.CATimeStamp(22050.0)
+		let ts = CXXCoreAudio.CATimeStamp(22050.0)
 		#expect(ts.IsValid())
 		#expect(ts.SampleTimeIsValid())
 		#expect(!ts.HostTimeIsValid())
 	}
 
 	@Test func streamDescription() async {
-		let fmt = CoreAudio.CAStreamDescription(.float32, 44100, 2, false)
+		let fmt = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
 		#expect(fmt.IsPCM() == true)
 		#expect(fmt.IsFloat() == true)
 		#expect(fmt.IsInteger() == false)
@@ -21,16 +21,16 @@ import Testing
 	}
 
 	@Test func channelLayout() async {
-		let empty = CoreAudio.CAChannelLayout()
+		let empty = CXXCoreAudio.CAChannelLayout()
 		#expect(empty.IsEmpty())
 		#expect(empty.Size() == 0)
 		#expect(empty.ChannelCount() == 0)
-		let stereo = CoreAudio.CAChannelLayout.Stereo
+		let stereo = CXXCoreAudio.CAChannelLayout.Stereo
 		#expect(stereo.ChannelCount() == 2)
 	}
 
 	@Test func audioBuffer() async {
-		let empty = CoreAudio.CAAudioBuffer()
+		let empty = CXXCoreAudio.CAAudioBuffer()
 		#expect(empty.FrameLength() == 0)
 		#expect(empty.FrameCapacity() == 0)
 	}

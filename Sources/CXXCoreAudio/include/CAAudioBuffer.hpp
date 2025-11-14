@@ -12,7 +12,7 @@
 
 #import "CAStreamDescription.hpp"
 
-namespace CoreAudio {
+namespace CXXCoreAudio {
 
 /// Allocates and returns a variable-length AudioBufferList structure in a single allocation.
 /// @note The allocation is performed using std::malloc and should be deallocated using std::free.
@@ -324,4 +324,4 @@ private:
 
 };
 
-} /* namespace CoreAudio */
+} /* namespace CXXCoreAudio */

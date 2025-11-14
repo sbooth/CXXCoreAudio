@@ -17,7 +17,7 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-namespace CoreAudio {
+namespace CXXCoreAudio {
 
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
 struct CAStreamDescription final : public AudioStreamBasicDescription {
@@ -302,4 +302,4 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 #endif /* __OBJC__ */
 };
 
-} /* namespace CoreAudio */
+} /* namespace CXXCoreAudio */
