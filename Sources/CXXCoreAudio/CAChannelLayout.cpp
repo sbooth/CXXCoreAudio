@@ -173,7 +173,7 @@ using cf_type_ref_unique_ptr = std::unique_ptr<std::remove_pointer_t<T>, cf_type
 /// A std::unique_ptr holding a CFStringRef.
 using cf_string_unique_ptr = cf_type_ref_unique_ptr<CFStringRef>;
 
-/// Returns the name of the channel for channelLabel.
+/// Returns the name of the channel for an AudioChannelLabel.
 cf_string_unique_ptr CopyChannelLabelName(AudioChannelLabel channelLabel, bool shortName) noexcept
 {
 	const auto property = shortName ? kAudioFormatProperty_ChannelShortName : kAudioFormatProperty_ChannelName;
