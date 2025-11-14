@@ -56,14 +56,14 @@ public:
 	/// Allocates space for audio.
 	/// @param format The format of the audio the buffer list will contain.
 	/// @param frameCapacity The desired buffer capacity in audio frames.
-	/// @return true on sucess, false if an error occurred or memory could not be allocated.
+	/// @return true on success, false if an error occurred or memory could not be allocated.
 	bool Allocate(const CAStreamDescription& format, UInt32 frameCapacity) noexcept;
 
 	/// Deallocates the memory associated with this buffer list and sets the frame length and frame capacity to zero.
 	void Deallocate() noexcept;
 
 	/// Clears the buffer list, setting the frame length to zero.
-	/// @return true on sucess, false otherwise.
+	/// @return true on success, false otherwise.
 	bool Clear() noexcept
 	{
 		return SetFrameLength(0);
@@ -77,7 +77,7 @@ public:
 
 	/// Set the length in audio frames of the data in this buffer list.
 	/// @param frameLength The number of valid audio frames.
-	/// @return true on sucess, false otherwise.
+	/// @return true on success, false otherwise.
 	bool SetFrameLength(UInt32 frameLength) noexcept;
 
 	/// Returns true if the frame length is zero.
@@ -119,7 +119,7 @@ public:
 	/// Infers and updates the frame length using the mDataByteSize field of the internal AudioBufferList.
 	///
 	/// This is normally called after data has been copied to the buffer list during a read operation.
-	/// @return true on sucess, false otherwise
+	/// @return true on success, false otherwise.
 	/// @throw std::logic_error
 	bool InferFrameLength();
 
@@ -300,16 +300,16 @@ public:
 	// MARK: AudioBufferList Management
 
 	/// Adopts an existing AudioBufferList.
-	/// @note The object assumes responsiblity for deallocating the passed AudioBufferList using std::free.
+	/// @note The object assumes responsibility for deallocating the passed AudioBufferList using std::free.
 	/// @param bufferList The AudioBufferList to adopt
 	/// @param format The format of bufferList
 	/// @param frameCapacity The frame capacity of bufferList
 	/// @param frameLength The number of valid audio frames in bufferList
-	/// @return true on sucess, false otherwise
+	/// @return true on success, false otherwise.
 	bool AdoptABL(AudioBufferList * _Nonnull bufferList, const AudioStreamBasicDescription& format, UInt32 frameCapacity, UInt32 frameLength) noexcept;
 
 	/// Releases ownership of the object's internal AudioBufferList and returns it.
-	/// @note The caller assumes responsiblity for deallocating the returned AudioBufferList using std::free.
+	/// @note The caller assumes responsibility for deallocating the returned AudioBufferList using std::free.
 	AudioBufferList * _Nullable Release() noexcept;
 
 private:
