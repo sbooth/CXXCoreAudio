@@ -19,7 +19,7 @@
 
 namespace CoreAudio {
 
-/// A class extending the functionality of a Core Audio stream basic description.
+/// A class extending the functionality of an AudioStreamBasicDescription structure.
 struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// Common PCM audio formats.
 	enum class CommonPCMFormat {
