@@ -10,7 +10,7 @@
 
 namespace CoreAudio {
 
-/// A class extending the functionality of a Core Audio time stamp.
+/// A class extending the functionality of an AudioTimeStamp structure.
 struct CATimeStamp final : public AudioTimeStamp {
 	// MARK: Creation and Destruction
 
