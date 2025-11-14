@@ -232,13 +232,18 @@ AudioChannelLayout * CoreAudio::CopyAudioChannelLayout(const AudioChannelLayout 
 	return channelLayout;
 }
 
-bool CoreAudio::operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
+bool CoreAudio::AudioChannelLayoutsAreEqual(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept
 {
-	const auto lsize = AudioChannelLayoutSize(lhs.mNumberChannelDescriptions);
-	const auto rsize = AudioChannelLayoutSize(rhs.mNumberChannelDescriptions);
+	if(!lhs && !rhs)
+		return true;
+	else if((lhs && !rhs) || (!lhs && rhs))
+		return false;
+
+	const auto lsize = AudioChannelLayoutSize(lhs->mNumberChannelDescriptions);
+	const auto rsize = AudioChannelLayoutSize(rhs->mNumberChannelDescriptions);
 	if(lsize != rsize)
 		return false;
-	return !memcmp(&lhs, &rhs, lsize);
+	return !memcmp(lhs, rhs, lsize);
 }
 
 bool CoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs, const AudioChannelLayout *rhs) noexcept
@@ -452,22 +457,6 @@ CoreAudio::CAChannelLayout& CoreAudio::CAChannelLayout::operator=(CAChannelLayou
 CoreAudio::CAChannelLayout::~CAChannelLayout() noexcept
 {
 	std::free(channelLayout_);
-}
-
-// MARK: Comparison
-
-bool CoreAudio::CAChannelLayout::operator==(const AudioChannelLayout *other) const noexcept
-{
-	if(!channelLayout_ && !other)
-		return true;
-	else if((channelLayout_ && !other) || (!channelLayout_ && other))
-		return false;
-	return CoreAudio::operator==(*channelLayout_, *other);
-}
-
-bool CoreAudio::CAChannelLayout::IsEquivalent(const CAChannelLayout& other) const noexcept
-{
-	return AudioChannelLayoutsAreEquivalent(channelLayout_, other.channelLayout_);
 }
 
 // MARK: Functionality

@@ -51,18 +51,10 @@ inline size_t AudioChannelLayoutSize(const AudioChannelLayout * _Nullable channe
 
 /// Returns true if two AudioChannelLayout structures are equal.
 ///
-/// This operator performs a bitwise comparison based on the number of channel descriptions.
-/// @note Two equivalent channel layouts may not be bitwise equal.
-bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept;
-
-/// Returns true if two AudioChannelLayout structures are not equal.
-///
-/// This operator performs a bitwise comparison based on the number of channel descriptions.
-/// @note Two equivalent channel layouts may be bitwise unequal.
-inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
-{
-	return !operator==(lhs, rhs);
-}
+/// This function performs a bitwise comparison based on the number of channel descriptions.
+/// @note Two equivalent channel layouts may not be equal.
+/// @return true if the AudioChannelLayout structs are equal, false if not equal or one is null
+bool AudioChannelLayoutsAreEqual(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equivalent.
 ///
@@ -71,6 +63,20 @@ inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& 
 /// 2) One is null and the other has a mono or stereo layout tag
 /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
 bool AudioChannelLayoutsAreEquivalent(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept;
+
+/// Returns true if two AudioChannelLayout structures are equal.
+/// @see ``AudioChannelLayoutsAreEqual``
+inline bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
+{
+	return AudioChannelLayoutsAreEqual(&lhs, &rhs);
+}
+
+/// Returns true if two AudioChannelLayout structures are not equal.
+/// @see ``AudioChannelLayoutsAreEqual``
+inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
+{
+	return !operator==(lhs, rhs);
+}
 
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
@@ -182,53 +188,46 @@ public:
 	// MARK: Comparison
 
 	/// Returns true if the channel layout is equal to another.
-	///
-	/// This operator performs a bitwise comparison based on the number of channel descriptions.
-	/// @note Two equivalent channel layouts may not be bitwise equal.
+	/// @see ``AudioChannelLayoutsAreEqual``
 	bool operator==(const CAChannelLayout& other) const noexcept
 	{
 		return operator==(other.channelLayout_);
 	}
 
 	/// Returns true if the channel layout is equal to an AudioChannelLayout.
-	///
-	/// This operator performs a bitwise comparison based on the number of channel descriptions.
-	/// @note Two equivalent channel layouts may not be bitwise equal.
-	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept;
+	/// @see ``AudioChannelLayoutsAreEqual``
+	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return AudioChannelLayoutsAreEqual(channelLayout_, other);
+	}
 
 	/// Returns true if the channel layout is not equal to another.
-	///
-	/// This operator performs a bitwise comparison based on the number of channel descriptions.
-	/// @note Two equivalent channel layouts may be bitwise unequal.
+	/// @see ``AudioChannelLayoutsAreEqual``
 	bool operator!=(const CAChannelLayout& other) const noexcept
 	{
-		return !operator==(other);
+		return !operator==(other.channelLayout_);
 	}
 
 	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
-	///
-	/// This operator performs a bitwise comparison based on the number of channel descriptions.
-	/// @note Two equivalent channel layouts may be bitwise unequal.
+	/// @see ``AudioChannelLayoutsAreEqual``
 	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept
 	{
 		return !operator==(other);
 	}
 
-	/// Returns true if the channel layout is equivalent to another.
-	///
-	/// Channel layouts are considered equivalent if:
-	/// 1) Both internal AudioChannelLayout are null
-	/// 2) One internal AudioChannelLayout is null and the other has a mono or stereo layout tag
-	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
-	bool IsEquivalent(const CAChannelLayout& other) const noexcept;
+	/// Returns true if the channel layout is equivalent to another channel layout.
+	/// @see ``AudioChannelLayoutsAreEquivalent``
+	bool IsEquivalent(const CAChannelLayout& other) const noexcept
+	{
+		return IsEquivalent(other.channelLayout_);
+	}
 
-	/// Returns true if the channel layout is equivalent to another.
-	///
-	/// Channel layouts are considered equivalent if:
-	/// 1) Both internal AudioChannelLayout are null
-	/// 2) One internal AudioChannelLayout is null and the other has a mono or stereo layout tag
-	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
-	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept;
+	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
+	/// @see ``AudioChannelLayoutsAreEquivalent``
+	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
+	}
 
 	// MARK: Functionality
 
