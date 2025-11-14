@@ -8,7 +8,7 @@
 
 // MARK: Comparison
 
-bool CoreAudio::CATimeStamp::operator==(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator==(const AudioTimeStamp& other) const noexcept
 {
 	if(SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
 		return mSampleTime == other.mSampleTime;
@@ -19,12 +19,12 @@ bool CoreAudio::CATimeStamp::operator==(const AudioTimeStamp& other) const noexc
 	return false;
 }
 
-bool CoreAudio::CATimeStamp::operator!=(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator!=(const AudioTimeStamp& other) const noexcept
 {
 	return !operator==(other);
 }
 
-bool CoreAudio::CATimeStamp::operator<(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator<(const AudioTimeStamp& other) const noexcept
 {
 	if(SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
 		return mSampleTime < other.mSampleTime;
@@ -35,12 +35,12 @@ bool CoreAudio::CATimeStamp::operator<(const AudioTimeStamp& other) const noexce
 	return false;
 }
 
-bool CoreAudio::CATimeStamp::operator<=(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator<=(const AudioTimeStamp& other) const noexcept
 {
 	return operator<(other) || operator==(other);
 }
 
-bool CoreAudio::CATimeStamp::operator>(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator>(const AudioTimeStamp& other) const noexcept
 {
 	if(SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
 		return mSampleTime > other.mSampleTime;
@@ -51,7 +51,7 @@ bool CoreAudio::CATimeStamp::operator>(const AudioTimeStamp& other) const noexce
 	return false;
 }
 
-bool CoreAudio::CATimeStamp::operator>=(const AudioTimeStamp& other) const noexcept
+bool CXXCoreAudio::CATimeStamp::operator>=(const AudioTimeStamp& other) const noexcept
 {
 	return operator>(other) || operator==(other);
 }

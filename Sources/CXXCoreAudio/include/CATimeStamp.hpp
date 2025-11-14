@@ -8,7 +8,7 @@
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
-namespace CoreAudio {
+namespace CXXCoreAudio {
 
 /// A class extending the functionality of an AudioTimeStamp structure.
 struct CATimeStamp final : public AudioTimeStamp {
@@ -148,4 +148,4 @@ struct CATimeStamp final : public AudioTimeStamp {
 	}
 };
 
-} /* namespace CoreAudio */
+} /* namespace CXXCoreAudio */

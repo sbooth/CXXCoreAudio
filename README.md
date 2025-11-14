@@ -1,14 +1,18 @@
 # CXXCoreAudio
 
-| C++ Class | Description |
+Assorted C++ classes simplifying common operations in Core Audio.
+
+| Class | Description |
 | --- | --- |
-| [CoreAudio::CAAudioBuffer](Sources/CXXCoreAudio/include/CAAudioBuffer.hpp) | An `AudioBufferList` with a specific format, frame capacity, and frame length. |
-| [CoreAudio::CAChannelLayout](Sources/CXXCoreAudio/include/CAChannelLayout.hpp) | Simplifies use of the variable-length `AudioChannelLayout`. |
-| [CoreAudio::CAStreamDescription](Sources/CXXCoreAudio/include/CAStreamDescription.hpp) | Extends the functionality of an `AudioStreamBasicDescription`. |
-| [CoreAudio::CATimeStamp](Sources/CXXCoreAudio/include/CATimeStamp.hpp) | Extends the functionality of an `AudioTimeStamp`. |
+| [CAAudioBuffer](Sources/CXXCoreAudio/include/CAAudioBuffer.hpp) | An `AudioBufferList` with a specific format, frame capacity, and frame length. |
+| [CAChannelLayout](Sources/CXXCoreAudio/include/CAChannelLayout.hpp) | Simplifies use of the variable-length `AudioChannelLayout`. |
+| [CAStreamDescription](Sources/CXXCoreAudio/include/CAStreamDescription.hpp) | Extends the functionality of an `AudioStreamBasicDescription`. |
+| [CATimeStamp](Sources/CXXCoreAudio/include/CATimeStamp.hpp) | Extends the functionality of an `AudioTimeStamp`. |
 
 > [!NOTE]
 > C++17 is required.
+
+All classes are in the `CXXCoreAudio` namespace.
 
 ## Installation
 
