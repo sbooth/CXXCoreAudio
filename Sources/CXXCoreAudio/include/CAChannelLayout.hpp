@@ -178,13 +178,13 @@ public:
 	/// @throw std::bad_alloc if memory could not be allocated.
 	CAChannelLayout& operator=(const AudioChannelLayout * _Nullable other);
 
-	/// Creates a channel layout by moving a channel layout.
+	/// Creates a channel layout by moving the contents of another.
 	CAChannelLayout(CAChannelLayout&& other) noexcept;
 
-	/// Replaces the channel layout by moving a channel layout.
+	/// Replaces the channel layout with the moved contents of another.
 	CAChannelLayout& operator=(CAChannelLayout&& other) noexcept;
 
-	/// Destroys the channel layout and release all associated resources.
+	/// Destroys the channel layout and releases all associated resources.
 	~CAChannelLayout() noexcept;
 
 	// MARK: Comparison
