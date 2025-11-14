@@ -1,0 +1,6 @@
+module CXXCoreAudio {
+	requires cplusplus17
+	header "CAStreamDescription.hpp"
+	header "CATimeStamp.hpp"
+	export *
+}
