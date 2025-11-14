@@ -265,10 +265,10 @@ bool CoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs, 
 		return false;
 
 	const AudioChannelLayout *layouts [] = { lhs, rhs, };
-	UInt32 layoutsEquivalent = false;
+	UInt32 layoutsEquivalent = 0;
 	UInt32 propertySize = sizeof(layoutsEquivalent);
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_AreChannelLayoutsEquivalent, sizeof(layouts), static_cast<void *>(layouts), &propertySize, &layoutsEquivalent);
-	if(noErr != result)
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_AreChannelLayoutsEquivalent, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, &layoutsEquivalent);
+	if(result != noErr)
 		return false;
 	return layoutsEquivalent;
 }
@@ -484,17 +484,12 @@ bool CoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLayout
 		outputLayout.channelLayout_
 	};
 
-	auto outputChannelCount = outputLayout.ChannelCount();
+	const auto outputChannelCount = outputLayout.ChannelCount();
 	if(outputChannelCount == 0)
 		return false;
 
 	channelMap.resize(outputChannelCount);
 	UInt32 propertySize = static_cast<UInt32>(sizeof(SInt32) * channelMap.size());
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof(layouts), static_cast<void *>(layouts), &propertySize, &channelMap[0]);
-
-	if(noErr != result)
-		return false;
-	//os_log_error(OS_LOG_DEFAULT, "AudioFormatGetProperty (kAudioFormatProperty_ChannelMap) failed: %d", result);
-
-	return true;
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, &channelMap[0]);
+	return result == noErr;
 }
