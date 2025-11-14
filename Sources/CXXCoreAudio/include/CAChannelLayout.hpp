@@ -53,26 +53,26 @@ inline size_t AudioChannelLayoutSize(const AudioChannelLayout * _Nullable channe
 ///
 /// This function performs a bitwise comparison based on the number of channel descriptions.
 /// @note Two equivalent channel layouts may not be equal.
-/// @return true if the AudioChannelLayout structs are equal, false if not equal or one is null
+/// @return true if the AudioChannelLayout structs are equal, false if not.
 bool AudioChannelLayoutsAreEqual(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equivalent.
 ///
 /// Audio channel layouts are considered equivalent if:
-/// 1) Both are null
-/// 2) One is null and the other has a mono or stereo layout tag
-/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
+/// 1) Both are null.
+/// 2) One is null and the other has a mono or stereo layout tag.
+/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+/// @note Two equivalent channel layouts may not be equal.
+/// @return true if the AudioChannelLayout structs are equivalent, false if not.
 bool AudioChannelLayoutsAreEquivalent(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equal.
-/// @see ``AudioChannelLayoutsAreEqual``
 inline bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
 {
 	return AudioChannelLayoutsAreEqual(&lhs, &rhs);
 }
 
 /// Returns true if two AudioChannelLayout structures are not equal.
-/// @see ``AudioChannelLayoutsAreEqual``
 inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept
 {
 	return !operator==(lhs, rhs);
@@ -92,9 +92,11 @@ CFStringRef _Nullable CopyAudioChannelLayoutDescription(const AudioChannelLayout
 /// Returns true if two the AVAudioChannelLayout objects are equivalent.
 ///
 /// Audio channel layouts are considered equivalent if:
-/// 1) Both are null
-/// 2) One is null and the other has a mono or stereo layout tag
-/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
+/// 1) Both are null.
+/// 2) One is null and the other has a mono or stereo layout tag.
+/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+/// @note Two equivalent channel layouts may not be equal.
+/// @return true if the AudioChannelLayout structs are equivalent, false if not.
 inline bool AVAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout * _Nullable lhs, AVAudioChannelLayout * _Nullable rhs) noexcept
 {
 	return AudioChannelLayoutsAreEquivalent(lhs.layout, rhs.layout);
@@ -187,46 +189,70 @@ public:
 
 	// MARK: Comparison
 
-	/// Returns true if the channel layout is equal to another.
-	/// @see ``AudioChannelLayoutsAreEqual``
-	bool operator==(const CAChannelLayout& other) const noexcept
+	/// Returns true if the channel layout is equal to another channel layout.
+	///
+	/// This function performs a bitwise comparison based on the number of channel descriptions.
+	/// @note Two equivalent channel layouts may not be equal.
+	bool IsEqual(const CAChannelLayout& other) const noexcept
 	{
-		return operator==(other.channelLayout_);
+		return IsEqual(other.channelLayout_);
 	}
 
 	/// Returns true if the channel layout is equal to an AudioChannelLayout.
-	/// @see ``AudioChannelLayoutsAreEqual``
-	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept
+	///
+	/// This function performs a bitwise comparison based on the number of channel descriptions.
+	/// @note Two equivalent channel layouts may not be equal.
+	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept
 	{
 		return AudioChannelLayoutsAreEqual(channelLayout_, other);
 	}
 
-	/// Returns true if the channel layout is not equal to another.
-	/// @see ``AudioChannelLayoutsAreEqual``
-	bool operator!=(const CAChannelLayout& other) const noexcept
-	{
-		return !operator==(other.channelLayout_);
-	}
-
-	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
-	/// @see ``AudioChannelLayoutsAreEqual``
-	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept
-	{
-		return !operator==(other);
-	}
-
 	/// Returns true if the channel layout is equivalent to another channel layout.
-	/// @see ``AudioChannelLayoutsAreEquivalent``
+	///
+	/// Channel layouts are considered equivalent if:
+	/// 1) Both are empty.
+	/// 2) One is empty and the other has a mono or stereo layout tag.
+	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+	/// @note Two equivalent channel layouts may not be equal.
 	bool IsEquivalent(const CAChannelLayout& other) const noexcept
 	{
 		return IsEquivalent(other.channelLayout_);
 	}
 
 	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
-	/// @see ``AudioChannelLayoutsAreEquivalent``
+	///
+	/// Channel layouts are considered equivalent if:
+	/// 1) Both are empty.
+	/// 2) One is empty and the other has a mono or stereo layout tag.
+	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+	/// @note Two equivalent channel layouts may not be equal.
 	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept
 	{
 		return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
+	}
+
+	/// Returns true if the channel layout is equal to another.
+	bool operator==(const CAChannelLayout& other) const noexcept
+	{
+		return operator==(other.channelLayout_);
+	}
+
+	/// Returns true if the channel layout is equal to an AudioChannelLayout.
+	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return IsEqual(other);
+	}
+
+	/// Returns true if the channel layout is not equal to another.
+	bool operator!=(const CAChannelLayout& other) const noexcept
+	{
+		return !operator==(other.channelLayout_);
+	}
+
+	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
+	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return !operator==(other);
 	}
 
 	// MARK: Functionality
@@ -264,25 +290,35 @@ public:
 			std::free(std::exchange(channelLayout_, channelLayout));
 	}
 
-	/// Returns true if this object's internal AudioChannelLayout is not nullptr.
-	explicit operator bool() const noexcept
+	/// Returns true if this channel layout is empty.
+	///
+	/// A channel layout is empty when the internal AudioChannelLayout is null.
+	bool IsEmpty() const noexcept
 	{
-		return channelLayout_ != nullptr;
+		return !channelLayout_;
 	}
 
-	/// Retrieves a const pointer to this object's internal AudioChannelLayout.
+	/// Returns true if this channel layout is not empty.
+	///
+	/// A channel layout is empty when the internal AudioChannelLayout is null.
+	explicit operator bool() const noexcept
+	{
+		return !IsEmpty();
+	}
+
+	/// Returns a const pointer to this object's internal AudioChannelLayout.
 	const AudioChannelLayout * _Nullable GetChannelLayout() const noexcept
 	{
 		return channelLayout_;
 	}
 
-	/// Retrieve a const pointer to this object's internal AudioChannelLayout.
+	/// Returns a const pointer to this object's internal AudioChannelLayout.
 	const AudioChannelLayout * _Nullable operator->() const noexcept
 	{
 		return channelLayout_;
 	}
 
-	/// Retrieve a const pointer to this object's internal AudioChannelLayout.
+	/// Returns a const pointer to this object's internal AudioChannelLayout.
 	operator const AudioChannelLayout * const _Nullable () const noexcept
 	{
 		return channelLayout_;
@@ -293,14 +329,16 @@ public:
 	/// Returns the name of this channel layout.
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-	/// - note: The caller is responsible for releasing the returned string.
+	/// @note The caller is responsible for releasing the returned string
 	CFStringRef _Nullable CopyLayoutName(bool simpleName = false) const noexcept CF_RETURNS_RETAINED
 	{
 		return CopyAudioChannelLayoutName(channelLayout_, simpleName);
 	}
 
 	/// Returns a string representation of this channel layout
-	/// - note: The caller is responsible for releasing the returned string
+	///
+	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
+	/// @note The caller is responsible for releasing the returned string
 	CFStringRef _Nullable CopyLayoutDescription() const noexcept CF_RETURNS_RETAINED
 	{
 		return CopyAudioChannelLayoutDescription(channelLayout_);
@@ -314,8 +352,6 @@ public:
 	}
 
 	/// Returns the name of this channel layout.
-	///
-	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
 	NSString * _Nullable LayoutName(bool simpleName = false) const noexcept
 	{
 		return (__bridge_transfer NSString *)CopyLayoutName(simpleName);
