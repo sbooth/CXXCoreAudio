@@ -24,13 +24,13 @@ namespace CoreAudio {
 /// Allocates and returns a new variable-length AudioChannelLayout structure with the specified number of channel descriptions.
 /// @note The allocation is performed using std::malloc and should be deallocated using std::free.
 /// @param numberChannelDescriptions The number of channel descriptions that will be stored in the channel layout.
-/// @return A newly-allocated AudioChannelLayout or nullptr on error.
+/// @return An AudioChannelLayout struct or null if memory could not be allocated.
 AudioChannelLayout * _Nullable AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
 
 /// Allocates and returns a copy of a variable-length AudioChannelLayout structure.
 /// @note The allocation is performed using std::malloc and should be deallocated using std::free.
 /// @param other The AudioChannelLayout to copy.
-/// @return A newly-allocated AudioChannelLayout or nullptr on error.
+/// @return An AudioChannelLayout struct or null if memory could not be allocated.
 AudioChannelLayout * _Nullable CopyAudioChannelLayout(const AudioChannelLayout * _Nullable other) noexcept;
 
 /// Returns the size required to hold a variable-length AudioChannelLayout structure with the specified number of channel descriptions.
@@ -41,7 +41,7 @@ constexpr size_t AudioChannelLayoutSize(UInt32 numberChannelDescriptions) noexce
 }
 
 /// Returns the size of a variable-length AudioChannelLayout structure.
-/// @return The size of channelLayout in bytes.
+/// @return The size of the channel layout in bytes.
 inline size_t AudioChannelLayoutSize(const AudioChannelLayout * _Nullable channelLayout) noexcept
 {
 	if(!channelLayout)
@@ -162,26 +162,26 @@ public:
 	/// @throw std::bad_alloc if memory could not be allocated.
 	explicit CAChannelLayout(std::vector<AudioChannelLabel> channelLabels);
 
-	/// Creates a copy of an existing channel layout.
+	/// Creates a copy of a channel layout.
 	/// @throw std::bad_alloc if memory could not be allocated.
 	CAChannelLayout(const CAChannelLayout& other);
 
-	/// Creates a channel layout by performing a deep copy of an AudioChannelLayout.
+	/// Creates a channel layout with a copy of an AudioChannelLayout.
 	/// @throw std::bad_alloc if memory could not be allocated.
 	CAChannelLayout(const AudioChannelLayout * _Nullable other);
 
-	/// Replaces the channel layout with a copy of an existing channel layout.
+	/// Replaces the channel layout with a copy of a channel layout.
 	/// @throw std::bad_alloc if memory could not be allocated.
 	CAChannelLayout& operator=(const CAChannelLayout& other);
 
-	/// Replaces the channel layout with a deep copy of an AudioChannelLayout.
+	/// Replaces the channel layout with a copy of an AudioChannelLayout.
 	/// @throw std::bad_alloc if memory could not be allocated.
 	CAChannelLayout& operator=(const AudioChannelLayout * _Nullable other);
 
-	/// Creates a channel layout by moving an existing channel layout.
+	/// Creates a channel layout by moving a channel layout.
 	CAChannelLayout(CAChannelLayout&& other) noexcept;
 
-	/// Replaces the channel layout by moving an existing channel layout.
+	/// Replaces the channel layout by moving a channel layout.
 	CAChannelLayout& operator=(CAChannelLayout&& other) noexcept;
 
 	/// Destroys the channel layout and release all associated resources.
