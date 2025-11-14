@@ -490,6 +490,6 @@ bool CoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLayout
 
 	channelMap.resize(outputChannelCount);
 	UInt32 propertySize = static_cast<UInt32>(sizeof(SInt32) * channelMap.size());
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, &channelMap[0]);
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, channelMap.data());
 	return result == noErr;
 }
