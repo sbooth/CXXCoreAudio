@@ -139,7 +139,7 @@ bool CoreAudio::CAAudioBuffer::InferFrameLength()
 	const auto buffer0ByteSize = bufferList_->mBuffers[0].mDataByteSize;
 	const auto frameLength = buffer0ByteSize / format_.mBytesPerFrame;
 	if(frameLength > frameCapacity_)
-		throw std::logic_error("bufferList_->mBuffers[0].mBytesPerFrame / format_.mBytesPerFrame > frameCapacity_");
+		throw std::logic_error("bufferList_->mBuffers[0].mDataByteSize / format_.mBytesPerFrame > frameCapacity_");
 
 	// Verify all buffers have same byte size
 	for(UInt32 i = 0; i < bufferList_->mNumberBuffers; ++i) {
