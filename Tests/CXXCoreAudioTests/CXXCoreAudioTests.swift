@@ -19,4 +19,9 @@ import Testing
 		#expect(fmt.IsInterleaved() == false)
 		#expect(fmt.IsNonInterleaved() == true)
 	}
+
+	@Test func channelLayout() async {
+		let stereo = CoreAudio.CAChannelLayout.Stereo
+		#expect(stereo.ChannelCount() == 2)
+	}
 }
