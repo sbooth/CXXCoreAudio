@@ -83,6 +83,17 @@ CFStringRef _Nullable CopyAudioChannelLayoutName(const AudioChannelLayout * _Nul
 CFStringRef _Nullable CopyAudioChannelLayoutDescription(const AudioChannelLayout * _Nullable channelLayout) noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
+/// Returns true if two the AVAudioChannelLayout objects are equivalent.
+///
+/// Audio channel layouts are considered equivalent if:
+/// 1) Both are null
+/// 2) One is null and the other has a mono or stereo layout tag
+/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true
+inline bool AVAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout * _Nullable lhs, AVAudioChannelLayout * _Nullable rhs) noexcept
+{
+	return AudioChannelLayoutsAreEquivalent(lhs.layout, rhs.layout);
+}
+
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
