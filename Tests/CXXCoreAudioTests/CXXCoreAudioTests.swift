@@ -28,4 +28,10 @@ import Testing
 		let stereo = CoreAudio.CAChannelLayout.Stereo
 		#expect(stereo.ChannelCount() == 2)
 	}
+
+	@Test func audioBuffer() async {
+		let empty = CoreAudio.CAAudioBuffer()
+		#expect(empty.FrameLength() == 0)
+		#expect(empty.FrameCapacity() == 0)
+	}
 }
