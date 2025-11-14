@@ -260,7 +260,8 @@ bool CoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs, 
 		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
 	}
-	else if(!lhs || !rhs)
+
+	if(!lhs || !rhs)
 		return false;
 
 	const AudioChannelLayout *layouts [] = { lhs, rhs, };
