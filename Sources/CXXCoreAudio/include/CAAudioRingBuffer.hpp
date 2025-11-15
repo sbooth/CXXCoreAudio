@@ -28,9 +28,11 @@ public:
 
 	/// Creates a ring buffer with the specified buffer size.
 	///
-	/// The minimum buffer capacity is two audio frames.
+	/// The minimum buffer capacity is two audio frames and the maximum capacity is 0x80000000 audio frames.
 	///
-	/// The maximum buffer capacity is the minimum of 0x80000000 and the largest integral power of two that is not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
+	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
+	///
+	/// The limiting buffer capacity is the lesser of the maximum capacity and the format-specific capacity.
 	/// @note Only non-interleaved formats are supported.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
@@ -61,9 +63,11 @@ public:
 
 	/// Allocates space for audio data.
 	///
-	/// The minimum buffer capacity is two audio frames.
+	/// The minimum buffer capacity is two audio frames and the maximum capacity is 0x80000000 audio frames.
 	///
-	/// The maximum buffer capacity is the minimum of 0x80000000 and the largest integral power of two that is not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
+	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
+	///
+	/// The limiting buffer capacity is the lesser of the maximum capacity and the format-specific capacity.
 	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
