@@ -16,9 +16,9 @@ namespace {
 
 /// Copies non-interleaved audio from an AudioBufferList to a buffer array.
 /// @param destination The destination buffer array.
-/// @param writeOffset The byte offset in destination to begin writing.
+/// @param writeOffset The byte offset in each destination buffer to begin writing.
 /// @param source The source AudioBufferList.
-/// @param readOffset The byte offset in source to begin reading.
+/// @param readOffset The byte offset in each source buffer to begin reading.
 /// @param byteCount The maximum number of bytes per buffer to read and write.
 void CopyToBuffersFromABL(void * const _Nonnull * const _Nonnull destination, uint32_t writeOffset, const AudioBufferList * const _Nonnull source, uint32_t readOffset, uint32_t byteCount) noexcept
 {
@@ -33,9 +33,9 @@ void CopyToBuffersFromABL(void * const _Nonnull * const _Nonnull destination, ui
 
 /// Copies non-interleaved audio from a buffer array to an AudioBufferList.
 /// @param destination The destination AudioBufferList.
-/// @param writeOffset The byte offset in destination to begin writing.
+/// @param writeOffset The byte offset in each destination buffer to begin writing.
 /// @param source The source buffer array.
-/// @param readOffset The byte offset in source to begin reading.
+/// @param readOffset The byte offset in each source buffer to begin reading.
 /// @param byteCount The maximum number of bytes per buffer to read and write.
 void CopyToABLFromBuffers(AudioBufferList * const _Nonnull destination, uint32_t writeOffset, const void * const _Nonnull * const _Nonnull source, uint32_t readOffset, uint32_t byteCount) noexcept
 {
