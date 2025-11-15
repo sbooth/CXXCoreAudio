@@ -27,8 +27,10 @@ public:
 	CAAudioRingBuffer() noexcept = default;
 
 	/// Creates a ring buffer with the specified buffer size.
+	/// @note Only non-interleaved formats are supported.
 	/// @note Buffer sizes from 2 to 2,147,483,648 (0x80000000) bytes are supported.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
+	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer size, in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
 	explicit CAAudioRingBuffer(const CAStreamDescription& format, uint32_t size);
@@ -55,7 +57,7 @@ public:
 	// MARK: Buffer Management
 
 	/// Allocates space for audio data.
-	/// @note Only interleaved formats are supported.
+	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
 	/// @note Capacities from 2 to 2,147,483,648 (0x80000000) frames are supported
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
