@@ -49,15 +49,15 @@ void CopyToABLFromBuffers(AudioBufferList * const _Nonnull destination, uint32_t
 }
 
 /// Calculates and returns the smallest integral power of two not less than x.
-/// @param x A value on the closed interval [2, 2147483648].
+/// @param x A value on the closed interval [0, 2147483648].
 /// @return The smallest integral power of two not less than x.
 constexpr uint32_t bit_ceil(uint32_t x) noexcept
 {
-#if __cplusplus >= 201402L
-	assert(x > 1);
-	assert(x <= ((std::numeric_limits<uint32_t>::max() / 2) + 1));
-#endif
-	return static_cast<uint32_t>(1 << (32 - __builtin_clz(x - 1)));
+	if(x < 2)
+		return 1;
+	const auto n = std::numeric_limits<uint32_t>::digits - __builtin_clz(x - 1);
+	assert(n != std::numeric_limits<uint32_t>::digits);
+	return static_cast<uint32_t>(1 << (32 - n));
 }
 
 } /* namespace */
@@ -132,14 +132,23 @@ bool CXXCoreAudio::CAAudioRingBuffer::Allocate(const CAStreamDescription& format
 	if(size < 2 || size > 0x80000000)
 		return false;
 
-	size = bit_ceil(size);
-	if(size > (std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame))
+	/// Values larger than this will overflow AudioBuffer.mDataByteSize
+	const auto maxAudioBufferFrameCount = std::numeric_limits<UInt32>::max() / format.mBytesPerFrame;
+	/// Values larger than this will exceed the maximum allocation size
+	const auto maxAllocationFrameCount = ((std::numeric_limits<size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) / format.mBytesPerFrame;
+
+	/// The maximum size per channel buffer in audio frames
+	const auto maxChannelBufferFrameSize = std::min(static_cast<size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
+
+	// Round to nearest power of two
+	const auto channelBufferFrameSize = bit_ceil(size);
+	if(channelBufferFrameSize > maxChannelBufferFrameSize)
 		return false;
 
 	Deallocate();
 
-	const auto channelBufferSize = size * format.mBytesPerFrame;
-	const auto allocationSize = (channelBufferSize + sizeof(void *)) * format.mChannelsPerFrame;
+	const auto channelBufferByteSize = channelBufferFrameSize * format.mBytesPerFrame;
+	const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
 
 	auto allocation = std::malloc(allocationSize);
 	if(!allocation)
@@ -148,18 +157,18 @@ bool CXXCoreAudio::CAAudioRingBuffer::Allocate(const CAStreamDescription& format
 	// Zero the entire allocation
 	std::memset(allocation, 0, allocationSize);
 
-	// Assign the buffers
+	// Assign the channel buffers
 	auto address = reinterpret_cast<uintptr_t>(allocation);
 
 	buffers_ = reinterpret_cast<void **>(address);
 	address += format.mChannelsPerFrame * sizeof(void *);
 	for(UInt32 i = 0; i < format.mChannelsPerFrame; ++i) {
 		buffers_[i] = reinterpret_cast<void *>(address);
-		address += channelBufferSize;
+		address += channelBufferByteSize;
 	}
 
-	capacity_ = size;
-	capacityMask_ = size - 1;
+	capacity_ = channelBufferFrameSize;
+	capacityMask_ = channelBufferFrameSize - 1;
 
 	readPosition_ = 0;
 	writePosition_ = 0;
