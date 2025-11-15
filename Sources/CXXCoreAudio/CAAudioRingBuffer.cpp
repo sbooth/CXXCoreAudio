@@ -14,40 +14,6 @@
 
 namespace {
 
-/// Copies non-interleaved audio from an AudioBufferList to a buffer array.
-/// @param destination The destination buffer array.
-/// @param writeOffset The byte offset in each destination buffer to begin writing.
-/// @param source The source AudioBufferList.
-/// @param readOffset The byte offset in each source buffer to begin reading.
-/// @param byteCount The maximum number of bytes per buffer to read and write.
-void CopyToBuffersFromABL(void * const _Nonnull * const _Nonnull destination, uint32_t writeOffset, const AudioBufferList * const _Nonnull source, uint32_t readOffset, uint32_t byteCount) noexcept
-{
-	for(UInt32 i = 0; i < source->mNumberBuffers; ++i) {
-		assert(readOffset <= source->mBuffers[i].mDataByteSize);
-		const auto dst = reinterpret_cast<uintptr_t>(destination[i]) + writeOffset;
-		const auto src = reinterpret_cast<uintptr_t>(source->mBuffers[i].mData) + readOffset;
-		const auto n = std::min(byteCount, source->mBuffers[i].mDataByteSize - readOffset);
-		std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
-	}
-}
-
-/// Copies non-interleaved audio from a buffer array to an AudioBufferList.
-/// @param destination The destination AudioBufferList.
-/// @param writeOffset The byte offset in each destination buffer to begin writing.
-/// @param source The source buffer array.
-/// @param readOffset The byte offset in each source buffer to begin reading.
-/// @param byteCount The maximum number of bytes per buffer to read and write.
-void CopyToABLFromBuffers(AudioBufferList * const _Nonnull destination, uint32_t writeOffset, const void * const _Nonnull * const _Nonnull source, uint32_t readOffset, uint32_t byteCount) noexcept
-{
-	for(UInt32 i = 0; i < destination->mNumberBuffers; ++i) {
-		assert(writeOffset <= destination->mBuffers[i].mDataByteSize);
-		const auto dst = reinterpret_cast<uintptr_t>(destination->mBuffers[i].mData) + writeOffset;
-		const auto src = reinterpret_cast<uintptr_t>(source[i]) + readOffset;
-		const auto n = std::min(byteCount, destination->mBuffers[i].mDataByteSize - writeOffset);
-		std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
-	}
-}
-
 /// Calculates and returns the smallest integral power of two not less than x.
 /// @param x A value on the closed interval [0, 2147483648].
 /// @return The smallest integral power of two not less than x.
@@ -258,15 +224,28 @@ uint32_t CXXCoreAudio::CAAudioRingBuffer::Read(AudioBufferList * const destinati
 	if(framesAvailable == 0 || (framesAvailable < count && !allowPartial))
 		return 0;
 
+	/// Copies non-interleaved audio from _buffers to an AudioBufferList.
+	const auto copyFromBuffers = [&](uint32_t readOffset, uint32_t frameLength, AudioBufferList * const _Nonnull destination, uint32_t writeOffset) noexcept {
+		const auto readOffsetBytes = readOffset * format_.mBytesPerFrame;
+		const auto byteCount = frameLength * format_.mBytesPerFrame;
+		const auto writeOffsetBytes = writeOffset * format_.mBytesPerFrame;
+		for(UInt32 i = 0; i < destination->mNumberBuffers; ++i) {
+			assert(writeOffsetBytes <= destination->mBuffers[i].mDataByteSize);
+			const auto dst = reinterpret_cast<uintptr_t>(destination->mBuffers[i].mData) + writeOffsetBytes;
+			const auto src = reinterpret_cast<uintptr_t>(buffers_[i]) + readOffsetBytes;
+			const auto n = std::min(byteCount, destination->mBuffers[i].mDataByteSize - writeOffsetBytes);
+			std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
+		}
+	};
+
 	const auto framesToRead = std::min(framesAvailable, count);
 	if(readPosition + framesToRead > capacity_) {
 		const auto framesAfterReadPosition = capacity_ - readPosition;
-		const auto bytesAfterReadPosition = framesAfterReadPosition * format_.mBytesPerFrame;
-		CopyToABLFromBuffers(destination, 0, buffers_, readPosition * format_.mBytesPerFrame, bytesAfterReadPosition);
-		CopyToABLFromBuffers(destination, bytesAfterReadPosition, buffers_, 0, (framesToRead - framesAfterReadPosition) * format_.mBytesPerFrame);
+		copyFromBuffers(readPosition, framesAfterReadPosition, destination, 0);
+		copyFromBuffers(0, framesToRead - framesAfterReadPosition, destination, framesAfterReadPosition);
 	}
 	else
-		CopyToABLFromBuffers(destination, 0, buffers_, readPosition * format_.mBytesPerFrame, framesToRead * format_.mBytesPerFrame);
+		copyFromBuffers(readPosition, framesToRead, destination, 0);
 
 	readPosition_.store((readPosition + framesToRead) & capacityMask_, std::memory_order_release);
 
@@ -297,15 +276,28 @@ uint32_t CXXCoreAudio::CAAudioRingBuffer::Write(const AudioBufferList * const so
 	if(framesAvailable == 0 || (framesAvailable < count && !allowPartial))
 		return 0;
 
+	/// Copies non-interleaved audio from an AudioBufferList to _buffers.
+	const auto copyToBuffers = [&](const AudioBufferList * const _Nonnull source, uint32_t readOffset, uint32_t frameLength, uint32_t writeOffset) noexcept {
+		const auto readOffsetBytes = readOffset * format_.mBytesPerFrame;
+		const auto byteCount = frameLength * format_.mBytesPerFrame;
+		const auto writeOffsetBytes = writeOffset * format_.mBytesPerFrame;
+		for(UInt32 i = 0; i < source->mNumberBuffers; ++i) {
+			assert(readOffsetBytes <= source->mBuffers[i].mDataByteSize);
+			const auto dst = reinterpret_cast<uintptr_t>(buffers_[i]) + writeOffsetBytes;
+			const auto src = reinterpret_cast<uintptr_t>(source->mBuffers[i].mData) + readOffsetBytes;
+			const auto n = std::min(byteCount, source->mBuffers[i].mDataByteSize - readOffsetBytes);
+			std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
+		}
+	};
+
 	const auto framesToWrite = std::min(framesAvailable, count);
 	if(writePosition + framesToWrite > capacity_) {
-		auto framesAfterWritePosition = capacity_ - writePosition;
-		auto bytesAfterWritePosition = framesAfterWritePosition * format_.mBytesPerFrame;
-		CopyToBuffersFromABL(buffers_, writePosition * format_.mBytesPerFrame, source, 0, bytesAfterWritePosition);
-		CopyToBuffersFromABL(buffers_, 0, source, bytesAfterWritePosition, (framesToWrite - framesAfterWritePosition) * format_.mBytesPerFrame);
+		const auto framesAfterWritePosition = capacity_ - writePosition;
+		copyToBuffers(source, 0, framesAfterWritePosition, writePosition);
+		copyToBuffers(source, framesAfterWritePosition, (framesToWrite - framesAfterWritePosition), 0);
 	}
 	else
-		CopyToBuffersFromABL(buffers_, writePosition * format_.mBytesPerFrame, source, 0, framesToWrite * format_.mBytesPerFrame);
+		copyToBuffers(source, 0, framesToWrite, writePosition);
 
 	writePosition_.store((writePosition + framesToWrite) & capacityMask_, std::memory_order_release);
 
