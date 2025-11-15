@@ -34,4 +34,11 @@ import Testing
 		#expect(empty.FrameLength() == 0)
 		#expect(empty.FrameCapacity() == 0)
 	}
+
+	@Test func ringBuffer() async {
+		let empty = CXXCoreAudio.CAAudioRingBuffer()
+		#expect(empty.AvailableReadCount() == 0)
+		#expect(empty.AvailableWriteCount() == 0)
+		#expect(empty.Capacity() == 0)
+	}
 }
