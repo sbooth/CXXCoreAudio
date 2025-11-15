@@ -57,7 +57,7 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept
 		return 1;
 	const auto n = std::numeric_limits<uint32_t>::digits - __builtin_clz(x - 1);
 	assert(n != std::numeric_limits<uint32_t>::digits);
-	return static_cast<uint32_t>(1 << (32 - n));
+	return uint32_t{1} << n;
 }
 
 } /* namespace */
