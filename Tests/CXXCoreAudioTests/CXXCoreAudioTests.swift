@@ -40,5 +40,11 @@ import Testing
 		#expect(empty.AvailableReadCount() == 0)
 		#expect(empty.AvailableWriteCount() == 0)
 		#expect(empty.Capacity() == 0)
+
+		var rb = CXXCoreAudio.CAAudioRingBuffer()
+		let std2ch = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
+		#expect(rb.Allocate(std2ch, 512) == true)
+		#expect(rb.AvailableReadCount() == 0)
+		#expect(rb.AvailableWriteCount() == rb.Capacity())
 	}
 }
