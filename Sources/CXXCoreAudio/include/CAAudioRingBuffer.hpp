@@ -17,40 +17,40 @@ namespace CXXCoreAudio {
 /// A lock-free SPSC audio ring buffer supporting non-interleaved audio.
 ///
 /// This class is thread safe when used from one reader thread and one writer thread.
-class AudioRingBuffer final {
+class CAAudioRingBuffer final {
 public:
 
 	// MARK: Creation and Destruction
 
 	/// Creates an empty ring buffer.
 	/// @note ``Allocate`` must be called before the object may be used.
-	AudioRingBuffer() noexcept = default;
+	CAAudioRingBuffer() noexcept = default;
 
 	/// Creates a ring buffer with the specified buffer size.
 	/// @note Buffer sizes from 2 to 2,147,483,648 (0x80000000) bytes are supported.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
 	/// @param size The desired buffer size, in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
-	explicit AudioRingBuffer(const CAStreamDescription& format, uint32_t size);
+	explicit CAAudioRingBuffer(const CAStreamDescription& format, uint32_t size);
 
 	// This class is non-copyable
-	AudioRingBuffer(const AudioRingBuffer&) = delete;
+	CAAudioRingBuffer(const CAAudioRingBuffer&) = delete;
 
 	/// Creates a ring buffer by moving the contents of another ring buffer.
 	/// @note This method is not thread safe for the ring buffer being moved.
 	/// @param other The ring buffer to move.
-	AudioRingBuffer(AudioRingBuffer&& other) noexcept;
+	CAAudioRingBuffer(CAAudioRingBuffer&& other) noexcept;
 
 	// This class is non-assignable
-	AudioRingBuffer& operator=(const AudioRingBuffer&) = delete;
+	CAAudioRingBuffer& operator=(const CAAudioRingBuffer&) = delete;
 
 	/// Moves the contents of another ring buffer into this ring buffer.
 	/// @note This method is not thread safe.
 	/// @param other The ring buffer to move.
-	AudioRingBuffer& operator=(AudioRingBuffer&& other) noexcept;
+	CAAudioRingBuffer& operator=(CAAudioRingBuffer&& other) noexcept;
 
 	/// Destroys the ring buffer and releases all associated resources.
-	~AudioRingBuffer() noexcept;
+	~CAAudioRingBuffer() noexcept;
 
 	// MARK: Buffer Management
 
