@@ -5,6 +5,7 @@ Assorted C++ classes simplifying common operations in Core Audio.
 | Class | Description |
 | --- | --- |
 | [CAAudioBuffer](Sources/CXXCoreAudio/include/CAAudioBuffer.hpp) | An `AudioBufferList` with a specific format, frame capacity, and frame length. |
+| [CAAudioRingBuffer](Sources/CXXCoreAudio/include/CAAudioRingBuffer.hpp) | A lock-free SPSC audio ring buffer supporting non-interleaved audio. |
 | [CAChannelLayout](Sources/CXXCoreAudio/include/CAChannelLayout.hpp) | Simplifies use of the variable-length `AudioChannelLayout`. |
 | [CAStreamDescription](Sources/CXXCoreAudio/include/CAStreamDescription.hpp) | Extends the functionality of an `AudioStreamBasicDescription`. |
 | [CATimeStamp](Sources/CXXCoreAudio/include/CATimeStamp.hpp) | Extends the functionality of an `AudioTimeStamp`. |
