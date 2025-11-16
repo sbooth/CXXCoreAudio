@@ -5,5 +5,6 @@ module CXXCoreAudio {
 	header "CAChannelLayout.hpp"
 	header "CAStreamDescription.hpp"
 	header "CATimeStamp.hpp"
+	header "CAValueRange.hpp"
 	export *
 }

@@ -9,6 +9,13 @@ import Testing
 		#expect(!ts.HostTimeIsValid())
 	}
 
+	@Test func valueRange() async {
+		let vr = CXXCoreAudio.CAValueRange()
+		#expect(vr.IsValid())
+		#expect(vr.Contains(0))
+		#expect(!vr.Contains(1))
+	}
+
 	@Test func streamDescription() async {
 		let fmt = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
 		#expect(fmt.IsPCM() == true)
