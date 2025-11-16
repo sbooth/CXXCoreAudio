@@ -33,7 +33,7 @@ enum class CACommonPCMFormat {
 
 // MARK: AudioStreamBasicDescription Helper Functions
 
-/// Returns the common PCM format described by a stream description or std::nullopt if none.
+/// Returns the common PCM format described by an AudioStreamBasicDescription structure or std::nullopt if none.
 std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept;
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
