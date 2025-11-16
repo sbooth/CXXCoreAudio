@@ -9,6 +9,7 @@
 #import <limits>
 #import <new>
 #import <stdexcept>
+#import <utility>
 
 #import "CAAudioRingBuffer.hpp"
 
@@ -41,46 +42,20 @@ CXXCoreAudio::CAAudioRingBuffer::CAAudioRingBuffer(const CAStreamDescription& fo
 }
 
 CXXCoreAudio::CAAudioRingBuffer::CAAudioRingBuffer(CAAudioRingBuffer&& other) noexcept
-: buffers_{other.buffers_}, capacity_{other.capacity_}, capacityMask_{other.capacityMask_}, writePosition_{other.writePosition_.load(std::memory_order_acquire)}, readPosition_{other.readPosition_.load(std::memory_order_acquire)}, format_{other.format_}
-{
-	other.buffers_ = nullptr;
-
-	other.capacity_ = 0;
-	other.capacityMask_ = 0;
-
-	other.writePosition_ = 0;
-	other.readPosition_ = 0;
-
-	other.format_.Reset();
-}
+: buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)}, capacityMask_{std::exchange(other.capacityMask_, 0)}, writePosition_{std::atomic_exchange(&other.writePosition_, 0)}, readPosition_{std::atomic_exchange(&other.readPosition_, 0)}, format_{std::exchange(other.format_, {})}
+{}
 
 CXXCoreAudio::CAAudioRingBuffer& CXXCoreAudio::CAAudioRingBuffer::operator=(CAAudioRingBuffer&& other) noexcept
 {
-	if(this == &other)
-		return *this;
-
-	std::free(buffers_);
-
-	buffers_ = other.buffers_;
-
-	capacity_ = other.capacity_;
-	capacityMask_ = other.capacityMask_;
-
-	writePosition_.store(other.writePosition_.load(std::memory_order_acquire), std::memory_order_release);
-	readPosition_.store(other.readPosition_.load(std::memory_order_acquire), std::memory_order_release);
-
-	format_ = other.format_;
-
-	other.buffers_ = nullptr;
-
-	other.capacity_ = 0;
-	other.capacityMask_ = 0;
-
-	other.writePosition_ = 0;
-	other.readPosition_ = 0;
-
-	other.format_.Reset();
-
+	if(this != &other) {
+		std::free(buffers_);
+		buffers_ = std::exchange(other.buffers_, nullptr);
+		capacity_ = std::exchange(other.capacity_, 0);
+		capacityMask_ = std::exchange(other.capacityMask_, 0);
+		writePosition_ = std::atomic_exchange(&other.writePosition_, 0);
+		readPosition_ = std::atomic_exchange(&other.readPosition_, 0);
+		format_ = std::exchange(other.format_, {});
+	}
 	return *this;
 }
 
