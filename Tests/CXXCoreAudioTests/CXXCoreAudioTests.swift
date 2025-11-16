@@ -43,12 +43,12 @@ import Testing
 	}
 
 	@Test func ringBuffer() async {
-		let empty = CXXCoreAudio.CAAudioRingBuffer()
+		let empty = CXXCoreAudio.AudioRingBuffer()
 		#expect(empty.AvailableReadCount() == 0)
 		#expect(empty.AvailableWriteCount() == 0)
 		#expect(empty.Capacity() == 0)
 
-		var rb = CXXCoreAudio.CAAudioRingBuffer()
+		var rb = CXXCoreAudio.AudioRingBuffer()
 		let std2ch = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
 		#expect(rb.Allocate(std2ch, 512) == true)
 		#expect(rb.AvailableReadCount() == 0)

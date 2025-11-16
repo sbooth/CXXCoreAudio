@@ -11,7 +11,7 @@
 #import <stdexcept>
 #import <utility>
 
-#import "CAAudioRingBuffer.hpp"
+#import "AudioRingBuffer.hpp"
 
 namespace {
 
@@ -31,7 +31,7 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept
 
 // MARK: Creation and Destruction
 
-CXXCoreAudio::CAAudioRingBuffer::CAAudioRingBuffer(const CAStreamDescription& format, uint32_t size)
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const CAStreamDescription& format, uint32_t size)
 {
 	if(format.IsInterleaved() || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
 		throw std::invalid_argument("unsupported audio format");
@@ -41,11 +41,11 @@ CXXCoreAudio::CAAudioRingBuffer::CAAudioRingBuffer(const CAStreamDescription& fo
 		throw std::bad_alloc();
 }
 
-CXXCoreAudio::CAAudioRingBuffer::CAAudioRingBuffer(CAAudioRingBuffer&& other) noexcept
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
 : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)}, capacityMask_{std::exchange(other.capacityMask_, 0)}, writePosition_{std::atomic_exchange(&other.writePosition_, 0)}, readPosition_{std::atomic_exchange(&other.readPosition_, 0)}, format_{std::exchange(other.format_, {})}
 {}
 
-CXXCoreAudio::CAAudioRingBuffer& CXXCoreAudio::CAAudioRingBuffer::operator=(CAAudioRingBuffer&& other) noexcept
+CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer&& other) noexcept
 {
 	if(this != &other) {
 		std::free(buffers_);
@@ -59,14 +59,14 @@ CXXCoreAudio::CAAudioRingBuffer& CXXCoreAudio::CAAudioRingBuffer::operator=(CAAu
 	return *this;
 }
 
-CXXCoreAudio::CAAudioRingBuffer::~CAAudioRingBuffer() noexcept
+CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept
 {
 	std::free(buffers_);
 }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::CAAudioRingBuffer::Allocate(const CAStreamDescription& format, uint32_t size) noexcept
+bool CXXCoreAudio::AudioRingBuffer::Allocate(const CAStreamDescription& format, uint32_t size) noexcept
 {
 	if(format.IsInterleaved() || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
 		return false;
@@ -119,7 +119,7 @@ bool CXXCoreAudio::CAAudioRingBuffer::Allocate(const CAStreamDescription& format
 	return true;
 }
 
-void CXXCoreAudio::CAAudioRingBuffer::Deallocate() noexcept
+void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 {
 	if(buffers_) {
 		std::free(buffers_);
@@ -135,7 +135,7 @@ void CXXCoreAudio::CAAudioRingBuffer::Deallocate() noexcept
 	}
 }
 
-void CXXCoreAudio::CAAudioRingBuffer::Reset() noexcept
+void CXXCoreAudio::AudioRingBuffer::Reset() noexcept
 {
 	readPosition_ = 0;
 	writePosition_ = 0;
@@ -143,14 +143,14 @@ void CXXCoreAudio::CAAudioRingBuffer::Reset() noexcept
 
 // MARK: Buffer Information
 
-uint32_t CXXCoreAudio::CAAudioRingBuffer::Capacity() const noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::Capacity() const noexcept
 {
 	if(capacity_ == 0)
 		return 0;
 	return capacity_ - 1;
 }
 
-uint32_t CXXCoreAudio::CAAudioRingBuffer::AvailableReadCount() const noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::AvailableReadCount() const noexcept
 {
 	if(capacity_ == 0)
 		return 0;
@@ -164,7 +164,7 @@ uint32_t CXXCoreAudio::CAAudioRingBuffer::AvailableReadCount() const noexcept
 		return (writePosition - readPosition + capacity_) & capacityMask_;
 }
 
-uint32_t CXXCoreAudio::CAAudioRingBuffer::AvailableWriteCount() const noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::AvailableWriteCount() const noexcept
 {
 	if(capacity_ == 0)
 		return 0;
@@ -182,7 +182,7 @@ uint32_t CXXCoreAudio::CAAudioRingBuffer::AvailableWriteCount() const noexcept
 
 // MARK: Reading and Writing Audio
 
-uint32_t CXXCoreAudio::CAAudioRingBuffer::Read(AudioBufferList * const destination, uint32_t count, bool allowPartial) noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const destination, uint32_t count, bool allowPartial) noexcept
 {
 	if(!destination || count == 0 || capacity_ == 0)
 		return 0;
@@ -232,7 +232,7 @@ uint32_t CXXCoreAudio::CAAudioRingBuffer::Read(AudioBufferList * const destinati
 	return framesToRead;
 }
 
-uint32_t CXXCoreAudio::CAAudioRingBuffer::Write(const AudioBufferList * const source, uint32_t count, bool allowPartial) noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const source, uint32_t count, bool allowPartial) noexcept
 {
 	if(!source || count == 0 || capacity_ == 0)
 		return 0;
