@@ -301,10 +301,10 @@ public:
 
 	/// Adopts an existing AudioBufferList.
 	/// @note The object assumes responsibility for deallocating the passed AudioBufferList using std::free.
-	/// @param bufferList The AudioBufferList to adopt
-	/// @param format The format of bufferList
-	/// @param frameCapacity The frame capacity of bufferList
-	/// @param frameLength The number of valid audio frames in bufferList
+	/// @param bufferList The AudioBufferList to adopt.
+	/// @param format The format of bufferList.
+	/// @param frameCapacity The frame capacity of bufferList.
+	/// @param frameLength The number of valid audio frames in bufferList.
 	/// @return true on success, false otherwise.
 	bool AdoptABL(AudioBufferList * _Nonnull bufferList, const AudioStreamBasicDescription& format, UInt32 frameCapacity, UInt32 frameLength) noexcept;
 
@@ -315,11 +315,11 @@ public:
 private:
 	/// The underlying AudioBufferList struct.
 	AudioBufferList * _Nullable bufferList_{nullptr};
-	/// The format of bufferList_
+	/// The format of ``bufferList_``.
 	CAStreamDescription format_{};
-	/// The capacity of bufferList_ in frames
+	/// The capacity of ``bufferList_`` in frames.
 	UInt32 frameCapacity_{0};
-	/// The number of valid frames in bufferList_
+	/// The number of valid frames in ``bufferList_``.
 	UInt32 frameLength_{0};
 
 };

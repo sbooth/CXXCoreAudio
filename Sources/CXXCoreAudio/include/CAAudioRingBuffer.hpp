@@ -124,14 +124,14 @@ private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
 
-	/// The per-channel capacity of buffer_ in audio frames.
+	/// The per-channel capacity of ``buffers_`` in audio frames.
 	uint32_t capacity_{0};
-	/// The per-channel capacity of buffer_ in audio frames minus one.
+	/// The per-channel capacity of ``buffers_`` in audio frames minus one.
 	uint32_t capacityMask_{0};
 
-	/// The offset into buffer_ of the write location.
+	/// The offset into ``buffers_`` of the write location.
 	std::atomic_uint32_t writePosition_{0};
-	/// The offset into buffer_ of the read location.
+	/// The offset into ``buffers_`` of the read location.
 	std::atomic_uint32_t readPosition_{0};
 
 	static_assert(std::atomic_uint32_t::is_always_lock_free, "Lock-free std::atomic_uint32_t required");
