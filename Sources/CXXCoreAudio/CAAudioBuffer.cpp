@@ -44,30 +44,18 @@ AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const CAStreamDescriptio
 }
 
 CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(CAAudioBuffer&& other) noexcept
-: bufferList_{other.bufferList_}, format_{other.format_}, frameCapacity_{other.frameCapacity_}, frameLength_{other.frameLength_}
-{
-	other.bufferList_ = nullptr;
-	other.format_.Reset();
-	other.frameCapacity_ = 0;
-	other.frameLength_ = 0;
-}
+: bufferList_{std::exchange(other.bufferList_, nullptr)}, format_{std::exchange(other.format_, {})}, frameCapacity_{std::exchange(other.frameCapacity_, 0)}, frameLength_{std::exchange(other.frameLength_, 0)}
+{}
 
 CXXCoreAudio::CAAudioBuffer& CXXCoreAudio::CAAudioBuffer::operator=(CAAudioBuffer&& other) noexcept
 {
-	if(this == &other)
-		return *this;
-
-	std::free(bufferList_);
-	bufferList_ = other.bufferList_;
-	format_ = other.format_;
-	frameCapacity_ = other.frameCapacity_;
-	frameLength_ = other.frameLength_;
-
-	other.bufferList_ = nullptr;
-	other.format_.Reset();
-	other.frameCapacity_ = 0;
-	other.frameLength_ = 0;
-
+	if(this != &other) {
+		std::free(bufferList_);
+		bufferList_ = std::exchange(other.bufferList_, nullptr);
+		format_ = std::exchange(other.format_, {});
+		frameCapacity_ = std::exchange(other.frameCapacity_, 0);
+		frameLength_ = std::exchange(other.frameLength_, 0);
+	}
 	return *this;
 }
 
