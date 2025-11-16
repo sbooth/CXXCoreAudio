@@ -9,8 +9,8 @@ import Testing
 		#expect(!ts.HostTimeIsValid())
 	}
 
-	@Test func audioValueRange() async {
-		let vr = CXXCoreAudio.CAAudioValueRange()
+	@Test func valueRange() async {
+		let vr = CXXCoreAudio.CAValueRange()
 		#expect(vr.IsValid())
 		#expect(vr.Contains(0))
 		#expect(!vr.Contains(1))
