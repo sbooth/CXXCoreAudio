@@ -40,9 +40,9 @@ std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicD
 /// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
 
-/// Returns a string representation of the stream description described by an AudioStreamBasicDescription structure.
+/// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
-CFStringRef _Nullable CopyAudioStreamBasicDescriptionDescription(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
+CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
@@ -51,10 +51,10 @@ inline NSString * _Nullable AudioStreamBasicDescriptionFormatName(const AudioStr
 	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatName(streamDescription);
 }
 
-/// Returns a string representation of the stream description described by an AudioStreamBasicDescription structure.
-inline NSString * _Nullable AudioStreamBasicDescriptionDescription(const AudioStreamBasicDescription& streamDescription) noexcept
+/// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
+inline NSString * _Nullable AudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
 {
-	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionDescription(streamDescription);
+	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatDescription(streamDescription);
 }
 #endif /* __OBJC__ */
 
@@ -312,7 +312,7 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// @note The caller is responsible for releasing the returned string.
 	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED
 	{
-		return CopyAudioStreamBasicDescriptionDescription(*this);
+		return CopyAudioStreamBasicDescriptionFormatDescription(*this);
 	}
 
 #ifdef __OBJC__

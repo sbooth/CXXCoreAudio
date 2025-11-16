@@ -121,7 +121,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioS
 	return name;
 }
 
-CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionDescription(const AudioStreamBasicDescription& streamDescription) noexcept
+CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
 {
 	CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
 
