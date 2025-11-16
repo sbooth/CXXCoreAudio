@@ -19,10 +19,13 @@ let package = Package(
 		// Targets can depend on other targets in this package and products from dependencies.
 		.target(
 			name: "CXXCoreAudio",
+			cSettings: [
+				.headerSearchPath("include/CXXCoreAudio"),
+			],
 			linkerSettings: [
 				.linkedFramework("CoreAudio"),
 				.linkedFramework("AudioToolbox"),
-			]
+			],
 		),
 		.testTarget(
 			name: "CXXCoreAudioTests",
