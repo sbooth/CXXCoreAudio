@@ -19,27 +19,54 @@
 
 namespace CXXCoreAudio {
 
+/// Common PCM audio formats.
+enum class CACommonPCMFormat {
+	/// Native-endian float.
+	float32,
+	/// Native-endian double.
+	float64,
+	/// Native-endian int16_t.
+	int16,
+	/// Native-endian int32_t.
+	int32,
+};
+
+// MARK: AudioStreamBasicDescription Helper Functions
+
+/// Returns the common PCM format described by an AudioStreamBasicDescription structure or std::nullopt if none.
+std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept;
+
+/// Returns the name of the format described by an AudioStreamBasicDescription structure.
+/// @note The caller is responsible for releasing the returned string.
+CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
+
+/// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
+/// @note The caller is responsible for releasing the returned string.
+CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
+
+#ifdef __OBJC__
+/// Returns the name of the format described by an AudioStreamBasicDescription structure.
+inline NSString * _Nullable AudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept
+{
+	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatName(streamDescription);
+}
+
+/// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
+inline NSString * _Nullable AudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
+{
+	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatDescription(streamDescription);
+}
+#endif /* __OBJC__ */
+
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
 struct CAStreamDescription final : public AudioStreamBasicDescription {
-	/// Common PCM audio formats.
-	enum class CommonPCMFormat {
-		/// Native-endian float.
-		float32,
-		/// Native-endian double.
-		float64,
-		/// Native-endian int16_t.
-		int16,
-		/// Native-endian int32_t.
-		int32,
-	};
-
 	// MARK: Creation and Destruction
 
 	/// Creates an empty stream description.
 	CAStreamDescription() noexcept = default;
 
 	/// Creates a stream description for the specified common PCM format.
-	CAStreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame, bool isInterleaved) noexcept;
+	CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame, bool isInterleaved) noexcept;
 
 	/// Creates a copy of an existing stream description.
 	CAStreamDescription(const CAStreamDescription& other) noexcept = default;
@@ -82,7 +109,10 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	// MARK: Format Information
 
 	/// Returns the common PCM format described by this stream description or std::nullopt if none.
-	std::optional<CommonPCMFormat> CommonFormat() const noexcept;
+	std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat() const noexcept
+	{
+		return CXXCoreAudio::IdentifyCommonPCMFormat(*this);
+	}
 
 	/// Returns true if the kAudioFormatFlagIsNonInterleaved flag is set.
 	bool IsNonInterleaved() const noexcept
@@ -217,7 +247,7 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// Returns the sample word size in bytes.
 	UInt32 SampleWordSize() const noexcept
 	{
-		auto interleavedChannelCount = InterleavedChannelCount();
+		const auto interleavedChannelCount = InterleavedChannelCount();
 		if(interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0)
 			return 0;
 		return mBytesPerFrame / interleavedChannelCount;
@@ -273,11 +303,17 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
 	/// @note The caller is responsible for releasing the returned string
-	CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED;
+	CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioStreamBasicDescriptionFormatName(*this);
+	}
 
 	/// Returns a string representation of this format.
 	/// @note The caller is responsible for releasing the returned string.
-	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED;
+	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioStreamBasicDescriptionFormatDescription(*this);
+	}
 
 #ifdef __OBJC__
 	/// Returns an AVAudioFormat object initialized with this format and no channel layout.
