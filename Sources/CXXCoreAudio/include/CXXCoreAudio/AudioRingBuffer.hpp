@@ -10,7 +10,7 @@
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
-#import "CAStreamDescription.hpp"
+#import <CXXCoreAudio/CAStreamDescription.hpp>
 
 namespace CXXCoreAudio {
 
