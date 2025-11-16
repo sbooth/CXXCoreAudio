@@ -81,7 +81,7 @@ inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& 
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-/// - note: The caller is responsible for releasing the returned string.
+/// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable CopyAudioChannelLayoutName(const AudioChannelLayout * _Nullable channelLayout, bool simpleName = false) noexcept CF_RETURNS_RETAINED;
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
