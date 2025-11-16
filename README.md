@@ -9,6 +9,7 @@ Assorted C++ classes simplifying common operations in Core Audio.
 | [CAChannelLayout](Sources/CXXCoreAudio/include/CAChannelLayout.hpp) | Simplifies use of the variable-length `AudioChannelLayout`. |
 | [CAStreamDescription](Sources/CXXCoreAudio/include/CAStreamDescription.hpp) | Extends the functionality of an `AudioStreamBasicDescription`. |
 | [CATimeStamp](Sources/CXXCoreAudio/include/CATimeStamp.hpp) | Extends the functionality of an `AudioTimeStamp`. |
+| [CAValueRange](Sources/CXXCoreAudio/include/CAValueRange.hpp) | Extends the functionality of an `AudioValueRange`. |
 
 > [!NOTE]
 > C++17 is required.
