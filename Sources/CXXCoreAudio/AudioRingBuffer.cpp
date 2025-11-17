@@ -152,37 +152,54 @@ uint32_t CXXCoreAudio::AudioRingBuffer::Capacity() const noexcept
 	return capacity_ - 1;
 }
 
-uint32_t CXXCoreAudio::AudioRingBuffer::AvailableReadCount() const noexcept
+// MARK: Writing and Reading Audio
+
+uint32_t CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const source, uint32_t count, bool allowPartial) noexcept
 {
-	if(capacity_ == 0)
+	if(!source || count == 0 || capacity_ == 0)
 		return 0;
 
 	const auto writePosition = writePosition_.load(std::memory_order_acquire);
 	const auto readPosition = readPosition_.load(std::memory_order_acquire);
 
+	uint32_t framesAvailable;
 	if(writePosition > readPosition)
-		return writePosition - readPosition;
-	else
-		return (writePosition - readPosition + capacity_) & capacityMask_;
-}
-
-uint32_t CXXCoreAudio::AudioRingBuffer::AvailableWriteCount() const noexcept
-{
-	if(capacity_ == 0)
-		return 0;
-
-	const auto writePosition = writePosition_.load(std::memory_order_acquire);
-	const auto readPosition = readPosition_.load(std::memory_order_acquire);
-
-	if(writePosition > readPosition)
-		return ((readPosition - writePosition + capacity_) & capacityMask_) - 1;
+		framesAvailable = ((readPosition - writePosition + capacity_) & capacityMask_) - 1;
 	else if(writePosition < readPosition)
-		return (readPosition - writePosition) - 1;
+		framesAvailable = (readPosition - writePosition) - 1;
 	else
-		return capacity_ - 1;
-}
+		framesAvailable = capacity_ - 1;
 
-// MARK: Reading and Writing Audio
+	if(framesAvailable == 0 || (framesAvailable < count && !allowPartial))
+		return 0;
+
+	/// Copies non-interleaved audio from an AudioBufferList to _buffers.
+	const auto copyToBuffers = [&](const AudioBufferList * const _Nonnull source, uint32_t readOffset, uint32_t frameLength, uint32_t writeOffset) noexcept {
+		const auto readOffsetBytes = readOffset * format_.mBytesPerFrame;
+		const auto byteCount = frameLength * format_.mBytesPerFrame;
+		const auto writeOffsetBytes = writeOffset * format_.mBytesPerFrame;
+		for(UInt32 i = 0; i < source->mNumberBuffers; ++i) {
+			assert(readOffsetBytes <= source->mBuffers[i].mDataByteSize);
+			const auto dst = reinterpret_cast<uintptr_t>(buffers_[i]) + writeOffsetBytes;
+			const auto src = reinterpret_cast<uintptr_t>(source->mBuffers[i].mData) + readOffsetBytes;
+			const auto n = std::min(byteCount, source->mBuffers[i].mDataByteSize - readOffsetBytes);
+			std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
+		}
+	};
+
+	const auto framesToWrite = std::min(framesAvailable, count);
+	if(writePosition + framesToWrite > capacity_) {
+		const auto framesAfterWritePosition = capacity_ - writePosition;
+		copyToBuffers(source, 0, framesAfterWritePosition, writePosition);
+		copyToBuffers(source, framesAfterWritePosition, (framesToWrite - framesAfterWritePosition), 0);
+	}
+	else
+		copyToBuffers(source, 0, framesToWrite, writePosition);
+
+	writePosition_.store((writePosition + framesToWrite) & capacityMask_, std::memory_order_release);
+
+	return framesToWrite;
+}
 
 uint32_t CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const destination, uint32_t count, bool allowPartial) noexcept
 {
@@ -232,51 +249,4 @@ uint32_t CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const destination
 		destination->mBuffers[bufferIndex].mDataByteSize = byteSize;
 
 	return framesToRead;
-}
-
-uint32_t CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const source, uint32_t count, bool allowPartial) noexcept
-{
-	if(!source || count == 0 || capacity_ == 0)
-		return 0;
-
-	const auto writePosition = writePosition_.load(std::memory_order_acquire);
-	const auto readPosition = readPosition_.load(std::memory_order_acquire);
-
-	uint32_t framesAvailable;
-	if(writePosition > readPosition)
-		framesAvailable = ((readPosition - writePosition + capacity_) & capacityMask_) - 1;
-	else if(writePosition < readPosition)
-		framesAvailable = (readPosition - writePosition) - 1;
-	else
-		framesAvailable = capacity_ - 1;
-
-	if(framesAvailable == 0 || (framesAvailable < count && !allowPartial))
-		return 0;
-
-	/// Copies non-interleaved audio from an AudioBufferList to _buffers.
-	const auto copyToBuffers = [&](const AudioBufferList * const _Nonnull source, uint32_t readOffset, uint32_t frameLength, uint32_t writeOffset) noexcept {
-		const auto readOffsetBytes = readOffset * format_.mBytesPerFrame;
-		const auto byteCount = frameLength * format_.mBytesPerFrame;
-		const auto writeOffsetBytes = writeOffset * format_.mBytesPerFrame;
-		for(UInt32 i = 0; i < source->mNumberBuffers; ++i) {
-			assert(readOffsetBytes <= source->mBuffers[i].mDataByteSize);
-			const auto dst = reinterpret_cast<uintptr_t>(buffers_[i]) + writeOffsetBytes;
-			const auto src = reinterpret_cast<uintptr_t>(source->mBuffers[i].mData) + readOffsetBytes;
-			const auto n = std::min(byteCount, source->mBuffers[i].mDataByteSize - readOffsetBytes);
-			std::memcpy(reinterpret_cast<void *>(dst), reinterpret_cast<const void *>(src), n);
-		}
-	};
-
-	const auto framesToWrite = std::min(framesAvailable, count);
-	if(writePosition + framesToWrite > capacity_) {
-		const auto framesAfterWritePosition = capacity_ - writePosition;
-		copyToBuffers(source, 0, framesAfterWritePosition, writePosition);
-		copyToBuffers(source, framesAfterWritePosition, (framesToWrite - framesAfterWritePosition), 0);
-	}
-	else
-		copyToBuffers(source, 0, framesToWrite, writePosition);
-
-	writePosition_.store((writePosition + framesToWrite) & capacityMask_, std::memory_order_release);
-
-	return framesToWrite;
 }
