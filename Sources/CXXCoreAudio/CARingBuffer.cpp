@@ -190,6 +190,15 @@ bool CXXCoreAudio::CARingBuffer::GetTimeBounds(int64_t& startTime, int64_t& endT
 	return false;
 }
 
+bool CXXCoreAudio::CARingBuffer::GetUnusedSpace(uint32_t& unusedSpace) const noexcept
+{
+	int64_t start, end;
+	if(!GetTimeBounds(start, end))
+		return false;
+	unusedSpace = Capacity() - static_cast<uint32_t>(end - start);
+	return true;
+}
+
 // MARK: Writing and Reading Audio
 
 bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const source, uint32_t count, int64_t startWrite) noexcept

@@ -86,7 +86,7 @@ public:
 
 	// MARK: Buffer Information
 
-	/// Returns the usable capacity of the ring buffer in audio frames.
+	/// Returns the usable capacity of the ring buffer.
 	/// @return The usable ring buffer capacity in audio frames.
 	uint32_t Capacity() const noexcept;
 
@@ -95,6 +95,11 @@ public:
 	/// @param endTime The end sample time of audio contained in the buffer.
 	/// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
 	bool GetTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
+
+	/// Returns the unused portion of the ring buffer's capacity.
+	/// @param unusedSpace The unused portion of the ring buffer's capacity in audio frames.
+	/// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
+	bool GetUnusedSpace(uint32_t& unusedSpace) const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
