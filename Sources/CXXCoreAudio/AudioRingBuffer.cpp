@@ -4,8 +4,10 @@
 // MIT license
 //
 
+#import <algorithm>
 #import <cassert>
 #import <cstdlib>
+#import <cstring>
 #import <limits>
 #import <new>
 #import <stdexcept>
@@ -31,9 +33,9 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept
 
 // MARK: Creation and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const CAStreamDescription& format, uint32_t size)
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, uint32_t size)
 {
-	if(format.IsInterleaved() || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
+	if((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
 		throw std::invalid_argument("unsupported audio format");
 	if(size < 2 || size > 0x80000000)
 		throw std::invalid_argument("capacity out of range");
@@ -66,9 +68,9 @@ CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::Allocate(const CAStreamDescription& format, uint32_t size) noexcept
+bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept
 {
-	if(format.IsInterleaved() || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
+	if((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
 		return false;
 	if(size < 2 || size > 0x80000000)
 		return false;
