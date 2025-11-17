@@ -152,6 +152,36 @@ uint32_t CXXCoreAudio::AudioRingBuffer::Capacity() const noexcept
 	return capacity_ - 1;
 }
 
+uint32_t CXXCoreAudio::AudioRingBuffer::AvailableWriteCount() const noexcept
+{
+	if(capacity_ == 0)
+		return 0;
+
+	const auto writePosition = writePosition_.load(std::memory_order_acquire);
+	const auto readPosition = readPosition_.load(std::memory_order_acquire);
+
+	if(writePosition > readPosition)
+		return ((readPosition - writePosition + capacity_) & capacityMask_) - 1;
+	else if(writePosition < readPosition)
+		return (readPosition - writePosition) - 1;
+	else
+		return capacity_ - 1;
+}
+
+uint32_t CXXCoreAudio::AudioRingBuffer::AvailableReadCount() const noexcept
+{
+	if(capacity_ == 0)
+		return 0;
+
+	const auto writePosition = writePosition_.load(std::memory_order_acquire);
+	const auto readPosition = readPosition_.load(std::memory_order_acquire);
+
+	if(writePosition > readPosition)
+		return writePosition - readPosition;
+	else
+		return (writePosition - readPosition + capacity_) & capacityMask_;
+}
+
 // MARK: Writing and Reading Audio
 
 uint32_t CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const source, uint32_t count, bool allowPartial) noexcept
