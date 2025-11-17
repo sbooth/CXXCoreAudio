@@ -93,7 +93,7 @@ public:
 	/// Gets the time bounds of the audio contained in the ring buffer.
 	/// @param startTime The starting sample time of audio contained in the buffer.
 	/// @param endTime The end sample time of audio contained in the buffer.
-	/// @return true on success, false on error.
+	/// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
 	bool GetTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
@@ -102,7 +102,15 @@ public:
 		return format_;
 	}
 
-	// MARK: Reading and Writing Audio
+	// MARK: Writing and Reading Audio
+
+	/// Writes audio to the ring buffer.
+	/// @note Negative time stamps are not supported.
+	/// @param source An audio buffer list containing the data to copy.
+	/// @param count The desired number of audio frames to write.
+	/// @param time The sample time of the first frame to write.
+	/// @return true on success, false on error.
+	bool Write(const AudioBufferList * const _Nonnull source, uint32_t count, int64_t time) noexcept;
 
 	/// Reads audio from the ring buffer.
 	///
@@ -115,14 +123,6 @@ public:
 	/// @param time The sample time of the first frame to read.
 	/// @return true on success, false on error.
 	bool Read(AudioBufferList * const _Nonnull destination, uint32_t count, int64_t time) noexcept;
-
-	/// Writes audio to the ring buffer.
-	/// @note Negative time stamps are not supported.
-	/// @param source An audio buffer list containing the data to copy.
-	/// @param count The desired number of audio frames to write.
-	/// @param time The sample time of the first frame to write.
-	/// @return true on success, false on error.
-	bool Write(const AudioBufferList * const _Nonnull source, uint32_t count, int64_t time) noexcept;
 
 private:
 	/// Returns the byte offset of a frame number.
