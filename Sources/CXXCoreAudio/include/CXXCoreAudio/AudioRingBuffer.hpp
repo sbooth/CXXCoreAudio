@@ -90,13 +90,13 @@ public:
 	/// @return The usable ring buffer capacity in audio frames.
 	uint32_t Capacity() const noexcept;
 
-	/// Returns the number of frames of audio available for reading.
-	/// @return The number of audio frames available to read.
-	uint32_t AvailableReadCount() const noexcept;
-
 	/// Returns the number of audio frames of free space available for writing.
 	/// @return The number of audio frames available to write.
 	uint32_t AvailableWriteCount() const noexcept;
+
+	/// Returns the number of frames of audio available for reading.
+	/// @return The number of audio frames available to read.
+	uint32_t AvailableReadCount() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
@@ -104,14 +104,7 @@ public:
 		return format_;
 	}
 
-	// MARK: Reading and Writing Audio
-
-	/// Reads audio and advances the read position.
-	/// @param destination An audio buffer list to receive the data.
-	/// @param count The desired number of audio frames to read.
-	/// @param allowPartial Whether any audio frames should be read if the number of frames available for reading is less than count.
-	/// @return The number of audio frames actually read.
-	uint32_t Read(AudioBufferList * const _Nonnull destination, uint32_t count, bool allowPartial = true) noexcept;
+	// MARK: Writing and Reading Audio
 
 	/// Writes audio and advances the write position.
 	/// @param source An audio buffer list containing the data to copy.
@@ -119,6 +112,13 @@ public:
 	/// @param allowPartial Whether any audio frames should be written if the free space available for writing is less than count.
 	/// @return The number of audio frames actually written.
 	uint32_t Write(const AudioBufferList * const _Nonnull source, uint32_t count, bool allowPartial = true) noexcept;
+
+	/// Reads audio and advances the read position.
+	/// @param destination An audio buffer list to receive the data.
+	/// @param count The desired number of audio frames to read.
+	/// @param allowPartial Whether any audio frames should be read if the number of frames available for reading is less than count.
+	/// @return The number of audio frames actually read.
+	uint32_t Read(AudioBufferList * const _Nonnull destination, uint32_t count, bool allowPartial = true) noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
