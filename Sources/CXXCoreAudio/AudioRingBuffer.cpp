@@ -4,8 +4,10 @@
 // MIT license
 //
 
+#import <algorithm>
 #import <cassert>
 #import <cstdlib>
+#import <cstring>
 #import <limits>
 #import <new>
 #import <stdexcept>
