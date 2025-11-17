@@ -9,6 +9,9 @@
 #import <cstdlib>
 #import <cstring>
 #import <limits>
+#import <new>
+#import <stdexcept>
+#import <utility>
 
 #import "CARingBuffer.hpp"
 
