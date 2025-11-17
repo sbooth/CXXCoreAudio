@@ -54,4 +54,18 @@ import Testing
 		#expect(rb.AvailableReadCount() == 0)
 		#expect(rb.AvailableWriteCount() == rb.Capacity())
 	}
+
+	@Test func tsRingBuffer() async {
+		let empty = CXXCoreAudio.CARingBuffer()
+		#expect(empty.Capacity() == 0)
+		var start: Int64 = 0, end: Int64 = 0
+		#expect(empty.GetTimeBounds(&start, &end) == true)
+		#expect(start == 0)
+		#expect(end == 0)
+
+		var rb = CXXCoreAudio.CARingBuffer()
+		let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
+		#expect(rb.Allocate(std2ch, 512) == true)
+		#expect(rb.Capacity() == 511)
+	}
 }
