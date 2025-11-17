@@ -38,7 +38,7 @@ public:
 	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer capacity per channel, in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
-	explicit AudioRingBuffer(const AudioStreamBasicDescription& format, uint32_t size);
+	AudioRingBuffer(const AudioStreamBasicDescription& format, uint32_t size);
 
 	// This class is non-copyable
 	AudioRingBuffer(const AudioRingBuffer&) = delete;
