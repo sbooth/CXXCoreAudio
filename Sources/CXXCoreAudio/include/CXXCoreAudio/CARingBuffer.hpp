@@ -97,9 +97,8 @@ public:
 	bool GetTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
 
 	/// Returns the unused portion of the ring buffer's capacity.
-	/// @param unusedSpace The unused portion of the ring buffer's capacity in audio frames.
-	/// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
-	bool GetUnusedSpace(uint32_t& unusedSpace) const noexcept;
+	/// @return The unused portion of the ring buffer's capacity in audio frames or zero if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
+	uint32_t UnusedSpace() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept

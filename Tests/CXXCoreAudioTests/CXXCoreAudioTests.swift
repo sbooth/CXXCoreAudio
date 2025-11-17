@@ -58,6 +58,7 @@ import Testing
 	@Test func tsRingBuffer() async {
 		let empty = CXXCoreAudio.CARingBuffer()
 		#expect(empty.Capacity() == 0)
+		#expect(empty.UnusedSpace() == empty.Capacity())
 		var start: Int64 = 0, end: Int64 = 0
 		#expect(empty.GetTimeBounds(&start, &end) == true)
 		#expect(start == 0)
@@ -67,5 +68,6 @@ import Testing
 		let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
 		#expect(rb.Allocate(std2ch, 512) == true)
 		#expect(rb.Capacity() == 511)
+		#expect(empty.UnusedSpace() == empty.Capacity())
 	}
 }
