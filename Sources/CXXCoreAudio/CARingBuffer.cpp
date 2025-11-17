@@ -190,26 +190,6 @@ bool CXXCoreAudio::CARingBuffer::GetTimeBounds(int64_t& startTime, int64_t& endT
 	return false;
 }
 
-uint32_t CXXCoreAudio::CARingBuffer::AvailableReadCount() const noexcept
-{
-	if(capacity_ == 0)
-		return 0;
-	int64_t start, end;
-	if(!GetTimeBounds(start, end))
-		return 0;
-	return static_cast<uint32_t>(end - start);
-}
-
-uint32_t CXXCoreAudio::CARingBuffer::AvailableWriteCount() const noexcept
-{
-	if(capacity_ == 0)
-		return 0;
-	int64_t start, end;
-	if(!GetTimeBounds(start, end))
-		return 0;
-	return (capacity_ - 1) - static_cast<uint32_t>(end - start);
-}
-
 // MARK: Writing and Reading Audio
 
 bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const source, uint32_t count, int64_t startWrite) noexcept
