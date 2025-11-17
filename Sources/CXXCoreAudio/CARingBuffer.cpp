@@ -227,7 +227,7 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const source, uin
 		timeBoundsQueue_[nextIndex].endTime_ = endTime;
 		timeBoundsQueue_[nextIndex].updateCounter_.store(nextCounter, std::memory_order_release);
 
-		timeBoundsQueueCounter_.store(nextCounter, std::memory_order_release);
+		timeBoundsQueueCounter_.fetch_add(1, std::memory_order_release);
 	};
 
 	const auto endWrite = startWrite + static_cast<int64_t>(count);
