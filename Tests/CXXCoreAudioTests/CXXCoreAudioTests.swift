@@ -49,7 +49,7 @@ import Testing
 		#expect(empty.Capacity() == 0)
 
 		var rb = CXXCoreAudio.AudioRingBuffer()
-		let std2ch = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
+		let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeEndian|kAudioFormatFlagIsPacked|kAudioFormatFlagIsFloat|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 3, mBitsPerChannel: 32, mReserved: 0)
 		#expect(rb.Allocate(std2ch, 512) == true)
 		#expect(rb.AvailableReadCount() == 0)
 		#expect(rb.AvailableWriteCount() == rb.Capacity())
