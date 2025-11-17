@@ -156,6 +156,16 @@ void CXXCoreAudio::CARingBuffer::Deallocate() noexcept
 	}
 }
 
+void CXXCoreAudio::CARingBuffer::Reset() noexcept
+{
+	for(uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+		timeBoundsQueue_[i].startTime_ = 0;
+		timeBoundsQueue_[i].endTime_ = 0;
+		timeBoundsQueue_[i].updateCounter_ = 0;
+	}
+	timeBoundsQueueCounter_ = 0;
+}
+
 uint32_t CXXCoreAudio::CARingBuffer::Capacity() const noexcept
 {
 	if(capacity_ == 0)
