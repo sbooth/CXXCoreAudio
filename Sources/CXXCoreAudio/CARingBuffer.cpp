@@ -239,8 +239,6 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const destination, uint3
 	if(destEndSize > 0)
 		zeroABL(destination, destStartByteOffset + byteSize, destEndSize * format_.mBytesPerFrame);
 
-	const auto offset0 = FrameOffset(startRead);
-	const auto offset1 = FrameOffset(endRead);
 	const auto byteOffset0 = FrameByteOffset(startRead);
 	const auto byteOffset1 = FrameByteOffset(endRead);
 	uint32_t byteCount;
