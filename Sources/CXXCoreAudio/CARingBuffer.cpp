@@ -288,7 +288,7 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const source, uin
 	if(offset0 < offset1)
 		storeABL(offset0, source, 0, offset1 - offset0);
 	else {
-		auto byteCount = (capacity_ * format_.mBytesPerFrame) - offset0;
+		const auto byteCount = (capacity_ * format_.mBytesPerFrame) - offset0;
 		storeABL(offset0, source, 0, byteCount);
 		storeABL(0, source, byteCount, offset1);
 	}
@@ -347,7 +347,6 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const destination, uint3
 		return true;
 	}
 
-	const auto readSize = static_cast<uint32_t>(endRead - startRead);
 	const auto byteSize = static_cast<uint32_t>(endRead - startRead) * format_.mBytesPerFrame;
 
 	const auto destStartOffset = static_cast<uint32_t>(std::max(int64_t{0}, startRead - startRead0));
