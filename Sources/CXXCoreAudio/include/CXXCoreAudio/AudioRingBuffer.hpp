@@ -136,7 +136,7 @@ private:
 
 	static_assert(std::atomic_uint32_t::is_always_lock_free, "Lock-free std::atomic_uint32_t required");
 
-	/// The format of the audio this buffer contains.
+	/// The format of the audio this ring buffer contains.
 	CAStreamDescription format_{};
 };
 
