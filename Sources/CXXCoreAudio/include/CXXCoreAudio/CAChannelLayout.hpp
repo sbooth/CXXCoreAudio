@@ -303,7 +303,7 @@ public:
 	/// A channel layout is empty when the internal AudioChannelLayout is null.
 	explicit operator bool() const noexcept
 	{
-		return !IsEmpty();
+		return channelLayout_ != nullptr;
 	}
 
 	/// Returns a const pointer to this object's internal AudioChannelLayout.
