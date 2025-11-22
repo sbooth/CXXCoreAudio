@@ -163,7 +163,7 @@ constexpr const char * GetChannelLayoutTagName(AudioChannelLayoutTag layoutTag) 
 
 /// A std::unique_ptr deleter for CFTypeRef objects.
 struct cf_type_ref_deleter {
-	void operator()(CFTypeRef cf) { CFRelease(cf); }
+	void operator()(CFTypeRef cf CF_RELEASES_ARGUMENT) { CFRelease(cf); }
 };
 
 /// A std::unique_ptr holding a CFTypeRef object.
@@ -178,8 +178,8 @@ cf_string_unique_ptr CopyChannelLabelName(AudioChannelLabel channelLabel, bool s
 {
 	const auto property = shortName ? kAudioFormatProperty_ChannelShortName : kAudioFormatProperty_ChannelName;
 	CFStringRef channelName = nullptr;
-	UInt32 dataSize = sizeof(channelName);
-	OSStatus result = AudioFormatGetProperty(property, sizeof(channelLabel), &channelLabel, &dataSize, &channelName);
+	UInt32 dataSize = sizeof channelName;
+	OSStatus result = AudioFormatGetProperty(property, sizeof channelLabel, &channelLabel, &dataSize, &channelName);
 	if(result != noErr)
 		return nullptr;
 	return cf_string_unique_ptr{channelName};
@@ -266,8 +266,8 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
 
 	const AudioChannelLayout *layouts [] = { lhs, rhs, };
 	UInt32 layoutsEquivalent = 0;
-	UInt32 propertySize = sizeof(layoutsEquivalent);
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_AreChannelLayoutsEquivalent, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, &layoutsEquivalent);
+	UInt32 propertySize = sizeof layoutsEquivalent;
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_AreChannelLayoutsEquivalent, sizeof layouts, static_cast<const void *>(layouts), &propertySize, &layoutsEquivalent);
 	if(result != noErr)
 		return false;
 	return layoutsEquivalent;
@@ -278,7 +278,7 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutName(const AudioChannelLayout * 
 	if(!channelLayout)
 		return nullptr;
 	CFStringRef name = nullptr;
-	UInt32 dataSize = sizeof(name);
+	UInt32 dataSize = sizeof name;
 	OSStatus result = AudioFormatGetProperty(simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout)), channelLayout, &dataSize, &name);
 	if(result != noErr)
 		return nullptr;
@@ -356,7 +356,7 @@ CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::ChannelLayoutWithBi
 
 	// Attempt to convert the bitmap to a layout tag
 	AudioChannelLayoutTag tag;
-	UInt32 dataSize = sizeof(tag);
+	UInt32 dataSize = sizeof tag;
 	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_TagForChannelLayout, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout.channelLayout_)), channelLayout.channelLayout_, &dataSize, &tag);
 	if(result == noErr) {
 		channelLayout.channelLayout_->mChannelLayoutTag = tag;
@@ -417,7 +417,7 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> ch
 
 	// Attempt to convert the channel labels to a layout tag
 	AudioChannelLayoutTag tag;
-	UInt32 dataSize = sizeof(tag);
+	UInt32 dataSize = sizeof tag;
 	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_TagForChannelLayout, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout_)), channelLayout_, &dataSize, &tag);
 	if(result == noErr) {
 		const auto channelLayout = AllocateAudioChannelLayout(0);
@@ -490,6 +490,6 @@ bool CXXCoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLay
 
 	channelMap.resize(outputChannelCount);
 	UInt32 propertySize = static_cast<UInt32>(sizeof(SInt32) * channelMap.size());
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof(layouts), static_cast<const void *>(layouts), &propertySize, channelMap.data());
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_ChannelMap, sizeof layouts, static_cast<const void *>(layouts), &propertySize, channelMap.data());
 	return result == noErr;
 }
