@@ -114,8 +114,8 @@ std::optional<CXXCoreAudio::CACommonPCMFormat> CXXCoreAudio::IdentifyCommonPCMFo
 CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept
 {
 	CFStringRef name = nullptr;
-	UInt32 dataSize = sizeof(name);
-	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof(streamDescription), &streamDescription, &dataSize, &name);
+	UInt32 dataSize = sizeof name;
+	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription, &streamDescription, &dataSize, &name);
 	if(result != noErr)
 		return nullptr;
 	return name;
