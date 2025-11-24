@@ -11,13 +11,14 @@
 
 #import "CAAudioBuffer.hpp"
 
-AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const CAStreamDescription& format, UInt32 frameCapacity) noexcept
+AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept
 {
 	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame))
 		return nullptr;
 
-	const auto bufferDataSize = format.FrameCountToByteSize(frameCapacity);
-	const auto bufferCount = format.ChannelStreamCount();
+	const auto bufferDataSize = frameCapacity * format.mBytesPerFrame;
+	const auto interleavedChannelCount = (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? format.mChannelsPerFrame : 1;
+	const auto bufferCount = interleavedChannelCount;
 	const auto bufferListSize = offsetof(AudioBufferList, mBuffers) + (sizeof(AudioBuffer) * bufferCount);
 	const auto allocationSize = bufferListSize + (bufferDataSize * bufferCount);
 
@@ -35,7 +36,7 @@ AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const CAStreamDescriptio
 	abl->mNumberBuffers = bufferCount;
 
 	for(UInt32 i = 0; i < bufferCount; ++i) {
-		abl->mBuffers[i].mNumberChannels = format.InterleavedChannelCount();
+		abl->mBuffers[i].mNumberChannels = interleavedChannelCount;
 		abl->mBuffers[i].mDataByteSize = bufferDataSize;
 		abl->mBuffers[i].mData = reinterpret_cast<void *>(address + bufferListSize + (bufferDataSize * i));
 	}
@@ -64,7 +65,7 @@ CXXCoreAudio::CAAudioBuffer::~CAAudioBuffer() noexcept
 	std::free(bufferList_);
 }
 
-CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const CAStreamDescription& format, UInt32 frameCapacity)
+CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const AudioStreamBasicDescription& format, UInt32 frameCapacity)
 : CAAudioBuffer{}
 {
 	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
@@ -77,7 +78,7 @@ CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const CAStreamDescription& format, UI
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::CAAudioBuffer::Allocate(const CAStreamDescription& format, UInt32 frameCapacity) noexcept
+bool CXXCoreAudio::CAAudioBuffer::Allocate(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept
 {
 	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity == 0)
 		return false;

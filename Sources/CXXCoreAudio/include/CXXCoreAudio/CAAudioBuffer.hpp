@@ -19,7 +19,7 @@ namespace CXXCoreAudio {
 /// @param format The format of the audio the buffer list will contain.
 /// @param frameCapacity The desired buffer capacity in audio frames.
 /// @return An AudioBufferList struct or null if an error occurred or memory could not be allocated.
-AudioBufferList * _Nullable AllocateAudioBufferList(const CAStreamDescription& format, UInt32 frameCapacity) noexcept;
+AudioBufferList * _Nullable AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
 /// A class containing an AudioBufferList with a specific format, frame capacity, and frame length.
 class CAAudioBuffer final {
@@ -49,7 +49,7 @@ public:
 	/// @param format The format of the audio the buffer list will contain.
 	/// @param frameCapacity The desired buffer capacity in audio frames.
 	/// @throw std::invalid_argument, std::bad_alloc
-	CAAudioBuffer(const CAStreamDescription& format, UInt32 frameCapacity);
+	CAAudioBuffer(const AudioStreamBasicDescription& format, UInt32 frameCapacity);
 
 	// MARK: Buffer Management
 
@@ -57,7 +57,7 @@ public:
 	/// @param format The format of the audio the buffer list will contain.
 	/// @param frameCapacity The desired buffer capacity in audio frames.
 	/// @return true on success, false if an error occurred or memory could not be allocated.
-	bool Allocate(const CAStreamDescription& format, UInt32 frameCapacity) noexcept;
+	bool Allocate(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
 	/// Deallocates the memory associated with this buffer list and sets the frame length and frame capacity to zero.
 	void Deallocate() noexcept;
