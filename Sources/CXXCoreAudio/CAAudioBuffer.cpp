@@ -17,8 +17,7 @@ AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDe
 		return nullptr;
 
 	const auto bufferDataSize = frameCapacity * format.mBytesPerFrame;
-	const auto channelStreamCount = (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? format.mChannelsPerFrame : 1;
-	const auto bufferCount = channelStreamCount;
+	const auto bufferCount = (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? format.mChannelsPerFrame : 1;
 	const auto bufferListSize = offsetof(AudioBufferList, mBuffers) + (sizeof(AudioBuffer) * bufferCount);
 	const auto allocationSize = bufferListSize + (bufferDataSize * bufferCount);
 
@@ -36,7 +35,7 @@ AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDe
 	abl->mNumberBuffers = bufferCount;
 
 	for(UInt32 i = 0; i < bufferCount; ++i) {
-		abl->mBuffers[i].mNumberChannels = channelStreamCount;
+		abl->mBuffers[i].mNumberChannels = (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : format.mChannelsPerFrame;
 		abl->mBuffers[i].mDataByteSize = bufferDataSize;
 		abl->mBuffers[i].mData = reinterpret_cast<void *>(address + bufferListSize + (bufferDataSize * i));
 	}
