@@ -57,7 +57,7 @@ public:
 #ifdef __OBJC__
 	AVAudioFormat * AVAudioFormat() const noexcept
 	{
-		return [[AVAudioFormat alloc] initWithStreamDescription:streamDescription_ channelLayout:channelLayout_]
+		return [[AVAudioFormat alloc] initWithStreamDescription:&streamDescription_ channelLayout:channelLayout_];
 	}
 #endif /* __OBJC__ */
 
