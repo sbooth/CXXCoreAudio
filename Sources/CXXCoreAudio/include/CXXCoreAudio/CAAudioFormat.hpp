@@ -10,8 +10,8 @@
 #import <AVFAudio/AVFAudio.h>
 #endif /* __OBJC__ */
 
-#import "CXXCoreAudio/CAStreamDescription.hpp"
-#import "CXXCoreAudio/CAChannelLayout.hpp"
+#import <CXXCoreAudio/CAStreamDescription.hpp>
+#import <CXXCoreAudio/CAChannelLayout.hpp>
 
 namespace CXXCoreAudio {
 
