@@ -49,6 +49,9 @@ inline size_t AudioChannelLayoutSize(const AudioChannelLayout * _Nullable channe
 	return AudioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
 }
 
+/// Returns the number of channels contained in an audio channel layout.
+UInt32 AudioChannelLayoutChannelCount(const AudioChannelLayout * _Nullable channelLayout) noexcept;
+
 /// Returns true if two AudioChannelLayout structures are equal.
 ///
 /// This function performs a bitwise comparison based on the number of channel descriptions.
@@ -258,7 +261,8 @@ public:
 	// MARK: Functionality
 
 	/// Returns the number of channels contained in this channel layout.
-	UInt32 ChannelCount() const noexcept;
+	UInt32 ChannelCount() const noexcept
+	{ return AudioChannelLayoutChannelCount(channelLayout_); }
 
 	/// Creates a channel map for remapping audio from this channel layout.
 	/// @param outputLayout The output channel layout

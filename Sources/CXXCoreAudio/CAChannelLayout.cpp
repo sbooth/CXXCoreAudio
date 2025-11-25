@@ -232,7 +232,18 @@ AudioChannelLayout * CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayo
 	return channelLayout;
 }
 
-bool CXXCoreAudio::AudioChannelLayoutsAreEqual(const AudioChannelLayout * _Nullable lhs, const AudioChannelLayout * _Nullable rhs) noexcept
+UInt32 CXXCoreAudio::AudioChannelLayoutChannelCount(const AudioChannelLayout *channelLayout) noexcept
+{
+	if(!channelLayout)
+		return 0;
+	else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions)
+		return channelLayout->mNumberChannelDescriptions;
+	else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
+		return static_cast<UInt32>(__builtin_popcount(channelLayout->mChannelBitmap));
+	return AudioChannelLayoutTag_GetNumberOfChannels(channelLayout->mChannelLayoutTag);
+}
+
+bool CXXCoreAudio::AudioChannelLayoutsAreEqual(const AudioChannelLayout *lhs, const AudioChannelLayout *rhs) noexcept
 {
 	if(!lhs && !rhs)
 		return true;
@@ -461,17 +472,6 @@ CXXCoreAudio::CAChannelLayout::~CAChannelLayout() noexcept
 }
 
 // MARK: Functionality
-
-UInt32 CXXCoreAudio::CAChannelLayout::ChannelCount() const noexcept
-{
-	if(!channelLayout_)
-		return 0;
-	else if(channelLayout_->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions)
-		return channelLayout_->mNumberChannelDescriptions;
-	else if(channelLayout_->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
-		return static_cast<UInt32>(__builtin_popcount(channelLayout_->mChannelBitmap));
-	return AudioChannelLayoutTag_GetNumberOfChannels(channelLayout_->mChannelLayoutTag);
-}
 
 bool CXXCoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLayout, std::vector<SInt32>& channelMap) const
 {
