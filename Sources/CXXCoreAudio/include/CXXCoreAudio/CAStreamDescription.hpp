@@ -264,8 +264,6 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// @note This is equivalent to byteSize / mBytesPerFrame.
 	UInt32 ByteSizeToFrameCount(UInt32 byteSize) const noexcept
 	{
-		if(mBytesPerFrame == 0)
-			return 0;
 		return byteSize / mBytesPerFrame;
 	}
 

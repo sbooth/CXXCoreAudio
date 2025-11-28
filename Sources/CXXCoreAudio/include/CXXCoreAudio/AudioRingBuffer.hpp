@@ -19,7 +19,6 @@ namespace CXXCoreAudio {
 /// This class is thread safe when used from one reader thread and one writer thread.
 class AudioRingBuffer final {
 public:
-
 	// MARK: Creation and Destruction
 
 	/// Creates an empty ring buffer.

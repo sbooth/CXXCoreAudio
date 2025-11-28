@@ -123,7 +123,6 @@ inline NSString * _Nullable AudioChannelLayoutDescription(const AudioChannelLayo
 /// A class simplifying use of the variable-length AudioChannelLayout structure.
 class CAChannelLayout final {
 public:
-
 	/// Mono layout.
 	static const CAChannelLayout Mono;
 
@@ -192,6 +191,15 @@ public:
 
 	// MARK: Comparison
 
+	/// Returns true if the channel layout is equal to an AudioChannelLayout.
+	///
+	/// This function performs a bitwise comparison based on the number of channel descriptions.
+	/// @note Two equivalent channel layouts may not be equal.
+	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return AudioChannelLayoutsAreEqual(channelLayout_, other);
+	}
+
 	/// Returns true if the channel layout is equal to another channel layout.
 	///
 	/// This function performs a bitwise comparison based on the number of channel descriptions.
@@ -202,12 +210,41 @@ public:
 	}
 
 	/// Returns true if the channel layout is equal to an AudioChannelLayout.
-	///
-	/// This function performs a bitwise comparison based on the number of channel descriptions.
-	/// @note Two equivalent channel layouts may not be equal.
-	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept
+	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept
 	{
-		return AudioChannelLayoutsAreEqual(channelLayout_, other);
+		return IsEqual(other);
+	}
+
+	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
+	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return !operator==(other);
+	}
+
+	/// Returns true if the channel layout is equal to another.
+	bool operator==(const CAChannelLayout& other) const noexcept
+	{
+		return operator==(other.channelLayout_);
+	}
+
+	/// Returns true if the channel layout is not equal to another.
+	bool operator!=(const CAChannelLayout& other) const noexcept
+	{
+		return !operator==(other.channelLayout_);
+	}
+
+	// MARK: Equivalence
+
+	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
+	///
+	/// Channel layouts are considered equivalent if:
+	/// 1) Both are empty.
+	/// 2) One is empty and the other has a mono or stereo layout tag.
+	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+	/// @note Two equivalent channel layouts may not be equal.
+	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept
+	{
+		return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
 	}
 
 	/// Returns true if the channel layout is equivalent to another channel layout.
@@ -222,47 +259,13 @@ public:
 		return IsEquivalent(other.channelLayout_);
 	}
 
-	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
-	///
-	/// Channel layouts are considered equivalent if:
-	/// 1) Both are empty.
-	/// 2) One is empty and the other has a mono or stereo layout tag.
-	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
-	/// @note Two equivalent channel layouts may not be equal.
-	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept
-	{
-		return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
-	}
-
-	/// Returns true if the channel layout is equal to another.
-	bool operator==(const CAChannelLayout& other) const noexcept
-	{
-		return operator==(other.channelLayout_);
-	}
-
-	/// Returns true if the channel layout is equal to an AudioChannelLayout.
-	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept
-	{
-		return IsEqual(other);
-	}
-
-	/// Returns true if the channel layout is not equal to another.
-	bool operator!=(const CAChannelLayout& other) const noexcept
-	{
-		return !operator==(other.channelLayout_);
-	}
-
-	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
-	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept
-	{
-		return !operator==(other);
-	}
-
 	// MARK: Functionality
 
 	/// Returns the number of channels contained in this channel layout.
 	UInt32 ChannelCount() const noexcept
-	{ return AudioChannelLayoutChannelCount(channelLayout_); }
+	{
+		return AudioChannelLayoutChannelCount(channelLayout_);
+	}
 
 	/// Creates a channel map for remapping audio from this channel layout.
 	/// @param outputLayout The output channel layout
@@ -294,22 +297,14 @@ public:
 			std::free(std::exchange(channelLayout_, channelLayout));
 	}
 
-	/// Returns true if this channel layout is empty.
-	///
-	/// A channel layout is empty when the internal AudioChannelLayout is null.
-	bool IsEmpty() const noexcept
-	{
-		return !channelLayout_;
-	}
-
-	/// Returns true if this channel layout is not empty.
-	///
 	/// A channel layout is empty when the internal AudioChannelLayout is null.
 	explicit operator bool() const noexcept
 	{
 		return channelLayout_ != nullptr;
 	}
 
+	/// Returns true if this channel layout is not empty.
+	///
 	/// Returns a const pointer to this object's internal AudioChannelLayout.
 	const AudioChannelLayout * _Nullable GetChannelLayout() const noexcept
 	{
