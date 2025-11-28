@@ -99,7 +99,9 @@ public:
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
-	{ return format_; }
+	{
+		return format_;
+	}
 
 	// MARK: Writing and Reading Audio
 

@@ -24,32 +24,23 @@ public:
 	{}
 
 	/// Returns true if this value range is valid.
-	bool IsValid() const noexcept
-	{ return mMaximum >= mMinimum; }
+	bool IsValid() const noexcept 									{ return mMaximum >= mMinimum; }
 
 	/// Returns true if this value range contains value.
-	bool Contains(Float64 value) const noexcept
-	{ return value >= mMinimum && value <= mMaximum; }
+	bool Contains(Float64 value) const noexcept 					{ return value >= mMinimum && value <= mMaximum; }
 
 	/// Clamps a value to within the range.
-	Float64 Clamp(Float64 value) const noexcept
-	{ return std::clamp(value, mMinimum, mMaximum); }
+	Float64 Clamp(Float64 value) const noexcept 					{ return std::clamp(value, mMinimum, mMaximum); }
 
 	/// Returns true if this value range intersects other.
-	bool Intersects(const AudioValueRange& other) const noexcept
-	{ return mMinimum <= other.mMaximum && other.mMinimum <= mMaximum; }
-
+	bool Intersects(const AudioValueRange& other) const noexcept 	{ return mMinimum <= other.mMaximum && other.mMinimum <= mMaximum; }
 	/// Returns true if this value range contains other.
-	bool Contains(const AudioValueRange& other) const noexcept
-	{ return mMinimum <= other.mMinimum && other.mMaximum <= mMaximum; }
+	bool Contains(const AudioValueRange& other) const noexcept 		{ return mMinimum <= other.mMinimum && other.mMaximum <= mMaximum; }
 
 	/// Returns true if this value range is equal to another.
-	bool operator==(const AudioValueRange& other) const noexcept
-	{ return mMinimum == other.mMinimum && mMaximum == other.mMaximum; }
-
+	bool operator==(const AudioValueRange& other) const noexcept 	{ return mMinimum == other.mMinimum && mMaximum == other.mMaximum; }
 	/// Returns true if this value range is not equal to another.
-	bool operator!=(const AudioValueRange& other) const noexcept
-	{ return !operator==(other); }
+	bool operator!=(const AudioValueRange& other) const noexcept 	{ return !operator==(other); }
 };
 
 } /* namespace CXXCoreAudio */
