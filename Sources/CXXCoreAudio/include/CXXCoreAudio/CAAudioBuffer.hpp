@@ -270,13 +270,13 @@ public:
 	/// Returns a pointer to this object's internal AudioBufferList.
 	AudioBufferList * _Nullable operator->() noexcept
 	{
-		return GetBufferList();
+		return bufferList_;
 	}
 
 	/// Returns a pointer to this object's internal AudioBufferList.
 	operator AudioBufferList * const _Nullable () noexcept
 	{
-		return GetBufferList();
+		return bufferList_;
 	}
 
 	/// Returns a const pointer to this object's internal AudioBufferList.
@@ -288,13 +288,13 @@ public:
 	/// Returns a const pointer to this object's internal AudioBufferList.
 	const AudioBufferList * _Nullable operator->() const noexcept
 	{
-		return GetBufferList();
+		return bufferList_;
 	}
 
 	/// Returns a const pointer to this object's internal AudioBufferList.
 	operator const AudioBufferList * const _Nullable () const noexcept
 	{
-		return GetBufferList();
+		return bufferList_;
 	}
 
 	// MARK: AudioBufferList Management
