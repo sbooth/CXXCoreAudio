@@ -221,7 +221,7 @@ public:
 	/// @return The number of frames deleted.
 	UInt32 TrimLast(UInt32 frameLength) noexcept
 	{
-		UInt32 framesToTrim = std::min(frameLength, frameLength_);
+		const UInt32 framesToTrim = std::min(frameLength, frameLength_);
 		SetFrameLength(frameLength_ - framesToTrim);
 		return framesToTrim;
 	}
@@ -255,47 +255,22 @@ public:
 
 	// MARK: AudioBufferList Access
 
-	/// Returns a pointer to this object's internal AudioBufferList.
-	AudioBufferList * _Nullable GetBufferList() noexcept
-	{
-		return bufferList_;
-	}
-
-	/// Returns a const pointer to this object's internal AudioBufferList.
-	const AudioBufferList * _Nullable GetBufferList() const noexcept
-	{
-		return bufferList_;
-	}
-
 	/// Returns true if this object's internal AudioBufferList is not null.
-	explicit operator bool() const noexcept
-	{
-		return bufferList_ != nullptr;
-	}
+	explicit operator bool() const noexcept 								{ return bufferList_ != nullptr; }
 
 	/// Returns a pointer to this object's internal AudioBufferList.
-	AudioBufferList * _Nullable operator->() noexcept
-	{
-		return bufferList_;
-	}
-
-	/// Returns a const pointer to this object's internal AudioBufferList.
-	const AudioBufferList * _Nullable operator->() const noexcept
-	{
-		return bufferList_;
-	}
-
+	AudioBufferList * _Nullable GetBufferList() noexcept 					{ return bufferList_; }
 	/// Returns a pointer to this object's internal AudioBufferList.
-	operator AudioBufferList * const _Nullable () noexcept
-	{
-		return bufferList_;
-	}
+	AudioBufferList * _Nullable operator->() noexcept 						{ return bufferList_; }
+	/// Returns a pointer to this object's internal AudioBufferList.
+	operator AudioBufferList * const _Nullable () noexcept 					{ return bufferList_; }
 
 	/// Returns a const pointer to this object's internal AudioBufferList.
-	operator const AudioBufferList * const _Nullable () const noexcept
-	{
-		return bufferList_;
-	}
+	const AudioBufferList * _Nullable GetBufferList() const noexcept 		{ return bufferList_; }
+	/// Returns a const pointer to this object's internal AudioBufferList.
+	const AudioBufferList * _Nullable operator->() const noexcept 			{ return bufferList_; }
+	/// Returns a const pointer to this object's internal AudioBufferList.
+	operator const AudioBufferList * const _Nullable () const noexcept 		{ return bufferList_; }
 
 	// MARK: AudioBufferList Management
 
@@ -321,7 +296,6 @@ private:
 	UInt32 frameCapacity_{0};
 	/// The number of valid frames in ``bufferList_``.
 	UInt32 frameLength_{0};
-
 };
 
 } /* namespace CXXCoreAudio */

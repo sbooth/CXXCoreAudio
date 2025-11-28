@@ -265,8 +265,7 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
 		const auto tag = lhs->mChannelLayoutTag;
 		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
-	}
-	else if(!lhs && rhs) {
+	} else if(!lhs && rhs) {
 		const auto tag = rhs->mChannelLayoutTag;
 		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
@@ -330,8 +329,7 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 					coordinateString.reset(CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"), desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2], desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
 
 				CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
-			}
-			else {
+			} else {
 				if(const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName)
 					CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(channelName.get()));
 				else
@@ -341,13 +339,11 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 
 		auto channelNamesString = JoinStringArray(array.get(), CFSTR(" "));
 		CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
-	}
-	else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
+	} else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
 		CFStringAppendFormat(result, nullptr, CFSTR("Bitmap %#x (%u ch)"), channelLayout->mChannelBitmap, __builtin_popcount(channelLayout->mChannelBitmap));
 		if(layoutName)
 			CFStringAppendFormat(result, nullptr, CFSTR(", %@"), layoutName.get());
-	}
-	else {
+	} else {
 		CFStringAppendFormat(result, nullptr, CFSTR("%s (0x%x, %u ch)"), GetChannelLayoutTagName(channelLayout->mChannelLayoutTag), channelLayout->mChannelLayoutTag, channelLayout->mChannelLayoutTag & 0xffff);
 		if(layoutName)
 			CFStringAppendFormat(result, nullptr, CFSTR(", %@"), layoutName.get());
