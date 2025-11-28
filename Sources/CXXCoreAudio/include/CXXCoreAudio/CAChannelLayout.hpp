@@ -189,6 +189,7 @@ public:
 	/// This function performs a bitwise comparison based on the number of channel descriptions.
 	/// @note Two equivalent channel layouts may not be equal.
 	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept 		{ return AudioChannelLayoutsAreEqual(channelLayout_, other); }
+
 	/// Returns true if the channel layout is equal to another channel layout.
 	///
 	/// This function performs a bitwise comparison based on the number of channel descriptions.
@@ -197,12 +198,23 @@ public:
 
 	/// Returns true if the channel layout is equal to an AudioChannelLayout.
 	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept 		{ return IsEqual(other); }
-	/// Returns true if the channel layout is equal to another.
-	bool operator==(const CAChannelLayout& other) const noexcept 					{ return operator==(other.channelLayout_); }
 	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
 	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept 		{ return !operator==(other); }
+	/// Returns true if the channel layout is equal to another.
+	bool operator==(const CAChannelLayout& other) const noexcept 					{ return operator==(other.channelLayout_); }
 	/// Returns true if the channel layout is not equal to another.
 	bool operator!=(const CAChannelLayout& other) const noexcept 					{ return !operator==(other.channelLayout_);	}
+
+	// MARK: Equivalence
+
+	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
+	///
+	/// Channel layouts are considered equivalent if:
+	/// 1) Both are empty.
+	/// 2) One is empty and the other has a mono or stereo layout tag.
+	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
+	/// @note Two equivalent channel layouts may not be equal.
+	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept 	{ return AudioChannelLayoutsAreEquivalent(channelLayout_, other); }
 
 	/// Returns true if the channel layout is equivalent to another channel layout.
 	///
@@ -212,14 +224,6 @@ public:
 	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
 	/// @note Two equivalent channel layouts may not be equal.
 	bool IsEquivalent(const CAChannelLayout& other) const noexcept 					{ return IsEquivalent(other.channelLayout_); }
-	/// Returns true if the channel layout is equivalent to an AudioChannelLayout.
-	///
-	/// Channel layouts are considered equivalent if:
-	/// 1) Both are empty.
-	/// 2) One is empty and the other has a mono or stereo layout tag.
-	/// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
-	/// @note Two equivalent channel layouts may not be equal.
-	bool IsEquivalent(const AudioChannelLayout * _Nullable other) const noexcept 	{ return AudioChannelLayoutsAreEquivalent(channelLayout_, other); }
 
 	// MARK: Functionality
 
@@ -284,6 +288,7 @@ public:
 	{
 		return CopyAudioChannelLayoutName(channelLayout_, simpleName);
 	}
+
 	/// Returns a string representation of this channel layout
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
@@ -305,6 +310,7 @@ public:
 	{
 		return (__bridge_transfer NSString *)CopyLayoutName(simpleName);
 	}
+
 	/// Returns a string representation of this channel layout.
 	NSString * _Nullable LayoutDescription() const noexcept
 	{

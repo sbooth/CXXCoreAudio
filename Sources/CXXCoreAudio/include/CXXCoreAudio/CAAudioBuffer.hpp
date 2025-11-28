@@ -256,22 +256,21 @@ public:
 	// MARK: AudioBufferList Access
 
 	/// Returns true if this object's internal AudioBufferList is not null.
-	explicit operator bool() const noexcept 							{ return bufferList_ != nullptr; }
+	explicit operator bool() const noexcept 								{ return bufferList_ != nullptr; }
 
 	/// Returns a pointer to this object's internal AudioBufferList.
-	AudioBufferList * _Nullable GetBufferList() noexcept 				{ return bufferList_; }
-	/// Returns a const pointer to this object's internal AudioBufferList.
-	const AudioBufferList * _Nullable GetBufferList() const noexcept 	{ return bufferList_; }
-
+	AudioBufferList * _Nullable GetBufferList() noexcept 					{ return bufferList_; }
 	/// Returns a pointer to this object's internal AudioBufferList.
-	AudioBufferList * _Nullable operator->() noexcept 					{ return bufferList_; }
-	/// Returns a const pointer to this object's internal AudioBufferList.
-	const AudioBufferList * _Nullable operator->() const noexcept 		{ return bufferList_; }
-
+	AudioBufferList * _Nullable operator->() noexcept 						{ return bufferList_; }
 	/// Returns a pointer to this object's internal AudioBufferList.
-	operator AudioBufferList * const _Nullable () noexcept 				{ return bufferList_; }
+	operator AudioBufferList * const _Nullable () noexcept 					{ return bufferList_; }
+
 	/// Returns a const pointer to this object's internal AudioBufferList.
-	operator const AudioBufferList * const _Nullable () const noexcept 	{ return bufferList_; }
+	const AudioBufferList * _Nullable GetBufferList() const noexcept 		{ return bufferList_; }
+	/// Returns a const pointer to this object's internal AudioBufferList.
+	const AudioBufferList * _Nullable operator->() const noexcept 			{ return bufferList_; }
+	/// Returns a const pointer to this object's internal AudioBufferList.
+	operator const AudioBufferList * const _Nullable () const noexcept 		{ return bufferList_; }
 
 	// MARK: AudioBufferList Management
 
