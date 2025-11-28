@@ -74,6 +74,7 @@ public:
 	{
 		return frameLength_;
 	}
+
 	/// Set the length in audio frames of the data in this buffer list.
 	/// @param frameLength The number of valid audio frames.
 	/// @return true on success, false otherwise.
@@ -84,6 +85,7 @@ public:
 	{
 		return frameLength_ == 0;
 	}
+
 	/// Returns true if the frame length is equal to the frame capacity.
 	bool IsFull() const noexcept
 	{
@@ -244,7 +246,7 @@ public:
 	{
 		return InsertSilence(frameLength_, frameLength);
 	}
-	
+
 	/// Inserts silence in this buffer list.
 	/// @param offset The location to start inserting, in audio frames.
 	/// @param frameLength The number of frames to insert.
