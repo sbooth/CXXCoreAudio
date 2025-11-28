@@ -218,10 +218,16 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
 	/// @note The caller is responsible for releasing the returned string
-	CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED 			{ return CopyAudioStreamBasicDescriptionFormatName(*this); }
+	CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioStreamBasicDescriptionFormatName(*this);
+	}
 	/// Returns a string representation of this format.
 	/// @note The caller is responsible for releasing the returned string.
-	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED 	{ return CopyAudioStreamBasicDescriptionFormatDescription(*this); }
+	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioStreamBasicDescriptionFormatDescription(*this);
+	}
 
 #ifdef __OBJC__
 	/// Returns an AVAudioFormat object initialized with this format and no channel layout.
@@ -233,9 +239,15 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// Returns the name of this format.
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
-	NSString * _Nullable FormatName() const noexcept 			{ return (__bridge_transfer NSString *)CopyFormatName(); }
+	NSString * _Nullable FormatName() const noexcept
+	{
+		return (__bridge_transfer NSString *)CopyFormatName();
+	}
 	/// Returns a string representation of this format.
-	NSString * _Nullable FormatDescription() const noexcept 	{ return (__bridge_transfer NSString *)CopyFormatDescription(); }
+	NSString * _Nullable FormatDescription() const noexcept
+	{
+		return (__bridge_transfer NSString *)CopyFormatDescription();
+	}
 #endif /* __OBJC__ */
 };
 

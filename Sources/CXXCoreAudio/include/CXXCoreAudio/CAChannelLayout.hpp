@@ -188,21 +188,21 @@ public:
 	///
 	/// This function performs a bitwise comparison based on the number of channel descriptions.
 	/// @note Two equivalent channel layouts may not be equal.
-	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept 	{ return AudioChannelLayoutsAreEqual(channelLayout_, other); }
+	bool IsEqual(const AudioChannelLayout * _Nullable other) const noexcept 		{ return AudioChannelLayoutsAreEqual(channelLayout_, other); }
 	/// Returns true if the channel layout is equal to another channel layout.
 	///
 	/// This function performs a bitwise comparison based on the number of channel descriptions.
 	/// @note Two equivalent channel layouts may not be equal.
-	bool IsEqual(const CAChannelLayout& other) const noexcept 					{ return IsEqual(other.channelLayout_); }
+	bool IsEqual(const CAChannelLayout& other) const noexcept 						{ return IsEqual(other.channelLayout_); }
 
 	/// Returns true if the channel layout is equal to an AudioChannelLayout.
-	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept 	{ return IsEqual(other); }
+	bool operator==(const AudioChannelLayout * _Nullable other) const noexcept 		{ return IsEqual(other); }
 	/// Returns true if the channel layout is equal to another.
-	bool operator==(const CAChannelLayout& other) const noexcept 				{ return operator==(other.channelLayout_); }
+	bool operator==(const CAChannelLayout& other) const noexcept 					{ return operator==(other.channelLayout_); }
 	/// Returns true if the channel layout is not equal to an AudioChannelLayout.
-	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept 	{ return !operator==(other); }
+	bool operator!=(const AudioChannelLayout * _Nullable other) const noexcept 		{ return !operator==(other); }
 	/// Returns true if the channel layout is not equal to another.
-	bool operator!=(const CAChannelLayout& other) const noexcept 				{ return !operator==(other.channelLayout_);	}
+	bool operator!=(const CAChannelLayout& other) const noexcept 					{ return !operator==(other.channelLayout_);	}
 
 	/// Returns true if the channel layout is equivalent to another channel layout.
 	///
@@ -280,12 +280,18 @@ public:
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
 	/// @note The caller is responsible for releasing the returned string
-	CFStringRef _Nullable CopyLayoutName(bool simpleName = false) const noexcept CF_RETURNS_RETAINED 	{ return CopyAudioChannelLayoutName(channelLayout_, simpleName); }
+	CFStringRef _Nullable CopyLayoutName(bool simpleName = false) const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioChannelLayoutName(channelLayout_, simpleName);
+	}
 	/// Returns a string representation of this channel layout
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
 	/// @note The caller is responsible for releasing the returned string
-	CFStringRef _Nullable CopyLayoutDescription() const noexcept CF_RETURNS_RETAINED 					{ return CopyAudioChannelLayoutDescription(channelLayout_); }
+	CFStringRef _Nullable CopyLayoutDescription() const noexcept CF_RETURNS_RETAINED
+	{
+		return CopyAudioChannelLayoutDescription(channelLayout_);
+	}
 
 #ifdef __OBJC__
 	/// Returns an AVAudioChannelLayout object initialized with this object's internal AudioChannelLayout.
@@ -295,9 +301,15 @@ public:
 	}
 
 	/// Returns the name of this channel layout.
-	NSString * _Nullable LayoutName(bool simpleName = false) const noexcept 	{ return (__bridge_transfer NSString *)CopyLayoutName(simpleName); }
+	NSString * _Nullable LayoutName(bool simpleName = false) const noexcept
+	{
+		return (__bridge_transfer NSString *)CopyLayoutName(simpleName);
+	}
 	/// Returns a string representation of this channel layout.
-	NSString * _Nullable LayoutDescription() const noexcept 					{ return (__bridge_transfer NSString *)CopyLayoutDescription(); }
+	NSString * _Nullable LayoutDescription() const noexcept
+	{
+		return (__bridge_transfer NSString *)CopyLayoutDescription();
+	}
 #endif /* __OBJC__ */
 
 private:
