@@ -236,9 +236,9 @@ UInt32 CXXCoreAudio::AudioChannelLayoutChannelCount(const AudioChannelLayout *ch
 {
 	if(!channelLayout)
 		return 0;
-	else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions)
+	if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions)
 		return channelLayout->mNumberChannelDescriptions;
-	else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
+	if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap)
 		return static_cast<UInt32>(__builtin_popcount(channelLayout->mChannelBitmap));
 	return AudioChannelLayoutTag_GetNumberOfChannels(channelLayout->mChannelLayoutTag);
 }
@@ -247,7 +247,7 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEqual(const AudioChannelLayout *lhs, co
 {
 	if(!lhs && !rhs)
 		return true;
-	else if((lhs && !rhs) || (!lhs && rhs))
+	if((lhs && !rhs) || (!lhs && rhs))
 		return false;
 
 	const auto lsize = AudioChannelLayoutSize(lhs->mNumberChannelDescriptions);
@@ -261,7 +261,7 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
 {
 	if(!lhs && !rhs)
 		return true;
-	else if(lhs && !rhs) {
+	if(lhs && !rhs) {
 		const auto tag = lhs->mChannelLayoutTag;
 		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
@@ -391,15 +391,15 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout& other)
 
 CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CAChannelLayout& other)
 {
-	if(this == &other)
-		return *this;
-	if(channelLayout_ && other.channelLayout_ && channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions)
-		memcpy(channelLayout_, other.channelLayout_, AudioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
-	else {
-		const auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
-		if(other.channelLayout_ && !channelLayout)
-			throw std::bad_alloc();
-		Reset(channelLayout);
+	if(this != &other) {
+		if(channelLayout_ && other.channelLayout_ && channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions)
+			memcpy(channelLayout_, other.channelLayout_, AudioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
+		else {
+			const auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
+			if(other.channelLayout_ && !channelLayout)
+				throw std::bad_alloc();
+			Reset(channelLayout);
+		}
 	}
 	return *this;
 }
