@@ -19,7 +19,6 @@ namespace CXXCoreAudio {
 /// This class is thread safe when used from one reader thread and one writer thread.
 class AudioRingBuffer final {
 public:
-
 	// MARK: Creation and Destruction
 
 	/// Creates an empty ring buffer.
@@ -100,9 +99,7 @@ public:
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
-	{
-		return format_;
-	}
+	{ return format_; }
 
 	// MARK: Writing and Reading Audio
 

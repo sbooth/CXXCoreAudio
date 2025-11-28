@@ -100,8 +100,7 @@ std::optional<CXXCoreAudio::CACommonPCMFormat> CXXCoreAudio::IdentifyCommonPCMFo
 			return CACommonPCMFormat::int16;
 		else if(streamDescription.mBitsPerChannel == 32)
 			return CACommonPCMFormat::int32;
-	}
-	else if(/* IsFloat */ (streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
+	} else if(/* IsFloat */ (streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
 		if(streamDescription.mBitsPerChannel == 32)
 			return CACommonPCMFormat::float32;
 		else if(streamDescription.mBitsPerChannel == 64)
@@ -190,8 +189,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 
 		if((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved)
 			CFStringAppendCString(result, ", deinterleaved", kCFStringEncodingASCII);
-	}
-	else if(streamDescription.mFormatID == kAudioFormatAppleLossless || streamDescription.mFormatID == kAudioFormatFLAC) {
+	} else if(streamDescription.mFormatID == kAudioFormatAppleLossless || streamDescription.mFormatID == kAudioFormatFLAC) {
 		if(CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString)
 			CFStringAppend(result, formatIDString);
 		else if(CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
@@ -224,8 +222,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 		else if(CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
 			CFStringAppend(result, fourCC);
 			CFRelease(fourCC);
-		}
-		else
+		} else
 			CFStringAppendFormat(result, nullptr, CFSTR("0x%.08x"), streamDescription.mFormatID);
 
 		// Format flags

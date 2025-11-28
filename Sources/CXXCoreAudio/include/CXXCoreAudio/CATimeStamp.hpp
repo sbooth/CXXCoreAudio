@@ -107,45 +107,31 @@ struct CATimeStamp final : public AudioTimeStamp {
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
 	explicit operator bool() const noexcept
-	{
-		return IsValid();
-	}
+	{ return IsValid(); }
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
 	bool IsValid() const noexcept
-	{
-		return mFlags != kAudioTimeStampNothingValid;
-	}
+	{ return mFlags != kAudioTimeStampNothingValid; }
 
 	/// Returns true if the kAudioTimeStampSampleTimeValid flag is set.
 	bool SampleTimeIsValid() const noexcept
-	{
-		return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid;
-	}
+	{ return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid; }
 
 	/// Returns true if the kAudioTimeStampHostTimeValid flag is set.
 	bool HostTimeIsValid() const noexcept
-	{
-		return (mFlags & kAudioTimeStampHostTimeValid) == kAudioTimeStampHostTimeValid;
-	}
+	{ return (mFlags & kAudioTimeStampHostTimeValid) == kAudioTimeStampHostTimeValid; }
 
 	/// Returns true if the kAudioTimeStampRateScalarValid flag is set.
 	bool RateScalarIsValid() const noexcept
-	{
-		return (mFlags & kAudioTimeStampRateScalarValid) == kAudioTimeStampRateScalarValid;
-	}
+	{ return (mFlags & kAudioTimeStampRateScalarValid) == kAudioTimeStampRateScalarValid; }
 
 	/// Returns true if the kAudioTimeStampWordClockTimeValid flag is set.
 	bool WordClockTimeIsValid() const noexcept
-	{
-		return (mFlags & kAudioTimeStampWordClockTimeValid) == kAudioTimeStampWordClockTimeValid;
-	}
+	{ return (mFlags & kAudioTimeStampWordClockTimeValid) == kAudioTimeStampWordClockTimeValid; }
 
 	/// Returns true if the kAudioTimeStampSMPTETimeValid flag is set.
 	bool SMPTETimeIsValid() const noexcept
-	{
-		return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid;
-	}
+	{ return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid; }
 };
 
 } /* namespace CXXCoreAudio */
