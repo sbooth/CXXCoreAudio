@@ -131,6 +131,7 @@ public:
 	{
 		return Insert(buffer, 0, buffer.frameLength_, 0);
 	}
+
 	/// Prepends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
@@ -142,6 +143,7 @@ public:
 			return 0;
 		return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), 0);
 	}
+
 	/// Prepends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
@@ -161,6 +163,7 @@ public:
 	{
 		return Insert(buffer, 0, buffer.frameLength_, frameLength_);
 	}
+
 	/// Appends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
@@ -172,6 +175,7 @@ public:
 			return 0;
 		return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), frameLength_);
 	}
+
 	/// Appends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
@@ -192,6 +196,7 @@ public:
 	{
 		return Insert(buffer, 0, buffer.frameLength_, writeOffset);
 	}
+
 	/// Inserts a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
@@ -208,6 +213,7 @@ public:
 	{
 		return Trim(0, frameLength);
 	}
+
 	/// Deletes frames from the end of this buffer list.
 	/// @param frameLength The number of frames to delete.
 	/// @return The number of frames deleted.
@@ -217,6 +223,7 @@ public:
 		SetFrameLength(frameLength_ - framesToTrim);
 		return framesToTrim;
 	}
+
 	/// Deletes frames from this buffer list.
 	/// @param offset The location to start deleting, in audio frames.
 	/// @param frameLength The number of frames to delete.
@@ -229,6 +236,7 @@ public:
 	{
 		return InsertSilence(frameLength_, frameCapacity_ - frameLength_);
 	}
+
 	/// Appends silence to this buffer list.
 	/// @param frameLength The number of frames to append.
 	/// @return The number of frames of silence appended.
@@ -236,6 +244,7 @@ public:
 	{
 		return InsertSilence(frameLength_, frameLength);
 	}
+	
 	/// Inserts silence in this buffer list.
 	/// @param offset The location to start inserting, in audio frames.
 	/// @param frameLength The number of frames to insert.
