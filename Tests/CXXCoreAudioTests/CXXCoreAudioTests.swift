@@ -29,7 +29,7 @@ import Testing
 
 	@Test func channelLayout() async {
 		let empty = CXXCoreAudio.CAChannelLayout()
-		#expect(empty.IsEmpty())
+		#expect(!empty.__convertToBool())
 		#expect(empty.Size() == 0)
 		#expect(empty.ChannelCount() == 0)
 		let stereo = CXXCoreAudio.CAChannelLayout.Stereo
