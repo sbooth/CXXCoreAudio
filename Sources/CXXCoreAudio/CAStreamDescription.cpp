@@ -86,24 +86,26 @@ std::optional<CXXCoreAudio::CACommonPCMFormat> CXXCoreAudio::IdentifyCommonPCMFo
 	if(streamDescription.mFramesPerPacket != 1 || streamDescription.mBytesPerFrame != streamDescription.mBytesPerPacket || streamDescription.mChannelsPerFrame == 0)
 		return std::nullopt;
 
-	if(/* !IsPCM */ 				streamDescription.mFormatID != kAudioFormatLinearPCM ||
-	   /* !IsNativeEndian */		(streamDescription.mFormatFlags & kAudioFormatFlagIsBigEndian) != kAudioFormatFlagsNativeEndian ||
-	   /* !IsImplicitlyPacked */ 	((streamDescription.mBitsPerChannel / 8) * (((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0) ? streamDescription.mChannelsPerFrame : 1)) != streamDescription.mBytesPerFrame)
+	// Exclude non-PCM, non-native endian, non-implicitly packed formats
+	if(streamDescription.mFormatID != kAudioFormatLinearPCM ||
+	   (streamDescription.mFormatFlags & kAudioFormatFlagIsBigEndian) != kAudioFormatFlagsNativeEndian ||
+	   ((streamDescription.mBitsPerChannel / 8) * (((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0) ? streamDescription.mChannelsPerFrame : 1)) != streamDescription.mBytesPerFrame)
 		return std::nullopt;
 
-	if(/* IsSignedInteger */ (streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger) {
-		if(/* IsFixedPoint */ (streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == 0 &&
+	if((streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger) {
+		// Disqualify fixed point
+		if((streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == 0 &&
 		   ((streamDescription.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift) > 0)
 			return std::nullopt;
 
 		if(streamDescription.mBitsPerChannel == 16)
 			return CACommonPCMFormat::int16;
-		else if(streamDescription.mBitsPerChannel == 32)
+		if(streamDescription.mBitsPerChannel == 32)
 			return CACommonPCMFormat::int32;
-	} else if(/* IsFloat */ (streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
+	} else if((streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
 		if(streamDescription.mBitsPerChannel == 32)
 			return CACommonPCMFormat::float32;
-		else if(streamDescription.mBitsPerChannel == 64)
+		if(streamDescription.mBitsPerChannel == 64)
 			return CACommonPCMFormat::float64;
 	}
 
@@ -195,8 +197,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 		else if(CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
 			CFStringAppend(result, fourCC);
 			CFRelease(fourCC);
-		}
-		else
+		} else
 			CFStringAppendFormat(result, nullptr, CFSTR("0x%.08x"), streamDescription.mFormatID);
 
 		CFStringAppendCString(result, ", ", kCFStringEncodingASCII);
@@ -215,8 +216,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 			CFStringAppendCString(result, "from UNKNOWN source bit depth, ", kCFStringEncodingASCII);
 
 		CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
-	}
-	else {
+	} else {
 		if(CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString)
 			CFStringAppend(result, formatIDString);
 		else if(CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
@@ -257,7 +257,7 @@ CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonP
 #pragma clang diagnostic pop
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(CAStreamDescription& format) const noexcept
+bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept
 {
 	if(!IsPCM() || mChannelsPerFrame == 0)
 		return false;
@@ -270,7 +270,7 @@ bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(CAStreamDesc
 	return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(CAStreamDescription& format) const noexcept
+bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept
 {
 	if(!IsPCM())
 		return false;
@@ -283,7 +283,7 @@ bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(CAStreamDescrip
 	return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetStandardEquivalent(CAStreamDescription& format) const noexcept
+bool CXXCoreAudio::CAStreamDescription::GetStandardEquivalent(AudioStreamBasicDescription& format) const noexcept
 {
 	if(!IsPCM())
 		return false;

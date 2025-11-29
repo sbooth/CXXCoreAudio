@@ -278,16 +278,16 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// Sets format to the equivalent non-interleaved format of this.
 	/// @note Fails for non-PCM formats.
 	/// @return true on success, false otherwise.
-	bool GetNonInterleavedEquivalent(CAStreamDescription& format) const noexcept;
+	bool GetNonInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
 	/// Sets format to the equivalent interleaved format of this.
 	/// @note Fails for non-PCM formats.
-	bool GetInterleavedEquivalent(CAStreamDescription& format) const noexcept;
+	bool GetInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
 	/// Sets format to the equivalent standard format of this.
 	/// @note Fails for non-PCM formats.
 	/// @return true on success, false otherwise.
-	bool GetStandardEquivalent(CAStreamDescription& format) const noexcept;
+	bool GetStandardEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
 	/// Resets the stream description to the default state.
 	void Reset() noexcept
