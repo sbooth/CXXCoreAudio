@@ -106,20 +106,46 @@ struct CATimeStamp final : public AudioTimeStamp {
 	// MARK: Flags
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
-	explicit operator bool() const noexcept 	{ return IsValid(); }
+	explicit operator bool() const noexcept
+	{
+		return IsValid();
+	}
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
-	bool IsValid() const noexcept 				{ return mFlags != kAudioTimeStampNothingValid; }
+	bool IsValid() const noexcept
+	{
+		return mFlags != kAudioTimeStampNothingValid;
+	}
+
 	/// Returns true if the kAudioTimeStampSampleTimeValid flag is set.
-	bool SampleTimeIsValid() const noexcept 	{ return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid; }
+	bool SampleTimeIsValid() const noexcept
+	{
+		return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid;
+	}
+
 	/// Returns true if the kAudioTimeStampHostTimeValid flag is set.
-	bool HostTimeIsValid() const noexcept 		{ return (mFlags & kAudioTimeStampHostTimeValid) == kAudioTimeStampHostTimeValid; }
+	bool HostTimeIsValid() const noexcept
+	{
+		return (mFlags & kAudioTimeStampHostTimeValid) == kAudioTimeStampHostTimeValid;
+	}
+
 	/// Returns true if the kAudioTimeStampRateScalarValid flag is set.
-	bool RateScalarIsValid() const noexcept 	{ return (mFlags & kAudioTimeStampRateScalarValid) == kAudioTimeStampRateScalarValid; }
+	bool RateScalarIsValid() const noexcept
+	{
+		return (mFlags & kAudioTimeStampRateScalarValid) == kAudioTimeStampRateScalarValid;
+	}
+
 	/// Returns true if the kAudioTimeStampWordClockTimeValid flag is set.
-	bool WordClockTimeIsValid() const noexcept 	{ return (mFlags & kAudioTimeStampWordClockTimeValid) == kAudioTimeStampWordClockTimeValid; }
+	bool WordClockTimeIsValid() const noexcept
+	{
+		return (mFlags & kAudioTimeStampWordClockTimeValid) == kAudioTimeStampWordClockTimeValid;
+	}
+
 	/// Returns true if the kAudioTimeStampSMPTETimeValid flag is set.
-	bool SMPTETimeIsValid() const noexcept 		{ return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid; }
+	bool SMPTETimeIsValid() const noexcept
+	{
+		return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid;
+	}
 };
 
 } /* namespace CXXCoreAudio */
