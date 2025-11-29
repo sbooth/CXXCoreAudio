@@ -40,22 +40,30 @@ public:
 
 	/// Returns true if this audio format is equal to another.
 	bool operator==(const CAAudioFormat& other) const noexcept
-	{ return streamDescription_ == other.streamDescription_ && channelLayout_ == other.channelLayout_; }
+	{
+		return streamDescription_ == other.streamDescription_ && channelLayout_ == other.channelLayout_;
+	}
 
 	/// Returns true if this audio format is not equal to another.
 	bool operator!=(const CAAudioFormat& other) const noexcept
-	{ return streamDescription_ != other.streamDescription_ || channelLayout_ != other.channelLayout_; }
+	{
+		return streamDescription_ != other.streamDescription_ || channelLayout_ != other.channelLayout_;
+	}
 
 	/// Returns the format's stream description.
 	const CAStreamDescription& StreamDescription() const noexcept
-	{ return streamDescription_; }
+	{
+		return streamDescription_;
+	}
 
 	/// Returns the format's channel layout.
 	const CAChannelLayout& ChannelLayout() const noexcept
-	{ return channelLayout_; }
+	{
+		return channelLayout_;
+	}
 
 #ifdef __OBJC__
-	AVAudioFormat * AVAudioFormat() const noexcept
+	operator AVAudioFormat * _Nullable () const noexcept
 	{
 		return [[AVAudioFormat alloc] initWithStreamDescription:&streamDescription_ channelLayout:channelLayout_];
 	}
