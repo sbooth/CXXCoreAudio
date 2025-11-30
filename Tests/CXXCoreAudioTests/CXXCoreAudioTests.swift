@@ -44,15 +44,15 @@ import Testing
 
 	@Test func ringBuffer() async {
 		let empty = CXXCoreAudio.AudioRingBuffer()
-		#expect(empty.FramesAvailable() == 0)
-		#expect(empty.SpaceAvailable() == 0)
+		#expect(empty.AvailableFrames() == 0)
+		#expect(empty.FreeSpace() == 0)
 		#expect(empty.Capacity() == 0)
 
 		var rb = CXXCoreAudio.AudioRingBuffer()
 		let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
 		#expect(rb.Allocate(std2ch, 512) == true)
-		#expect(rb.FramesAvailable() == 0)
-		#expect(rb.SpaceAvailable() == rb.Capacity())
+		#expect(rb.AvailableFrames() == 0)
+		#expect(rb.FreeSpace() == rb.Capacity())
 	}
 
 	@Test func tsRingBuffer() async {
