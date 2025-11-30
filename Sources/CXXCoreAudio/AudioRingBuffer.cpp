@@ -152,7 +152,7 @@ uint32_t CXXCoreAudio::AudioRingBuffer::Capacity() const noexcept
 	return capacity_ - 1;
 }
 
-uint32_t CXXCoreAudio::AudioRingBuffer::AvailableWriteCount() const noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::FreeSpace() const noexcept
 {
 	if(capacity_ == 0)
 		return 0;
@@ -168,7 +168,7 @@ uint32_t CXXCoreAudio::AudioRingBuffer::AvailableWriteCount() const noexcept
 		return capacity_ - 1;
 }
 
-uint32_t CXXCoreAudio::AudioRingBuffer::AvailableReadCount() const noexcept
+uint32_t CXXCoreAudio::AudioRingBuffer::AvailableFrames() const noexcept
 {
 	if(capacity_ == 0)
 		return 0;
