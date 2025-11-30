@@ -91,11 +91,11 @@ public:
 
 	/// Returns the number of audio frames of free space available for writing.
 	/// @return The number of audio frames available to write.
-	uint32_t AvailableWriteCount() const noexcept;
+	uint32_t SpaceAvailable() const noexcept;
 
 	/// Returns the number of frames of audio available for reading.
 	/// @return The number of audio frames available to read.
-	uint32_t AvailableReadCount() const noexcept;
+	uint32_t FramesAvailable() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
