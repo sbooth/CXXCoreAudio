@@ -347,7 +347,7 @@ public:
 		return channelLayout_;
 	}
 
-	/// Replaces the object's managed AudioChannelLayout struct with another AudioChannelLayout struct.
+	/// Replaces the managed AudioChannelLayout struct with another AudioChannelLayout struct.
 	/// @note The object assumes responsibility for deallocating the passed AudioChannelLayout struct using std::free.
 	void reset(AudioChannelLayout * _Nullable channelLayout = nullptr) noexcept
 	{
@@ -360,7 +360,7 @@ public:
 		std::swap(channelLayout_, other.channelLayout_);
 	}
 
-	/// Releases ownership of the object's managed AudioChannelLayout struct and returns it.
+	/// Releases ownership of the managed AudioChannelLayout struct and returns it.
 	/// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout struct using std::free.
 	AudioChannelLayout * _Nullable release() noexcept
 	{
