@@ -21,7 +21,7 @@ namespace CXXCoreAudio {
 /// @return An AudioBufferList struct or null if an error occurred or memory could not be allocated.
 AudioBufferList * _Nullable AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
-/// A class containing an AudioBufferList with a specific format, frame capacity, and frame length.
+/// A class managing an AudioBufferList with a specific format, frame capacity, and frame length.
 class CAAudioBuffer final {
 public:
 	// MARK: Creation and Destruction

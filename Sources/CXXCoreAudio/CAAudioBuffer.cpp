@@ -69,7 +69,7 @@ CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const AudioStreamBasicDescription& fo
 {
 	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0)
 		throw std::invalid_argument("invalid format");
-	if(frameCapacity == 0)
+	if(frameCapacity == 0 || frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame))
 		throw std::invalid_argument("invalid frame capacity");
 	if(!Allocate(format, frameCapacity))
 		throw std::bad_alloc();
@@ -79,7 +79,7 @@ CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const AudioStreamBasicDescription& fo
 
 bool CXXCoreAudio::CAAudioBuffer::Allocate(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept
 {
-	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity == 0)
+	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity == 0 || frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame))
 		return false;
 
 	Deallocate();
