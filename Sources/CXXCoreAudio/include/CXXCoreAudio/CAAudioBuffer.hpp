@@ -7,6 +7,9 @@
 #pragma once
 
 #import <algorithm>
+#if defined(__has_include) && __has_include(<span>)
+#import <span>
+#endif
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -284,6 +287,15 @@ public:
 	{
 		return bufferList_;
 	}
+
+#if defined(__cpp_lib_span) && __cpp_lib_span >= 202002L
+	std::span<AudioBuffer *> AudioBuffers() noexcept
+	{
+		if(!mBufferList)
+			return {};
+		return {bufferList_->mBuffers[0], bufferList->mNumberBuffers};
+	}
+#endif
 
 	// MARK: AudioBufferList Management
 
