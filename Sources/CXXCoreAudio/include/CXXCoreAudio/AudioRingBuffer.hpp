@@ -7,6 +7,8 @@
 #pragma once
 
 #import <atomic>
+#import <cstddef>
+#import <limits>
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -19,6 +21,14 @@ namespace CXXCoreAudio {
 /// This class is thread safe when used from one reader thread and one writer thread.
 class AudioRingBuffer final {
 public:
+	/// Unsigned integer type.
+	using size_type = std::size_t;
+
+	/// The minimum supported ring buffer size in audio frames.
+	static constexpr size_type min_buffer_size = size_type{2};
+	/// The maximum supported ring buffer size in audio frames.
+	static constexpr size_type max_buffer_size = size_type{1} << (std::numeric_limits<size_type>::digits - 1);
+
 	// MARK: Creation and Destruction
 
 	/// Creates an empty ring buffer.
@@ -27,17 +37,15 @@ public:
 
 	/// Creates a ring buffer with the specified buffer size.
 	///
-	/// The minimum buffer capacity is two audio frames and the maximum capacity is 0x80000000 audio frames.
+	/// The format-specific maximum size is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
 	///
-	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
-	///
-	/// The limiting buffer capacity is the lesser of the maximum capacity and the format-specific capacity.
+	/// The limiting ring buffer size is the lesser of the maximum supported size and the format-specific maximum size.
 	/// @note Only non-interleaved formats are supported.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer capacity per channel, in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
-	AudioRingBuffer(const AudioStreamBasicDescription& format, uint32_t size);
+	AudioRingBuffer(const AudioStreamBasicDescription& format, size_type size);
 
 	// This class is non-copyable
 	AudioRingBuffer(const AudioRingBuffer&) = delete;
@@ -62,18 +70,16 @@ public:
 
 	/// Allocates space for audio data.
 	///
-	/// The minimum buffer capacity is two audio frames and the maximum capacity is 0x80000000 audio frames.
+	/// The format-specific maximum size is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
 	///
-	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<uint32_t>::max() / format.mBytesPerFrame.
-	///
-	/// The limiting buffer capacity is the lesser of the maximum capacity and the format-specific capacity.
+	/// The limiting ring buffer size is the lesser of the maximum supported size and the format-specific maximum size.
 	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
 	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer capacity per channel, in audio frames.
 	/// @return true on success, false if memory could not be allocated, the audio format is not supported, or the buffer size is not supported.
-	bool Allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept;
+	bool Allocate(const AudioStreamBasicDescription& format, size_type size) noexcept;
 
 	/// Frees any space allocated for data.
 	/// @note This method is not thread safe.
@@ -87,15 +93,18 @@ public:
 
 	/// Returns the usable capacity of the ring buffer.
 	/// @return The usable ring buffer capacity in audio frames.
-	uint32_t Capacity() const noexcept;
+	size_type Capacity() const noexcept;
 
 	/// Returns the amount of free space in the buffer.
 	/// @return The number of audio frames of free space available for writing.
-	uint32_t FreeSpace() const noexcept;
+	size_type FreeSpace() const noexcept;
 
 	/// Returns the amount of audio in the buffer.
 	/// @return The number of audio frames available for reading.
-	uint32_t AvailableFrames() const noexcept;
+	size_type AvailableFrames() const noexcept;
+
+	/// Returns true if the ring buffer is empty.
+	bool IsEmpty() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
 	const CAStreamDescription& Format() const noexcept
@@ -106,34 +115,34 @@ public:
 	// MARK: Writing and Reading Audio
 
 	/// Writes audio and advances the write position.
-	/// @param source An audio buffer list containing the data to copy.
-	/// @param count The desired number of audio frames to write.
-	/// @param allowPartial Whether any audio frames should be written if the free space available for writing is less than count.
+	/// @param bufferList An audio buffer list containing the data to copy.
+	/// @param frameCount The desired number of audio frames to write.
+	/// @param allowPartial Whether any audio frames should be written if the free space available for writing is less than frameCount.
 	/// @return The number of audio frames actually written.
-	uint32_t Write(const AudioBufferList * const _Nonnull source, uint32_t count, bool allowPartial = true) noexcept;
+	size_type Write(const AudioBufferList * const _Nonnull bufferList, size_type frameCount, bool allowPartial = true) noexcept;
 
 	/// Reads audio and advances the read position.
-	/// @param destination An audio buffer list to receive the data.
-	/// @param count The desired number of audio frames to read.
-	/// @param allowPartial Whether any audio frames should be read if the number of frames available for reading is less than count.
+	/// @param bufferList An audio buffer list to receive the data.
+	/// @param frameCount The desired number of audio frames to read.
+	/// @param allowPartial Whether any audio frames should be read if the number of frames available for reading is less than frameCount.
 	/// @return The number of audio frames actually read.
-	uint32_t Read(AudioBufferList * const _Nonnull destination, uint32_t count, bool allowPartial = true) noexcept;
+	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount, bool allowPartial = true) noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
 
 	/// The per-channel capacity of ``buffers_`` in audio frames.
-	uint32_t capacity_{0};
+	size_type capacity_{0};
 	/// The per-channel capacity of ``buffers_`` in audio frames minus one.
-	uint32_t capacityMask_{0};
+	size_type capacityMask_{0};
 
 	/// The offset into ``buffers_`` of the write location.
-	std::atomic_uint32_t writePosition_{0};
+	std::atomic<size_type> writePosition_{0};
 	/// The offset into ``buffers_`` of the read location.
-	std::atomic_uint32_t readPosition_{0};
+	std::atomic<size_type> readPosition_{0};
 
-	static_assert(std::atomic_uint32_t::is_always_lock_free, "Lock-free std::atomic_uint32_t required");
+	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
 
 	/// The format of the audio this ring buffer contains.
 	CAStreamDescription format_{};
