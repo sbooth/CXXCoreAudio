@@ -279,7 +279,6 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	readPosition_.store((readPos + framesToRead) & capacityMask_, std::memory_order_release);
 
 	// Set the ABL buffer sizes
-//	auto audioBuffers = std::span(bufferList->mBuffers, bufferList->mNumberBuffers);
 	const auto byteSize = static_cast<UInt32>(framesToRead) * format_.mBytesPerFrame;
 	for(UInt32 bufferIndex = 0; bufferIndex < bufferList->mNumberBuffers; ++bufferIndex)
 		bufferList->mBuffers[bufferIndex].mDataByteSize = byteSize;
