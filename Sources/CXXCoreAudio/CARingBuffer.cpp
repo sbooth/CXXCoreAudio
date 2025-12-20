@@ -177,10 +177,10 @@ bool CXXCoreAudio::CARingBuffer::GetTimeBounds(int64_t& startTime, int64_t& endT
 		const auto currentCounter = timeBoundsQueueCounter_.load(std::memory_order_acquire);
 		const auto currentIndex = currentCounter & sTimeBoundsQueueMask;
 
-		const TimeBounds * const bounds = timeBoundsQueue_ + currentIndex;
-		if(const auto counter = bounds->updateCounter_.load(std::memory_order_acquire); counter == currentCounter) {
-			startTime = bounds->startTime_;
-			endTime = bounds->endTime_;
+		const TimeBounds& bounds = timeBoundsQueue_[currentIndex];
+		if(const auto counter = bounds.updateCounter_.load(std::memory_order_acquire); counter == currentCounter) {
+			startTime = bounds.startTime_;
+			endTime = bounds.endTime_;
 			return true;
 		}
 	}
