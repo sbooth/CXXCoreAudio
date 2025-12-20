@@ -267,8 +267,7 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const bufferList,
 		}
 
 		offset0 = offset1;
-	}
-	else
+	} else
 		offset0 = FrameByteOffset(sampleTime);
 
 	/// Copies non-interleaved audio from _buffers to an AudioBufferList.
@@ -371,9 +370,8 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const bufferList, uint32
 	if(byteOffset0 < byteOffset1) {
 		byteCount = byteOffset1 - byteOffset0;
 		fetchABL(bufferList, destStartByteOffset, byteOffset0, byteCount);
-	}
-	else {
-		byteCount = static_cast<UInt32>((capacity_ * format_.mBytesPerFrame) - byteOffset0);
+	} else {
+		byteCount = (capacity_ * format_.mBytesPerFrame) - byteOffset0;
 		fetchABL(bufferList, destStartByteOffset, byteOffset0, byteCount);
 		fetchABL(bufferList, destStartByteOffset + byteCount, 0, byteOffset1);
 		byteCount += byteOffset1;
