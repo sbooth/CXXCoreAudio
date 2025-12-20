@@ -41,7 +41,7 @@ public:
 	///
 	/// The limiting ring buffer size is the lesser of the maximum supported size and the format-specific maximum size.
 	/// @note Only non-interleaved formats are supported.
-	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
+	/// @note The ring buffer capacity will rounded to the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer capacity per channel, in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
@@ -75,7 +75,7 @@ public:
 	/// The limiting ring buffer size is the lesser of the maximum supported size and the format-specific maximum size.
 	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
-	/// @note The usable ring buffer capacity will be one less than the smallest integral power of two that is not less than the specified size.
+	/// @note The ring buffer capacity will rounded to the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
 	/// @param size The desired buffer capacity per channel, in audio frames.
 	/// @return true on success, false if memory could not be allocated, the audio format is not supported, or the buffer size is not supported.
@@ -91,23 +91,26 @@ public:
 
 	// MARK: Buffer Information
 
-	/// Returns the usable capacity of the ring buffer.
-	/// @return The usable ring buffer capacity in audio frames.
-	size_type Capacity() const noexcept;
+	/// Returns the capacity of the ring buffer.
+	/// @return The ring buffer capacity in audio frames.
+	[[nodiscard]] size_type Capacity() const noexcept;
 
 	/// Returns the amount of free space in the buffer.
 	/// @return The number of audio frames of free space available for writing.
-	size_type FreeSpace() const noexcept;
+	[[nodiscard]] size_type FreeSpace() const noexcept;
 
 	/// Returns the amount of audio in the buffer.
 	/// @return The number of audio frames available for reading.
-	size_type AvailableFrames() const noexcept;
+	[[nodiscard]] size_type AvailableFrames() const noexcept;
 
 	/// Returns true if the ring buffer is empty.
-	bool IsEmpty() const noexcept;
+	[[nodiscard]] bool IsEmpty() const noexcept;
+
+	/// Returns true if the ring buffer is full.
+	[[nodiscard]] bool IsFull() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
-	const CAStreamDescription& Format() const noexcept
+	[[nodiscard]] const CAStreamDescription& Format() const noexcept
 	{
 		return format_;
 	}
@@ -137,9 +140,9 @@ private:
 	/// The per-channel capacity of ``buffers_`` in audio frames minus one.
 	size_type capacityMask_{0};
 
-	/// The offset into ``buffers_`` of the write location.
+	/// The free-running write location.
 	std::atomic<size_type> writePosition_{0};
-	/// The offset into ``buffers_`` of the read location.
+	/// The free-running read location.
 	std::atomic<size_type> readPosition_{0};
 
 	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
