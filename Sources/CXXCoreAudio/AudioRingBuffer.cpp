@@ -242,12 +242,12 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(co
 	const auto writePos = writePosition_.load(std::memory_order_relaxed);
 	const auto readPos = readPosition_.load(std::memory_order_acquire);
 
-	const auto usedFrames = writePos - readPos;
-	const auto framesAvailable = capacity_ - usedFrames;
-	if(framesAvailable == 0 || (framesAvailable < frameCount && !allowPartial))
+	const auto framesUsed = writePos - readPos;
+	const auto framesFree = capacity_ - framesUsed;
+	if(framesFree == 0 || (framesFree < frameCount && !allowPartial))
 		return 0;
 
-	const auto framesToWrite = std::min(framesAvailable, frameCount);
+	const auto framesToWrite = std::min(framesFree, frameCount);
 
 	const auto writeIndex = writePos & capacityMask_;
 	const auto framesToEnd = capacity_ - writeIndex;
