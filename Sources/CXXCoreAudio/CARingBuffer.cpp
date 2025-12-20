@@ -49,7 +49,7 @@ CXXCoreAudio::CARingBuffer::CARingBuffer(CARingBuffer&& other) noexcept
 	for(uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
 		timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
 		timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
-		timeBoundsQueue_[i].updateCounter_.store(other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed));
+		timeBoundsQueue_[i].updateCounter_.store(other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
 	}
 }
 
@@ -63,7 +63,7 @@ CXXCoreAudio::CARingBuffer& CXXCoreAudio::CARingBuffer::operator=(CARingBuffer&&
 		for(uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
 			timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
 			timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
-			timeBoundsQueue_[i].updateCounter_.store(other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed));
+			timeBoundsQueue_[i].updateCounter_.store(other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
 		}
 		timeBoundsQueueCounter_.store(other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
 		format_ = std::exchange(other.format_, {});
