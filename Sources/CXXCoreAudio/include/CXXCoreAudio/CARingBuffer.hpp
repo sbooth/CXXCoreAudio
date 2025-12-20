@@ -109,11 +109,11 @@ public:
 
 	/// Writes audio to the ring buffer.
 	/// @note Negative time stamps are not supported.
-	/// @param source An audio buffer list containing the data to copy.
-	/// @param count The desired number of audio frames to write.
-	/// @param time The sample time of the first frame to write.
+	/// @param bufferList An audio buffer list containing the data to copy.
+	/// @param frameCount The desired number of audio frames to write.
+	/// @param sampleTime The sample time of the first frame to write.
 	/// @return true on success, false on error.
-	bool Write(const AudioBufferList * const _Nonnull source, uint32_t count, int64_t time) noexcept;
+	bool Write(const AudioBufferList * const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
 
 	/// Reads audio from the ring buffer.
 	///
@@ -121,11 +121,11 @@ public:
 	/// A sufficiently large gap effectively empties the buffer before storing the new data.
 	/// @note Negative time stamps are not supported.
 	/// @note If the time stamp is less than the previous sample time the behavior is undefined.
-	/// @param destination An audio buffer list to receive the data.
-	/// @param count The desired number of audio frames to read.
-	/// @param time The sample time of the first frame to read.
+	/// @param bufferList An audio buffer list to receive the data.
+	/// @param frameCount The desired number of audio frames to read.
+	/// @param sampleTime The sample time of the first frame to read.
 	/// @return true on success, false on error.
-	bool Read(AudioBufferList * const _Nonnull destination, uint32_t count, int64_t time) noexcept;
+	bool Read(AudioBufferList * const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
 
 private:
 	/// Returns the byte offset of a frame number.
