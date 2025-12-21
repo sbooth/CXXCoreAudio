@@ -24,10 +24,10 @@ public:
 	/// Unsigned integer type.
 	using size_type = std::size_t;
 
-	/// The minimum supported ring buffer size in audio frames.
-	static constexpr size_type min_buffer_size = size_type{2};
-	/// The maximum supported ring buffer size in audio frames.
-	static constexpr size_type max_buffer_size = size_type{1} << (std::numeric_limits<size_type>::digits - 1);
+	/// The minimum supported ring buffer capacity in audio frames.
+	static constexpr size_type min_capacity = size_type{2};
+	/// The maximum supported ring buffer capacity in audio frames.
+	static constexpr size_type max_capacity = size_type{1} << (std::numeric_limits<size_type>::digits - 1);
 
 	// MARK: Creation and Destruction
 
@@ -37,14 +37,14 @@ public:
 
 	/// Creates a ring buffer with the specified format and minimum audio frame capacity.
 	///
-	/// The format-specific maximum size per channel is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
-	/// The limiting size per channel is the lesser of the maximum supported size and the format-specific maximum size.
+	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
+	/// The limiting ring buffer capacity is the lesser of the maximum supported capacity and the format-specific capacity.
+	/// The actual ring buffer capacity will be the smallest integral power of two that is not less than the limiting or specified minimum capacity.
 	/// @note Only non-interleaved formats are supported.
-	/// @note The actual ring buffer capacity will be the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from the buffer.
-	/// @param size The desired minimum capacity in audio frames.
+	/// @param minFrameCapacity The desired minimum capacity in audio frames.
 	/// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not supported.
-	AudioRingBuffer(const AudioStreamBasicDescription& format, size_type size);
+	AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity);
 
 	// This class is non-copyable
 	AudioRingBuffer(const AudioRingBuffer&) = delete;
@@ -69,15 +69,15 @@ public:
 
 	/// Allocates space for audio data of the specified format.
 	///
-	/// The format-specific maximum size per channel is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
-	/// The limiting size per channel is the lesser of the maximum supported size and the format-specific maximum size.
+	/// The format-specific capacity is the largest integral power of two not greater than std::numeric_limits<UInt32>::max() / format.mBytesPerFrame.
+	/// The limiting ring buffer capacity is the lesser of the maximum supported capacity and the format-specific capacity.
+	/// The actual ring buffer capacity will be the smallest integral power of two that is not less than the limiting or specified minimum capacity.
 	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
-	/// @note The actual ring buffer capacity will be the smallest integral power of two that is not less than the specified size.
 	/// @param format The format of the audio that will be written to and read from this buffer.
-	/// @param size The desired minimum capacity in audio frames.
+	/// @param minFrameCapacity The desired minimum capacity in audio frames.
 	/// @return true on success, false if memory could not be allocated, the audio format is not supported, or the buffer size is not supported.
-	bool Allocate(const AudioStreamBasicDescription& format, size_type size) noexcept;
+	bool Allocate(const AudioStreamBasicDescription& format, size_type minFrameCapacity) noexcept;
 
 	/// Frees any space allocated for audio data.
 	/// @note This method is not thread safe.

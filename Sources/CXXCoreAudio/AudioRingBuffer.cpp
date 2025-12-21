@@ -84,13 +84,13 @@ constexpr T bit_ceil(T x) noexcept
 
 // MARK: Creation and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, size_type size)
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity)
 {
 	if((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) [[unlikely]]
 		throw std::invalid_argument("unsupported audio format");
-	if(size < min_buffer_size || size > max_buffer_size) [[unlikely]]
+	if(minFrameCapacity < min_capacity || minFrameCapacity > max_capacity) [[unlikely]]
 		throw std::invalid_argument("capacity out of range");
-	if(!Allocate(format, size)) [[unlikely]]
+	if(!Allocate(format, minFrameCapacity)) [[unlikely]]
 		throw std::bad_alloc();
 }
 
@@ -122,11 +122,11 @@ CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& format, size_type size) noexcept
+bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& format, size_type minFrameCapacity) noexcept
 {
 	if((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) [[unlikely]]
 		return false;
-	if(size < min_buffer_size || size > max_buffer_size) [[unlikely]]
+	if(minFrameCapacity < min_capacity || minFrameCapacity > max_capacity) [[unlikely]]
 		return false;
 
 	/// Values larger than this will overflow AudioBuffer.mDataByteSize
@@ -138,7 +138,7 @@ bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& 
 	const auto maxChannelBufferFrameSize = std::min(static_cast<size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
 
 	// Round to nearest power of two
-	const auto channelBufferFrameSize = bit_ceil(size);
+	const auto channelBufferFrameSize = bit_ceil(minFrameCapacity);
 	if(channelBufferFrameSize > maxChannelBufferFrameSize) [[unlikely]]
 		return false;
 
