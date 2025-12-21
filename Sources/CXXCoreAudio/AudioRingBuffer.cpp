@@ -310,10 +310,5 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	if(framesToRead != frameCount)
 		ZeroAudioBufferList(bufferList, framesToRead * format_.mBytesPerFrame, (frameCount - framesToRead) * format_.mBytesPerFrame);
 
-	// Set the AudioBuffer buffer sizes
-	const auto byteSize = static_cast<UInt32>(framesToRead) * format_.mBytesPerFrame;
-	for(UInt32 bufferIndex = 0; bufferIndex < bufferList->mNumberBuffers; ++bufferIndex)
-		bufferList->mBuffers[bufferIndex].mDataByteSize = byteSize;
-
 	return framesToRead;
 }

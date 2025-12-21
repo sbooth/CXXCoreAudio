@@ -129,7 +129,7 @@ public:
 
 	/// Reads audio and advances the read position.
 	///
-	/// If fewer than frameCount frames are available the remainder of bufferList will be set to silence.
+	/// If fewer than the requested number of frames are available the remainder of the audio buffer list will be set to silence.
 	/// @note This method is only safe to call from the consumer.
 	/// @param bufferList An audio buffer list to receive the data.
 	/// @param frameCount The desired number of audio frames to read.
