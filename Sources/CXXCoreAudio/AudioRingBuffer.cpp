@@ -22,7 +22,7 @@ namespace {
 /// @param dstOffset The byte offset to begin writing.
 /// @param src The source AudioBufferList.
 /// @param srcOffset The byte offset to begin reading.
-/// @param byteCount The maximum number of bytes per non-interleaved buffer to read and write.
+/// @param byteCount The number of bytes per non-interleaved buffer to read and write.
 void CopyToBuffersFromAudioBufferList(void * const _Nonnull * const _Nonnull dst, std::size_t dstOffset, const AudioBufferList * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept
 {
 	for(UInt32 i = 0; i < src->mNumberBuffers; ++i) {
@@ -38,7 +38,7 @@ void CopyToBuffersFromAudioBufferList(void * const _Nonnull * const _Nonnull dst
 /// @param dstOffset The byte offset to begin writing.
 /// @param src The source audio buffers.
 /// @param srcOffset The byte offset to begin reading.
-/// @param byteCount The maximum number of bytes per non-interleaved buffer to read and write.
+/// @param byteCount The number of bytes per non-interleaved buffer to read and write.
 void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std::size_t dstOffset, const void * const _Nonnull * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept
 {
 	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
@@ -51,8 +51,8 @@ void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std:
 
 /// Zeroes a range of bytes in an AudioBufferList struct.
 /// @param dst The destination AudioBufferList.
-/// @param byteOffset The byte offset to begin writing.
-/// @param byteCount The maximum number of bytes to write.
+/// @param byteOffset The byte offset to begin writing zeroes.
+/// @param byteCount The number of bytes to set to zero.
 void ZeroAudioBufferList(AudioBufferList * const _Nonnull dst, std::size_t byteOffset, std::size_t byteCount) noexcept
 {
 	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
