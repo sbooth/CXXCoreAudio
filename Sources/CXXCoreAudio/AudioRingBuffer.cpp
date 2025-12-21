@@ -207,8 +207,8 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 
 void CXXCoreAudio::AudioRingBuffer::Reset() noexcept
 {
-	writePosition_.store(0, std::memory_order_relaxed);
-	readPosition_.store(0, std::memory_order_relaxed);
+	writePosition_.store(0, std::memory_order_release);
+	readPosition_.store(0, std::memory_order_release);
 }
 
 // MARK: Buffer Information
