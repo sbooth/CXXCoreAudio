@@ -124,17 +124,17 @@ public:
 	/// @note This method is only safe to call from the producer.
 	/// @param bufferList An audio buffer list containing the data to copy.
 	/// @param frameCount The desired number of audio frames to write.
-	/// @param allowPartial Whether any audio frames should be written if the free space available for writing is less than frameCount.
 	/// @return The number of audio frames actually written.
-	size_type Write(const AudioBufferList * const _Nonnull bufferList, size_type frameCount, bool allowPartial = true) noexcept;
+	size_type Write(const AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept;
 
 	/// Reads audio and advances the read position.
+	///
+	/// If fewer than frameCount frames are available the remainder of bufferList will be set to silence.
 	/// @note This method is only safe to call from the consumer.
 	/// @param bufferList An audio buffer list to receive the data.
 	/// @param frameCount The desired number of audio frames to read.
-	/// @param allowPartial Whether any audio frames should be read if the number of frames available for reading is less than frameCount.
 	/// @return The number of audio frames actually read.
-	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount, bool allowPartial = true) noexcept;
+	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.

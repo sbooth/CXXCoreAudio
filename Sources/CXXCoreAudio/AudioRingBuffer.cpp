@@ -17,7 +17,7 @@
 
 namespace {
 
-/// Copies non-interleaved audio to dst from src.
+/// Copies non-interleaved audio to a buffer array from an AudioBufferList struct.
 /// @param dst The destination audio buffers.
 /// @param dstOffset The byte offset to begin writing.
 /// @param src The source AudioBufferList.
@@ -33,7 +33,7 @@ void CopyToBuffersFromAudioBufferList(void * const _Nonnull * const _Nonnull dst
 	}
 }
 
-/// Copies non-interleaved audio to dst from src.
+/// Copies non-interleaved audio to an AudioBufferList struct from a buffer array.
 /// @param dst The destination AudioBufferList.
 /// @param dstOffset The byte offset to begin writing.
 /// @param src The source audio buffers.
@@ -45,6 +45,20 @@ void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std:
 		assert(dstOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
 		std::memcpy(static_cast<uint8_t *>(dst->mBuffers[i].mData) + dstOffset,
 					static_cast<const uint8_t *>(src[i]) + srcOffset,
+					byteCount);
+	}
+}
+
+/// Zeroes a range of bytes in an AudioBufferList struct.
+/// @param dst The destination AudioBufferList.
+/// @param byteOffset The byte offset to begin writing.
+/// @param byteCount The maximum number of bytes to write.
+void ZeroAudioBufferList(AudioBufferList * const _Nonnull dst, std::size_t byteOffset, std::size_t byteCount) noexcept
+{
+	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
+		assert(byteOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
+		std::memset(static_cast<uint8_t *>(dst->mBuffers[i].mData) + byteOffset,
+					0,
 					byteCount);
 	}
 }
@@ -234,7 +248,7 @@ bool CXXCoreAudio::AudioRingBuffer::IsFull() const noexcept
 
 // MARK: Writing and Reading Audio
 
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const bufferList, size_type frameCount, bool allowPartial) noexcept
+CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const bufferList, size_type frameCount) noexcept
 {
 	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
 		return 0;
@@ -244,7 +258,7 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(co
 
 	const auto framesUsed = writePos - readPos;
 	const auto framesFree = capacity_ - framesUsed;
-	if(framesFree == 0 || (framesFree < frameCount && !allowPartial))
+	if(framesFree == 0) [[unlikely]]
 		return 0;
 
 	const auto framesToWrite = std::min(framesFree, frameCount);
@@ -264,7 +278,7 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(co
 	return framesToWrite;
 }
 
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const bufferList, size_type frameCount, bool allowPartial) noexcept
+CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const bufferList, size_type frameCount) noexcept
 {
 	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
 		return 0;
@@ -273,8 +287,10 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
 	const auto availableFrames = writePos - readPos;
-	if(availableFrames == 0 || (availableFrames < frameCount && !allowPartial))
+	if(availableFrames == 0) [[unlikely]] {
+		ZeroAudioBufferList(bufferList, 0, frameCount * format_.mBytesPerFrame);
 		return 0;
+	}
 
 	const auto framesToRead = std::min(availableFrames, frameCount);
 
@@ -289,6 +305,10 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	}
 
 	readPosition_.store(readPos + framesToRead, std::memory_order_release);
+
+	// Fill remainder with silence if fewer than requested frames read
+	if(framesToRead != frameCount)
+		ZeroAudioBufferList(bufferList, framesToRead * format_.mBytesPerFrame, (frameCount - framesToRead) * format_.mBytesPerFrame);
 
 	// Set the AudioBuffer buffer sizes
 	const auto byteSize = static_cast<UInt32>(framesToRead) * format_.mBytesPerFrame;
