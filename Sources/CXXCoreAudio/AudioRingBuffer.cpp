@@ -49,17 +49,23 @@ void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std:
 	}
 }
 
+/// Zeroes the bytes in an AudioBufferList struct.
+/// @param abl The destination AudioBufferList.
+void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl) noexcept
+{
+	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i)
+		std::memset(abl->mBuffers[i].mData, 0, abl->mBuffers[i].mDataByteSize);
+}
+
 /// Zeroes a range of bytes in an AudioBufferList struct.
-/// @param dst The destination AudioBufferList.
+/// @param abl The destination AudioBufferList.
 /// @param byteOffset The byte offset to begin writing zeroes.
 /// @param byteCount The number of bytes to set to zero.
-void ZeroAudioBufferList(AudioBufferList * const _Nonnull dst, std::size_t byteOffset, std::size_t byteCount) noexcept
+void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl, std::size_t byteOffset, std::size_t byteCount) noexcept
 {
-	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
-		assert(byteOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
-		std::memset(static_cast<uint8_t *>(dst->mBuffers[i].mData) + byteOffset,
-					0,
-					byteCount);
+	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i) {
+		assert(byteOffset + byteCount <= abl->mBuffers[i].mDataByteSize);
+		std::memset(static_cast<uint8_t *>(abl->mBuffers[i].mData) + byteOffset, 0, byteCount);
 	}
 }
 
@@ -277,7 +283,7 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 
 	const auto availableFrames = writePos - readPos;
 	if(availableFrames == 0) [[unlikely]] {
-		ZeroAudioBufferList(bufferList, 0, frameCount * format_.mBytesPerFrame);
+		ZeroAudioBufferList(bufferList);
 		return 0;
 	}
 
