@@ -79,9 +79,9 @@ public:
 	/// @note This method is not thread safe.
 	void Deallocate() noexcept;
 
-	/// Resets the read and write positions to their default state, emptying the buffer.
-	/// @note This method is not thread safe.
-	void Reset() noexcept;
+	/// Drains the ring buffer.
+	/// @note This method is only safe to call from the consumer.
+	void Drain() noexcept;
 
 	// MARK: Buffer Information
 
@@ -135,6 +135,12 @@ public:
 	/// @param frameCount The desired number of audio frames to read.
 	/// @return The number of audio frames actually read.
 	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept;
+
+	/// Skips audio and advances the read position.
+	/// @note This method is only safe to call from the consumer.
+	/// @param frameCount The desired number of audio frames to skip.
+	/// @return The number of audio frames actually skipped.
+	size_type Skip(size_type frameCount) noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
