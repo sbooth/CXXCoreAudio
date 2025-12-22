@@ -287,11 +287,13 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
 		return 0;
 
-	// Check for buffer reset
 	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
 	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+
+	// If the epoch changed resynchronize with the producer
 	if(currentEpoch != localEpoch) [[unlikely]] {
 		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
+
 		const auto writePos = writePosition_.load(std::memory_order_acquire);
 		readPosition_.store(writePos, std::memory_order_release);
 
@@ -338,6 +340,7 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 
 	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
 	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+
 	if(currentEpoch != localEpoch) [[unlikely]] {
 		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
 
@@ -365,6 +368,7 @@ void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
 {
 	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
 	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+
 	if(currentEpoch != localEpoch) [[unlikely]]
 		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
 
