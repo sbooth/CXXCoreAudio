@@ -304,12 +304,12 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	const auto writePos = writePosition_.load(std::memory_order_acquire);
 	const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
-	if(writePos <= readPos) [[unlikely]] {
+	const auto availableFrames = writePos - readPos;
+	if(availableFrames == 0) [[unlikely]] {
 		ZeroAudioBufferList(bufferList);
 		return 0;
 	}
 
-	const auto availableFrames = writePos - readPos;
 	const auto framesToRead = std::min(availableFrames, frameCount);
 
 	const auto readIndex = readPos & capacityMask_;
@@ -322,11 +322,11 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 		CopyToAudioBufferListFromBuffers(bufferList, bytesToEnd, buffers_, 0, (framesToRead - framesToEnd) * format_.mBytesPerFrame);
 	}
 
-	readPosition_.store(readPos + framesToRead, std::memory_order_release);
-
 	// Fill remainder with silence if fewer than requested frames read
 	if(framesToRead != frameCount)
 		ZeroAudioBufferList(bufferList, framesToRead * format_.mBytesPerFrame, (frameCount - framesToRead) * format_.mBytesPerFrame);
+
+	readPosition_.store(readPos + framesToRead, std::memory_order_release);
 
 	return framesToRead;
 }
@@ -353,10 +353,10 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 	const auto writePos = writePosition_.load(std::memory_order_acquire);
 	const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
-	if(writePos <= readPos) [[unlikely]]
+	const auto availableFrames = writePos - readPos;
+	if(availableFrames == 0) [[unlikely]]
 		return 0;
 
-	const auto availableFrames = writePos - readPos;
 	const auto framesToSkip = std::min(availableFrames, frameCount);
 
 	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
