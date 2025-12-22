@@ -79,16 +79,25 @@ public:
 	/// @note This method is not thread safe.
 	void Deallocate() noexcept;
 
-	/// Drains the ring buffer.
-	/// @note This method is only safe to call from the consumer.
-	void Drain() noexcept;
-
 	// MARK: Buffer Information
+
+	/// Returns the format of the audio stored in the ring buffer.
+	/// @note This method is thread safe.
+	/// @return The audio format of the ring buffer.
+	[[nodiscard]] const CAStreamDescription& Format() const noexcept
+	{
+		return format_;
+	}
 
 	/// Returns the capacity of the ring buffer.
 	/// @note This method is thread safe.
 	/// @return The ring buffer capacity in audio frames.
-	[[nodiscard]] size_type Capacity() const noexcept;
+	[[nodiscard]] size_type Capacity() const noexcept
+	{
+		return capacity_;
+	}
+
+	// MARK: Buffer Usage
 
 	/// Returns the amount of free space in the buffer.
 	/// @note This method is only safe to call from the producer.
@@ -110,14 +119,6 @@ public:
 	/// @return true if the buffer is full.
 	[[nodiscard]] bool IsFull() const noexcept;
 
-	/// Returns the format of the audio stored in the ring buffer.
-	/// @note This method is thread safe.
-	/// @return The audio format of the ring buffer.
-	[[nodiscard]] const CAStreamDescription& Format() const noexcept
-	{
-		return format_;
-	}
-
 	// MARK: Writing and Reading Audio
 
 	/// Writes audio and advances the write position.
@@ -136,11 +137,17 @@ public:
 	/// @return The number of audio frames actually read.
 	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept;
 
+	// MARK: Discarding Audio
+
 	/// Skips audio and advances the read position.
 	/// @note This method is only safe to call from the consumer.
 	/// @param frameCount The desired number of audio frames to skip.
 	/// @return The number of audio frames actually skipped.
 	size_type Skip(size_type frameCount) noexcept;
+
+	/// Drains the ring buffer.
+	/// @note This method is only safe to call from the consumer.
+	void Drain() noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
