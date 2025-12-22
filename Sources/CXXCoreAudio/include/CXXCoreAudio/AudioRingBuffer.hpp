@@ -9,6 +9,7 @@
 #import <atomic>
 #import <cstddef>
 #import <limits>
+#import <new>
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -159,11 +160,14 @@ private:
 	size_type capacityMask_{0};
 
 	/// The free-running write location.
+	alignas(std::hardware_destructive_interference_size)
 	std::atomic<size_type> writePosition_{0};
 	/// The free-running read location.
+	alignas(std::hardware_destructive_interference_size)
 	std::atomic<size_type> readPosition_{0};
 
 	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
+	static_assert(std::hardware_destructive_interference_size >= alignof(std::atomic<size_type>));
 
 	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
