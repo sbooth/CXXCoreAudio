@@ -312,3 +312,22 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 
 	return framesToRead;
 }
+
+CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(size_type frameCount) noexcept
+{
+	if(frameCount == 0 || capacity_ == 0) [[unlikely]]
+		return 0;
+
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+	const auto availableFrames = writePos - readPos;
+	if(availableFrames == 0) [[unlikely]]
+		return 0;
+
+	const auto framesToSkip = std::min(availableFrames, frameCount);
+
+	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
+
+	return framesToSkip;
+}

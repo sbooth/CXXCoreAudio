@@ -136,6 +136,12 @@ public:
 	/// @return The number of audio frames actually read.
 	size_type Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept;
 
+	/// Skips audio and advances the read position.
+	/// @note This method is only safe to call from the consumer.
+	/// @param frameCount The desired number of audio frames to skip.
+	/// @return The number of audio frames actually skipped.
+	size_type Skip(size_type frameCount) noexcept;
+
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
