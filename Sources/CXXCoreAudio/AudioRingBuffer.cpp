@@ -372,7 +372,7 @@ void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
 	readPosition_.store(writePos, std::memory_order_release);
 }
 
-void CXXCoreAudio::AudioRingBuffer::Reset() noexcept
+void CXXCoreAudio::AudioRingBuffer::Clear() noexcept
 {
 	epoch_.fetch_add(1, std::memory_order_release);
 	writePosition_.store(0, std::memory_order_relaxed);

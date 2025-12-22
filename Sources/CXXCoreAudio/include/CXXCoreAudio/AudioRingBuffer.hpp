@@ -24,9 +24,9 @@ public:
 	/// Unsigned integer type.
 	using size_type = std::size_t;
 
-	/// The minimum supported ring buffer capacity in audio frames.
+	/// The minimum supported buffer capacity in audio frames.
 	static constexpr size_type min_capacity = size_type{2};
-	/// The maximum supported ring buffer capacity in audio frames.
+	/// The maximum supported buffer capacity in audio frames.
 	static constexpr size_type max_capacity = size_type{1} << (std::numeric_limits<size_type>::digits - 1);
 
 	// MARK: Creation and Destruction
@@ -37,7 +37,7 @@ public:
 
 	/// Creates a ring buffer with the specified format and minimum audio frame capacity.
 	///
-	/// The actual ring buffer capacity will be the smallest integral power of two that is not less than the specified minimum capacity.
+	/// The actual buffer capacity will be the smallest integral power of two that is not less than the specified minimum capacity.
 	/// @note Only non-interleaved formats are supported.
 	/// @param format The format of the audio that will be written to and read from the buffer.
 	/// @param minFrameCapacity The desired minimum capacity in audio frames.
@@ -67,7 +67,7 @@ public:
 
 	/// Allocates space for audio data of the specified format.
 	///
-	/// The actual ring buffer capacity will be the smallest integral power of two that is not less than the specified minimum capacity.
+	/// The actual buffer capacity will be the smallest integral power of two that is not less than the specified minimum capacity.
 	/// @note Only non-interleaved formats are supported.
 	/// @note This method is not thread safe.
 	/// @param format The format of the audio that will be written to and read from this buffer.
@@ -81,17 +81,17 @@ public:
 
 	// MARK: Buffer Information
 
-	/// Returns the format of the audio stored in the ring buffer.
+	/// Returns the format of the audio stored in the buffer.
 	/// @note This method is thread safe.
-	/// @return The audio format of the ring buffer.
+	/// @return The audio format of the buffer.
 	[[nodiscard]] const CAStreamDescription& Format() const noexcept
 	{
 		return format_;
 	}
 
-	/// Returns the capacity of the ring buffer.
+	/// Returns the capacity of the buffer.
 	/// @note This method is thread safe.
-	/// @return The ring buffer capacity in audio frames.
+	/// @return The buffer capacity in audio frames.
 	[[nodiscard]] size_type Capacity() const noexcept
 	{
 		return capacity_;
@@ -109,12 +109,12 @@ public:
 	/// @return The number of audio frames available for reading.
 	[[nodiscard]] size_type AvailableFrames() const noexcept;
 
-	/// Returns true if the ring buffer is empty.
+	/// Returns true if the buffer is empty.
 	/// @note This method is thread safe.
 	/// @return true if the buffer contains no data.
 	[[nodiscard]] bool IsEmpty() const noexcept;
 
-	/// Returns true if the ring buffer is full.
+	/// Returns true if the buffer is full.
 	/// @note This method is thread safe.
 	/// @return true if the buffer is full.
 	[[nodiscard]] bool IsFull() const noexcept;
@@ -145,13 +145,13 @@ public:
 	/// @return The number of audio frames actually skipped.
 	size_type Skip(size_type frameCount) noexcept;
 
-	/// Drains the ring buffer.
+	/// Advances the read position to the write position, emptying the buffer.
 	/// @note This method is only safe to call from the consumer.
 	void Drain() noexcept;
 
-	/// Resets the ring buffer.
+	/// Sets the read and write positions to zero, emptying the buffer.
 	/// @note This method is only safe to call from the producer.
-	void Reset() noexcept;
+	void Clear() noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
@@ -167,14 +167,14 @@ private:
 	/// The free-running read location.
 	std::atomic<size_type> readPosition_{0};
 
-	/// The ring buffer epoch, incremented by ``Reset``.
+	/// The buffer epoch, incremented by ``Reset``.
 	std::atomic<size_type> epoch_{0};
 	/// The epoch during the latest call to ``Read``.
 	std::atomic<size_type> readEpoch_{0};
 
 	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
 
-	/// The format of the audio this ring buffer contains.
+	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
 };
 
