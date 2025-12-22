@@ -167,9 +167,9 @@ private:
 	/// The free-running read location.
 	std::atomic<size_type> readPosition_{0};
 
-	/// The buffer epoch, incremented by ``Reset``.
+	/// The buffer epoch, incremented by ``Clear``.
 	std::atomic<size_type> epoch_{0};
-	/// The epoch during the latest call to ``Read``.
+	/// The epoch during the latest read operation.
 	std::atomic<size_type> readEpoch_{0};
 
 	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
