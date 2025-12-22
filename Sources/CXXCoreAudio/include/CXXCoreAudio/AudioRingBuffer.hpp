@@ -100,12 +100,12 @@ public:
 	// MARK: Buffer Usage
 
 	/// Returns the amount of free space in the buffer.
-	/// @note This method is only safe to call from the producer.
+	/// @note This method is thread safe.
 	/// @return The number of audio frames of free space available for writing.
 	[[nodiscard]] size_type FreeSpace() const noexcept;
 
 	/// Returns the amount of audio in the buffer.
-	/// @note This method is only safe to call from the consumer.
+	/// @note This method is thread safe.
 	/// @return The number of audio frames available for reading.
 	[[nodiscard]] size_type AvailableFrames() const noexcept;
 
