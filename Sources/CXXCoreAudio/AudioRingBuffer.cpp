@@ -49,17 +49,23 @@ void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std:
 	}
 }
 
+/// Zeroes the bytes in an AudioBufferList struct.
+/// @param abl The destination AudioBufferList.
+void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl) noexcept
+{
+	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i)
+		std::memset(abl->mBuffers[i].mData, 0, abl->mBuffers[i].mDataByteSize);
+}
+
 /// Zeroes a range of bytes in an AudioBufferList struct.
-/// @param dst The destination AudioBufferList.
+/// @param abl The destination AudioBufferList.
 /// @param byteOffset The byte offset to begin writing zeroes.
 /// @param byteCount The number of bytes to set to zero.
-void ZeroAudioBufferList(AudioBufferList * const _Nonnull dst, std::size_t byteOffset, std::size_t byteCount) noexcept
+void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl, std::size_t byteOffset, std::size_t byteCount) noexcept
 {
-	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
-		assert(byteOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
-		std::memset(static_cast<uint8_t *>(dst->mBuffers[i].mData) + byteOffset,
-					0,
-					byteCount);
+	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i) {
+		assert(byteOffset + byteCount <= abl->mBuffers[i].mDataByteSize);
+		std::memset(static_cast<uint8_t *>(abl->mBuffers[i].mData) + byteOffset, 0, byteCount);
 	}
 }
 
@@ -109,7 +115,7 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription
 }
 
 CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
-: buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)}, capacityMask_{std::exchange(other.capacityMask_, 0)}, writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)}, readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)}, format_{std::exchange(other.format_, {})}
+: buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)}, capacityMask_{std::exchange(other.capacityMask_, 0)}, writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)}, readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)}, epoch_{other.epoch_.exchange(0, std::memory_order_relaxed)}, readEpoch_{other.readEpoch_.exchange(0, std::memory_order_relaxed)}, format_{std::exchange(other.format_, {})}
 {}
 
 CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer&& other) noexcept
@@ -123,6 +129,9 @@ CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRin
 
 		writePosition_.store(other.writePosition_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
 		readPosition_.store(other.readPosition_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
+
+		epoch_.store(other.epoch_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
+		readEpoch_.store(other.readEpoch_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
 
 		format_ = std::exchange(other.format_, {});
 	}
@@ -184,6 +193,9 @@ bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& 
 	writePosition_.store(0, std::memory_order_relaxed);
 	readPosition_.store(0, std::memory_order_relaxed);
 
+	epoch_.store(0, std::memory_order_relaxed);
+	readEpoch_.store(0, std::memory_order_relaxed);
+
 	format_ = format;
 
 	return true;
@@ -200,6 +212,9 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 
 		writePosition_.store(0, std::memory_order_relaxed);
 		readPosition_.store(0, std::memory_order_relaxed);
+
+		epoch_.store(0, std::memory_order_relaxed);
+		readEpoch_.store(0, std::memory_order_relaxed);
 
 		format_.Reset();
 	}
@@ -272,15 +287,27 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(Aud
 	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
 		return 0;
 
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+	// Check for buffer reset
+	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
+	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+	if(currentEpoch != localEpoch) [[unlikely]] {
+		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
+		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		readPosition_.store(writePos, std::memory_order_release);
 
-	const auto availableFrames = writePos - readPos;
-	if(availableFrames == 0) [[unlikely]] {
-		ZeroAudioBufferList(bufferList, 0, frameCount * format_.mBytesPerFrame);
+		ZeroAudioBufferList(bufferList);
 		return 0;
 	}
 
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+	if(writePos <= readPos) [[unlikely]] {
+		ZeroAudioBufferList(bufferList);
+		return 0;
+	}
+
+	const auto availableFrames = writePos - readPos;
 	const auto framesToRead = std::min(availableFrames, frameCount);
 
 	const auto readIndex = readPos & capacityMask_;
@@ -309,13 +336,24 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 	if(frameCount == 0 || capacity_ == 0) [[unlikely]]
 		return 0;
 
+	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
+	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+	if(currentEpoch != localEpoch) [[unlikely]] {
+		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
+
+		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		readPosition_.store(writePos, std::memory_order_release);
+
+		return 0;
+	}
+
 	const auto writePos = writePosition_.load(std::memory_order_acquire);
 	const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
-	const auto availableFrames = writePos - readPos;
-	if(availableFrames == 0) [[unlikely]]
+	if(writePos <= readPos) [[unlikely]]
 		return 0;
 
+	const auto availableFrames = writePos - readPos;
 	const auto framesToSkip = std::min(availableFrames, frameCount);
 
 	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
@@ -325,6 +363,18 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 
 void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
 {
+	const auto currentEpoch = epoch_.load(std::memory_order_acquire);
+	const auto localEpoch = readEpoch_.load(std::memory_order_relaxed);
+	if(currentEpoch != localEpoch) [[unlikely]]
+		readEpoch_.store(currentEpoch, std::memory_order_relaxed);
+
 	const auto writePos = writePosition_.load(std::memory_order_acquire);
 	readPosition_.store(writePos, std::memory_order_release);
+}
+
+void CXXCoreAudio::AudioRingBuffer::Reset() noexcept
+{
+	epoch_.fetch_add(1, std::memory_order_release);
+	writePosition_.store(0, std::memory_order_relaxed);
+	readPosition_.store(0, std::memory_order_relaxed);
 }

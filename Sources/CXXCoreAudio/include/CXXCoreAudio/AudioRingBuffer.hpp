@@ -149,6 +149,10 @@ public:
 	/// @note This method is only safe to call from the consumer.
 	void Drain() noexcept;
 
+	/// Resets the ring buffer.
+	/// @note This method is only safe to call from the producer.
+	void Reset() noexcept;
+
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
@@ -162,6 +166,11 @@ private:
 	std::atomic<size_type> writePosition_{0};
 	/// The free-running read location.
 	std::atomic<size_type> readPosition_{0};
+
+	/// The ring buffer epoch, incremented by ``Reset``.
+	std::atomic<size_type> epoch_{0};
+	/// The epoch during the latest call to ``Read``.
+	std::atomic<size_type> readEpoch_{0};
 
 	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
 
