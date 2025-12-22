@@ -205,10 +205,10 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 	}
 }
 
-void CXXCoreAudio::AudioRingBuffer::Reset() noexcept
+void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
 {
-	writePosition_.store(0, std::memory_order_relaxed);
-	readPosition_.store(0, std::memory_order_relaxed);
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	readPosition_.store(writePos, std::memory_order_release);
 }
 
 // MARK: Buffer Information
