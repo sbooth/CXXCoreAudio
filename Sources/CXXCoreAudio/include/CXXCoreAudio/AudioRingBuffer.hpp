@@ -85,7 +85,7 @@ public:
 	// MARK: Buffer Information
 
 	/// Returns the format of the audio stored in the buffer.
-	/// @note This method is thread safe.
+	/// @note This method is safe to call from both producer and consumer.
 	/// @return The audio format of the buffer.
 	[[nodiscard]] const CAStreamDescription& Format() const noexcept
 	{
@@ -93,7 +93,7 @@ public:
 	}
 
 	/// Returns the capacity of the buffer.
-	/// @note This method is thread safe.
+	/// @note This method is safe to call from both producer and consumer.
 	/// @return The buffer capacity in audio frames.
 	[[nodiscard]] size_type Capacity() const noexcept
 	{
@@ -103,24 +103,24 @@ public:
 	// MARK: Buffer Usage
 
 	/// Returns the amount of free space in the buffer.
-	/// @note This method is only safe to call from the producer.
+	/// @note The result of this method is only accurate when called from the producer.
 	/// @return The number of audio frames of free space available for writing.
 	[[nodiscard]] size_type FreeSpace() const noexcept;
 
+	/// Returns true if the buffer is full.
+	/// @note The result of this method is only accurate when called from the producer.
+	/// @return true if the buffer is full.
+	[[nodiscard]] bool IsFull() const noexcept;
+
 	/// Returns the amount of audio in the buffer.
-	/// @note This method is only safe to call from the consumer.
+	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return The number of audio frames available for reading.
 	[[nodiscard]] size_type AvailableFrames() const noexcept;
 
 	/// Returns true if the buffer is empty.
-	/// @note This method is thread safe.
+	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return true if the buffer contains no data.
 	[[nodiscard]] bool IsEmpty() const noexcept;
-
-	/// Returns true if the buffer is full.
-	/// @note This method is thread safe.
-	/// @return true if the buffer is full.
-	[[nodiscard]] bool IsFull() const noexcept;
 
 	// MARK: Writing and Reading Audio
 
