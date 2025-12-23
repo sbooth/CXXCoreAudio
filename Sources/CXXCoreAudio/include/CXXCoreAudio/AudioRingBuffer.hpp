@@ -84,7 +84,7 @@ public:
 	// MARK: Buffer Information
 
 	/// Returns the format of the audio stored in the buffer.
-	/// @note This method is thread safe.
+	/// @note This method is safe to call from both producer and consumer.
 	/// @return The audio format of the buffer.
 	[[nodiscard]] const CAStreamDescription& Format() const noexcept
 	{
@@ -92,7 +92,7 @@ public:
 	}
 
 	/// Returns the capacity of the buffer.
-	/// @note This method is thread safe.
+	/// @note This method is safe to call from both producer and consumer.
 	/// @return The buffer capacity in audio frames.
 	[[nodiscard]] size_type Capacity() const noexcept
 	{
