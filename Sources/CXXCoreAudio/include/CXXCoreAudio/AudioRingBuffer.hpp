@@ -23,6 +23,8 @@ class AudioRingBuffer final {
 public:
 	/// Unsigned integer type.
 	using size_type = std::size_t;
+	/// Atomic unsigned integer type.
+	using atomic_size_type = std::atomic<size_type>;
 
 	/// The minimum supported buffer capacity in audio frames.
 	static constexpr size_type min_capacity = size_type{2};
@@ -159,11 +161,11 @@ private:
 	size_type capacityMask_{0};
 
 	/// The free-running write location.
-	std::atomic<size_type> writePosition_{0};
+	atomic_size_type writePosition_{0};
 	/// The free-running read location.
-	std::atomic<size_type> readPosition_{0};
+	atomic_size_type readPosition_{0};
 
-	static_assert(std::atomic<size_type>::is_always_lock_free, "Lock-free std::atomic<size_type> required");
+	static_assert(atomic_size_type::is_always_lock_free, "Lock-free atomic_size_type required");
 
 	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
