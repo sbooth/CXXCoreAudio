@@ -250,7 +250,7 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const bufferList,
 	const auto zeroByteRange = [&](uint32_t byteOffset, uint32_t byteCount) noexcept {
 		const auto bufferCount = format_.ChannelStreamCount();
 		for(uint32_t i = 0; i < bufferCount; ++i)
-			std::memset(static_cast<uint8_t *>(buffers_[i]) + byteOffset,
+			std::memset(static_cast<unsigned char *>(buffers_[i]) + byteOffset,
 						0,
 						byteCount);
 	};
@@ -274,8 +274,8 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList * const bufferList,
 	const auto storeABL = [&](uint32_t dstOffset, const AudioBufferList * const _Nonnull bufferList, uint32_t srcOffset, uint32_t byteCount) noexcept {
 		for(UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {
 			assert(srcOffset <= bufferList->mBuffers[i].mDataByteSize);
-			std::memcpy(static_cast<uint8_t *>(buffers_[i]) + dstOffset,
-						static_cast<uint8_t *>(bufferList->mBuffers[i].mData) + srcOffset,
+			std::memcpy(static_cast<unsigned char *>(buffers_[i]) + dstOffset,
+						static_cast<unsigned char *>(bufferList->mBuffers[i].mData) + srcOffset,
 						std::min(byteCount, bufferList->mBuffers[i].mDataByteSize - srcOffset));
 		}
 	};
@@ -332,7 +332,7 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const bufferList, uint32
 	const auto zeroABL = [](AudioBufferList * const _Nonnull bufferList, uint32_t byteOffset, uint32_t byteCount) noexcept {
 		for(UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {
 			assert(byteOffset <= bufferList->mBuffers[i].mDataByteSize);
-			std::memset(static_cast<uint8_t *>(bufferList->mBuffers[i].mData) + byteOffset,
+			std::memset(static_cast<unsigned char *>(bufferList->mBuffers[i].mData) + byteOffset,
 						0,
 						std::min(byteCount, bufferList->mBuffers[i].mDataByteSize - byteOffset));
 		}
@@ -361,8 +361,8 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const bufferList, uint32
 	const auto fetchABL = [&](AudioBufferList * const _Nonnull bufferList, uint32_t dstOffset, uint32_t srcOffset, uint32_t byteCount) noexcept {
 		for(UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {
 			assert(dstOffset <= bufferList->mBuffers[i].mDataByteSize);
-			std::memcpy(static_cast<uint8_t *>(bufferList->mBuffers[i].mData) + dstOffset,
-						static_cast<uint8_t *>(buffers_[i]) + srcOffset,
+			std::memcpy(static_cast<unsigned char *>(bufferList->mBuffers[i].mData) + dstOffset,
+						static_cast<unsigned char *>(buffers_[i]) + srcOffset,
 						std::min(byteCount, bufferList->mBuffers[i].mDataByteSize - dstOffset));
 		}
 	};
