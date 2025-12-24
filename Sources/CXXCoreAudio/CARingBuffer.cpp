@@ -346,7 +346,7 @@ bool CXXCoreAudio::CARingBuffer::Read(AudioBufferList * const bufferList, uint32
 	const auto byteSize = static_cast<uint32_t>(endRead - sampleTime) * format_.mBytesPerFrame;
 
 	const auto destStartOffset = static_cast<uint32_t>(std::max(int64_t{0}, sampleTime - startRead0));
-	const auto destStartByteOffset = static_cast<uint32_t>(std::max(int64_t{0}, (sampleTime - startRead0) * format_.mBytesPerFrame));
+	const auto destStartByteOffset = destStartOffset * format_.mBytesPerFrame;
 	if(destStartByteOffset > 0)
 		zeroABL(bufferList, 0, std::min(frameCount * format_.mBytesPerFrame, destStartByteOffset));
 
