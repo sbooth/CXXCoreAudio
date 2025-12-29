@@ -6,6 +6,7 @@
 
 #pragma once
 
+#import <cassert>
 #import <cstring>
 #import <optional>
 
@@ -264,12 +265,14 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// @note This is equivalent to byteSize / mBytesPerFrame.
 	UInt32 ByteSizeToFrameCount(UInt32 byteSize) const noexcept
 	{
+		assert(mBytesPerFrame > 0);
 		return byteSize / mBytesPerFrame;
 	}
 
 	/// Returns the duration of a single packet in seconds.
-	double GetPacketDuration() const noexcept
+	double PacketDuration() const noexcept
 	{
+		assert(mSampleRate > 0);
 		return (1 / mSampleRate) * mFramesPerPacket;
 	}
 

@@ -276,48 +276,25 @@ public:
 
 	// MARK: AudioChannelLayout access
 
-	/// Returns the size in bytes of this object's internal AudioChannelLayout.
+	/// Returns the size in bytes of the managed AudioChannelLayout struct.
 	size_t Size() const noexcept
 	{
 		return AudioChannelLayoutSize(channelLayout_);
 	}
 
-	/// Releases ownership of the object's internal AudioChannelLayout and returns it.
-	/// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout using std::free.
-	AudioChannelLayout * _Nullable Release() noexcept
-	{
-		return std::exchange(channelLayout_, nullptr);
-	}
-
-	/// Replaces the object's internal AudioChannelLayout with another AudioChannelLayout.
-	/// @note The object assumes responsibility for deallocating the passed AudioChannelLayout using std::free.
-	void Reset(AudioChannelLayout * _Nullable channelLayout = nullptr) noexcept
-	{
-		if(channelLayout_ != channelLayout)
-			std::free(std::exchange(channelLayout_, channelLayout));
-	}
-
-	/// A channel layout is empty when the internal AudioChannelLayout is null.
+	/// A channel layout is empty when the managed AudioChannelLayout struct is null.
 	explicit operator bool() const noexcept
 	{
 		return channelLayout_ != nullptr;
 	}
 
-	/// Returns true if this channel layout is not empty.
-	///
-	/// Returns a const pointer to this object's internal AudioChannelLayout.
-	const AudioChannelLayout * _Nullable GetChannelLayout() const noexcept
-	{
-		return channelLayout_;
-	}
-
-	/// Returns a const pointer to this object's internal AudioChannelLayout.
+	/// Returns a const pointer to the managed AudioChannelLayout struct.
 	const AudioChannelLayout * _Nullable operator->() const noexcept
 	{
 		return channelLayout_;
 	}
 
-	/// Returns a const pointer to this object's internal AudioChannelLayout.
+	/// Returns a const pointer to the managed AudioChannelLayout struct.
 	operator const AudioChannelLayout * const _Nullable () const noexcept
 	{
 		return channelLayout_;
@@ -344,7 +321,7 @@ public:
 	}
 
 #ifdef __OBJC__
-	/// Returns an AVAudioChannelLayout object initialized with this object's internal AudioChannelLayout.
+	/// Returns an AVAudioChannelLayout object initialized with the managed AudioChannelLayout struct.
 	operator AVAudioChannelLayout * _Nullable () const noexcept
 	{
 		return [[AVAudioChannelLayout alloc] initWithLayout:channelLayout_];
@@ -363,8 +340,35 @@ public:
 	}
 #endif /* __OBJC__ */
 
+
+	/// Returns the managed AudioChannelLayout struct.
+	const AudioChannelLayout * _Nullable get() const noexcept
+	{
+		return channelLayout_;
+	}
+
+	/// Replaces the managed AudioChannelLayout struct with another AudioChannelLayout struct.
+	/// @note The object assumes responsibility for deallocating the passed AudioChannelLayout struct using std::free.
+	void reset(AudioChannelLayout * _Nullable channelLayout = nullptr) noexcept
+	{
+		std::free(std::exchange(channelLayout_, channelLayout));
+	}
+
+	/// Swaps the managed AudioChannelLayout struct with the managed AudioChannelLayout struct from another audio channel layout.
+	void swap(CAChannelLayout& other) noexcept
+	{
+		std::swap(channelLayout_, other.channelLayout_);
+	}
+
+	/// Releases ownership of the managed AudioChannelLayout struct and returns it.
+	/// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout struct using std::free.
+	AudioChannelLayout * _Nullable release() noexcept
+	{
+		return std::exchange(channelLayout_, nullptr);
+	}
+
 private:
-	/// The underlying AudioChannelLayout structure.
+	/// The managed AudioChannelLayout structure.
 	AudioChannelLayout * _Nullable channelLayout_{nullptr};
 };
 

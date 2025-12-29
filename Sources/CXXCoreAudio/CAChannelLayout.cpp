@@ -262,12 +262,10 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
 	if(!lhs && !rhs)
 		return true;
 	if(lhs && !rhs) {
-		const auto tag = lhs->mChannelLayoutTag;
-		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
+		if(const auto tag = lhs->mChannelLayoutTag; tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
 	} else if(!lhs && rhs) {
-		const auto tag = rhs->mChannelLayoutTag;
-		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
+		if(const auto tag = rhs->mChannelLayoutTag; tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
 	}
 
@@ -398,7 +396,7 @@ CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CA
 			const auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
 			if(other.channelLayout_ && !channelLayout)
 				throw std::bad_alloc();
-			Reset(channelLayout);
+			reset(channelLayout);
 		}
 	}
 	return *this;
@@ -430,7 +428,7 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> ch
 		const auto channelLayout = AllocateAudioChannelLayout(0);
 		if(!channelLayout)
 			throw std::bad_alloc();
-		Reset(channelLayout);
+		reset(channelLayout);
 		channelLayout_->mChannelLayoutTag = tag;
 	}
 }
@@ -447,24 +445,23 @@ CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const Au
 	const auto channelLayout = CopyAudioChannelLayout(other);
 	if(other && !channelLayout)
 		throw std::bad_alloc();
-	Reset(channelLayout);
+	reset(channelLayout);
 	return *this;
 }
 
 CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout&& other) noexcept
-: channelLayout_{other.Release()}
+: channelLayout_{other.release()}
 {}
 
 CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(CAChannelLayout&& other) noexcept
 {
-	if(this != &other)
-		Reset(other.Release());
+	reset(other.release());
 	return *this;
 }
 
 CXXCoreAudio::CAChannelLayout::~CAChannelLayout() noexcept
 {
-	std::free(channelLayout_);
+	reset();
 }
 
 // MARK: Functionality

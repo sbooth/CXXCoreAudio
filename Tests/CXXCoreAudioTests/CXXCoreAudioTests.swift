@@ -44,15 +44,24 @@ import Testing
 
 	@Test func ringBuffer() async {
 		let empty = CXXCoreAudio.AudioRingBuffer()
-		#expect(empty.AvailableReadCount() == 0)
-		#expect(empty.AvailableWriteCount() == 0)
+		#expect(empty.__convertToBool() == false)
 		#expect(empty.Capacity() == 0)
+		#expect(empty.AvailableFrames() == 0)
+		#expect(empty.FreeSpace() == empty.Capacity())
 
 		var rb = CXXCoreAudio.AudioRingBuffer()
 		let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
 		#expect(rb.Allocate(std2ch, 512) == true)
-		#expect(rb.AvailableReadCount() == 0)
-		#expect(rb.AvailableWriteCount() == rb.Capacity())
+		#expect(rb.__convertToBool() == true)
+		#expect(rb.Capacity() == 512)
+		#expect(rb.AvailableFrames() == 0)
+		#expect(rb.FreeSpace() == rb.Capacity())
+
+		rb.Deallocate()
+		#expect(rb.__convertToBool() == false)
+		#expect(rb.Capacity() == 0)
+		#expect(rb.AvailableFrames() == 0)
+		#expect(rb.FreeSpace() == rb.Capacity())
 	}
 
 	@Test func tsRingBuffer() async {

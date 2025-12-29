@@ -21,7 +21,7 @@ namespace CXXCoreAudio {
 /// @return An AudioBufferList struct or null if an error occurred or memory could not be allocated.
 AudioBufferList * _Nullable AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
-/// A class containing an AudioBufferList with a specific format, frame capacity, and frame length.
+/// A class managing an AudioBufferList structure along with a specific format, frame capacity, and frame length.
 class CAAudioBuffer final {
 public:
 	// MARK: Creation and Destruction
@@ -116,7 +116,7 @@ public:
 		return SetFrameLength(frameCapacity_);
 	}
 
-	/// Infers and updates the frame length using the mDataByteSize field of the internal AudioBufferList.
+	/// Infers and updates the frame length using the mDataByteSize field of the managed AudioBufferList struct.
 	///
 	/// This is normally called after data has been copied to the buffer list during a read operation.
 	/// @return true on success, false otherwise.
@@ -255,43 +255,31 @@ public:
 
 	// MARK: AudioBufferList Access
 
-	/// Returns true if this object's internal AudioBufferList is not null.
+	/// Returns true if the managed AudioBufferList struct is not null.
 	explicit operator bool() const noexcept
 	{
 		return bufferList_ != nullptr;
 	}
 
-	/// Returns a pointer to this object's internal AudioBufferList.
-	AudioBufferList * _Nullable GetBufferList() noexcept
-	{
-		return bufferList_;
-	}
-
-	/// Returns a pointer to this object's internal AudioBufferList.
+	/// Returns a pointer to the managed AudioBufferList struct.
 	AudioBufferList * _Nullable operator->() noexcept
 	{
 		return bufferList_;
 	}
 
-	/// Returns a pointer to this object's internal AudioBufferList.
+	/// Returns a pointer to the managed AudioBufferList struct.
 	operator AudioBufferList * const _Nullable () noexcept
 	{
 		return bufferList_;
 	}
 
-	/// Returns a const pointer to this object's internal AudioBufferList.
-	const AudioBufferList * _Nullable GetBufferList() const noexcept
-	{
-		return bufferList_;
-	}
-
-	/// Returns a const pointer to this object's internal AudioBufferList.
+	/// Returns a const pointer to the managed AudioBufferList struct.
 	const AudioBufferList * _Nullable operator->() const noexcept
 	{
 		return bufferList_;
 	}
 
-	/// Returns a const pointer to this object's internal AudioBufferList.
+	/// Returns a const pointer to the managed AudioBufferList struct.
 	operator const AudioBufferList * const _Nullable () const noexcept
 	{
 		return bufferList_;
@@ -299,21 +287,21 @@ public:
 
 	// MARK: AudioBufferList Management
 
-	/// Adopts an existing AudioBufferList.
-	/// @note The object assumes responsibility for deallocating the passed AudioBufferList using std::free.
-	/// @param bufferList The AudioBufferList to adopt.
+	/// Adopts an existing AudioBufferList struct.
+	/// @note The object assumes responsibility for deallocating the passed AudioBufferList struct using std::free.
+	/// @param bufferList The AudioBufferList struct to adopt.
 	/// @param format The format of bufferList.
 	/// @param frameCapacity The frame capacity of bufferList.
 	/// @param frameLength The number of valid audio frames in bufferList.
 	/// @return true on success, false otherwise.
-	bool AdoptABL(AudioBufferList * _Nonnull bufferList, const AudioStreamBasicDescription& format, UInt32 frameCapacity, UInt32 frameLength) noexcept;
+	bool adopt(AudioBufferList * _Nonnull bufferList, const AudioStreamBasicDescription& format, UInt32 frameCapacity, UInt32 frameLength) noexcept;
 
-	/// Releases ownership of the object's internal AudioBufferList and returns it.
+	/// Releases ownership of managed AudioBufferList struct and returns it.
 	/// @note The caller assumes responsibility for deallocating the returned AudioBufferList using std::free.
-	AudioBufferList * _Nullable Release() noexcept;
+	AudioBufferList * _Nullable release() noexcept;
 
 private:
-	/// The underlying AudioBufferList struct.
+	/// The managed AudioBufferList struct.
 	AudioBufferList * _Nullable bufferList_{nullptr};
 	/// The format of ``bufferList_``.
 	CAStreamDescription format_{};
