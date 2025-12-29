@@ -110,22 +110,42 @@ public:
 	/// Returns the amount of free space in the buffer.
 	/// @note The result of this method is only accurate when called from the producer.
 	/// @return The number of audio frames of free space available for writing.
-	[[nodiscard]] size_type FreeSpace() const noexcept;
+	[[nodiscard]] size_type FreeSpace() const noexcept
+	{
+		const auto writePos = writePosition_.load(std::memory_order_relaxed);
+		const auto readPos = readPosition_.load(std::memory_order_acquire);
+		return capacity_ - (writePos - readPos);
+	}
 
 	/// Returns true if the buffer is full.
 	/// @note The result of this method is only accurate when called from the producer.
 	/// @return true if the buffer is full.
-	[[nodiscard]] bool IsFull() const noexcept;
+	[[nodiscard]] bool IsFull() const noexcept
+	{
+		const auto writePos = writePosition_.load(std::memory_order_relaxed);
+		const auto readPos = readPosition_.load(std::memory_order_acquire);
+		return (writePos - readPos) == capacity_;
+	}
 
 	/// Returns the amount of audio in the buffer.
 	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return The number of audio frames available for reading.
-	[[nodiscard]] size_type AvailableFrames() const noexcept;
+	[[nodiscard]] size_type AvailableFrames() const noexcept
+	{
+		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		const auto readPos = readPosition_.load(std::memory_order_relaxed);
+		return writePos - readPos;
+	}
 
 	/// Returns true if the buffer is empty.
 	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return true if the buffer contains no data.
-	[[nodiscard]] bool IsEmpty() const noexcept;
+	[[nodiscard]] bool IsEmpty() const noexcept
+	{
+		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		const auto readPos = readPosition_.load(std::memory_order_relaxed);
+		return writePos == readPos;
+	}
 
 	// MARK: Writing and Reading Audio
 
@@ -155,7 +175,11 @@ public:
 
 	/// Advances the read position to the write position, emptying the buffer.
 	/// @note This method is only safe to call from the consumer.
-	void Drain() noexcept;
+	void Drain() noexcept
+	{
+		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		readPosition_.store(writePos, std::memory_order_release);
+	}
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.

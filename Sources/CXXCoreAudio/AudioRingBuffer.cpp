@@ -211,36 +211,6 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 	}
 }
 
-// MARK: Buffer Usage
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::FreeSpace() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_relaxed);
-	const auto readPos = readPosition_.load(std::memory_order_acquire);
-	return capacity_ - (writePos - readPos);
-}
-
-bool CXXCoreAudio::AudioRingBuffer::IsFull() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_relaxed);
-	const auto readPos = readPosition_.load(std::memory_order_acquire);
-	return (writePos - readPos) == capacity_;
-}
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::AvailableFrames() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-	return writePos - readPos;
-}
-
-bool CXXCoreAudio::AudioRingBuffer::IsEmpty() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-	return writePos == readPos;
-}
-
 // MARK: Writing and Reading Audio
 
 CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const bufferList, size_type frameCount) noexcept
@@ -327,10 +297,4 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
 
 	return framesToSkip;
-}
-
-void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	readPosition_.store(writePos, std::memory_order_release);
 }
