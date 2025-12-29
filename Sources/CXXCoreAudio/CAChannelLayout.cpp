@@ -262,12 +262,10 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
 	if(!lhs && !rhs)
 		return true;
 	if(lhs && !rhs) {
-		const auto tag = lhs->mChannelLayoutTag;
-		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
+		if(const auto tag = lhs->mChannelLayoutTag; tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
 	} else if(!lhs && rhs) {
-		const auto tag = rhs->mChannelLayoutTag;
-		if(tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
+		if(const auto tag = rhs->mChannelLayoutTag; tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo)
 			return true;
 	}
 
