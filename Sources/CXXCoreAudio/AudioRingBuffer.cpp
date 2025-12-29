@@ -27,8 +27,8 @@ void CopyToBuffersFromAudioBufferList(void * const _Nonnull * const _Nonnull dst
 {
 	for(UInt32 i = 0; i < src->mNumberBuffers; ++i) {
 		assert(srcOffset + byteCount <= src->mBuffers[i].mDataByteSize);
-		std::memcpy(static_cast<uint8_t *>(dst[i]) + dstOffset,
-					static_cast<const uint8_t *>(src->mBuffers[i].mData) + srcOffset,
+		std::memcpy(static_cast<unsigned char *>(dst[i]) + dstOffset,
+					static_cast<const unsigned char *>(src->mBuffers[i].mData) + srcOffset,
 					byteCount);
 	}
 }
@@ -43,8 +43,8 @@ void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std:
 {
 	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
 		assert(dstOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
-		std::memcpy(static_cast<uint8_t *>(dst->mBuffers[i].mData) + dstOffset,
-					static_cast<const uint8_t *>(src[i]) + srcOffset,
+		std::memcpy(static_cast<unsigned char *>(dst->mBuffers[i].mData) + dstOffset,
+					static_cast<const unsigned char *>(src[i]) + srcOffset,
 					byteCount);
 	}
 }
@@ -65,7 +65,7 @@ void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl, std::size_t byteO
 {
 	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i) {
 		assert(byteOffset + byteCount <= abl->mBuffers[i].mDataByteSize);
-		std::memset(static_cast<uint8_t *>(abl->mBuffers[i].mData) + byteOffset, 0, byteCount);
+		std::memset(static_cast<unsigned char *>(abl->mBuffers[i].mData) + byteOffset, 0, byteCount);
 	}
 }
 
@@ -211,36 +211,6 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 	}
 }
 
-// MARK: Buffer Usage
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::FreeSpace() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_relaxed);
-	const auto readPos = readPosition_.load(std::memory_order_acquire);
-	return capacity_ - (writePos - readPos);
-}
-
-bool CXXCoreAudio::AudioRingBuffer::IsFull() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_relaxed);
-	const auto readPos = readPosition_.load(std::memory_order_acquire);
-	return (writePos - readPos) == capacity_;
-}
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::AvailableFrames() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-	return writePos - readPos;
-}
-
-bool CXXCoreAudio::AudioRingBuffer::IsEmpty() const noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-	return writePos == readPos;
-}
-
 // MARK: Writing and Reading Audio
 
 CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const bufferList, size_type frameCount) noexcept
@@ -327,10 +297,4 @@ CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(siz
 	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
 
 	return framesToSkip;
-}
-
-void CXXCoreAudio::AudioRingBuffer::Drain() noexcept
-{
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	readPosition_.store(writePos, std::memory_order_release);
 }
