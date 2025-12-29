@@ -81,6 +81,12 @@ public:
 	/// @note This method is not thread safe.
 	void Deallocate() noexcept;
 
+	/// Returns true if the buffer has allocated space for audio data.
+	explicit operator bool() const noexcept
+	{
+		return buffers_ != nullptr;
+	}
+
 	// MARK: Buffer Information
 
 	/// Returns the format of the audio stored in the buffer.
