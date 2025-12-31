@@ -175,10 +175,18 @@ public:
 
 	/// Advances the read position to the write position, emptying the buffer.
 	/// @note This method is only safe to call from the consumer.
-	void Drain() noexcept
+	/// @return The number of audio frames discarded.
+	size_type Drain() noexcept
 	{
 		const auto writePos = writePosition_.load(std::memory_order_acquire);
+		const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+		const auto availableFrames = writePos - readPos;
+		if(availableFrames == 0) [[unlikely]]
+			return 0;
+
 		readPosition_.store(writePos, std::memory_order_release);
+		return availableFrames;
 	}
 
 private:
