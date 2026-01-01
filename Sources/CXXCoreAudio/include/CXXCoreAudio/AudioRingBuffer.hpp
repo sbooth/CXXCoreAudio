@@ -178,6 +178,9 @@ public:
 	/// @return The number of audio frames discarded.
 	size_type Drain() noexcept
 	{
+		if(capacity_ == 0) [[unlikely]]
+			return 0;
+
 		const auto writePos = writePosition_.load(std::memory_order_acquire);
 		const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
