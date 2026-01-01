@@ -181,12 +181,12 @@ public:
 		const auto writePos = writePosition_.load(std::memory_order_acquire);
 		const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
-		const auto availableFrames = writePos - readPos;
-		if(availableFrames == 0) [[unlikely]]
+		const auto framesAvailable = writePos - readPos;
+		if(framesAvailable == 0) [[unlikely]]
 			return 0;
 
 		readPosition_.store(writePos, std::memory_order_release);
-		return availableFrames;
+		return framesAvailable;
 	}
 
 private:
