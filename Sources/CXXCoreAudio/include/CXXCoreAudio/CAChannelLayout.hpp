@@ -1,11 +1,13 @@
 //
-// Copyright © 2013-2025 Stephen F. Booth
+// SPDX-FileCopyrightText: 2013 Stephen F. Booth <contact@sbooth.dev>
+// SPDX-License-Identifier: MIT
+//
 // Part of https://github.com/sbooth/CXXCoreAudio
-// MIT license
 //
 
 #pragma once
 
+#import <cstdlib>
 #import <utility>
 #import <vector>
 
