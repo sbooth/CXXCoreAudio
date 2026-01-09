@@ -5,7 +5,6 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import <cstdlib>
 #import <cstring>
 #import <new>
 
