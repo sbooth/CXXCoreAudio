@@ -65,16 +65,10 @@ public:
 
 	/// Clears the buffer list, setting the frame length to zero.
 	/// @return true on success, false otherwise.
-	bool Clear() noexcept
-	{
-		return SetFrameLength(0);
-	}
+	bool Clear() noexcept;
 
 	/// Returns the length in audio frames of the data in this buffer list.
-	UInt32 FrameLength() const noexcept
-	{
-		return frameLength_;
-	}
+	UInt32 FrameLength() const noexcept;
 
 	/// Set the length in audio frames of the data in this buffer list.
 	/// @param frameLength The number of valid audio frames.
@@ -82,40 +76,25 @@ public:
 	bool SetFrameLength(UInt32 frameLength) noexcept;
 
 	/// Returns true if the frame length is zero.
-	bool IsEmpty() const noexcept
-	{
-		return frameLength_ == 0;
-	}
+	bool IsEmpty() const noexcept;
 
 	/// Returns true if the frame length is equal to the frame capacity.
-	bool IsFull() const noexcept
-	{
-		return frameLength_ == frameCapacity_;
-	}
+	bool IsFull() const noexcept;
 
 	/// Returns the audio frame capacity.
-	UInt32 FrameCapacity() const noexcept
-	{
-		return frameCapacity_;
-	}
+	UInt32 FrameCapacity() const noexcept;
 
 	// MARK: Format
 
 	/// Returns the audio format of the buffer list.
-	const CAStreamDescription& Format() const noexcept
-	{
-		return format_;
-	}
+	const CAStreamDescription& Format() const noexcept;
 
 	// MARK: External Reading
 
 	/// Sets the frame length to the frame capacity.
 	///
 	/// This is normally called to prepare the buffer list for a read operation.
-	bool PrepareForReading() noexcept
-	{
-		return SetFrameLength(frameCapacity_);
-	}
+	bool PrepareForReading() noexcept;
 
 	/// Infers and updates the frame length using the mDataByteSize field of the managed AudioBufferList struct.
 	///
@@ -130,22 +109,14 @@ public:
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
 	/// @return The number of frames prepended.
-	UInt32 Prepend(const CAAudioBuffer& buffer) noexcept
-	{
-		return Insert(buffer, 0, buffer.frameLength_, 0);
-	}
+	UInt32 Prepend(const CAAudioBuffer& buffer) noexcept;
 
 	/// Prepends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
 	/// @param readOffset The location in buffer to start reading, in audio frames.
 	/// @return The number of frames prepended.
-	UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept
-	{
-		if(readOffset > buffer.frameLength_)
-			return 0;
-		return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), 0);
-	}
+	UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept;
 
 	/// Prepends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
@@ -153,31 +124,20 @@ public:
 	/// @param readOffset The location in buffer to start reading, in audio frames.
 	/// @param frameLength The number of frames to prepend.
 	/// @return The number of frames prepended
-	UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept
-	{
-		return Insert(buffer, readOffset, frameLength, 0);
-	}
+	UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
 
 	/// Appends the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
 	/// @return The number of frames appended.
-	UInt32 Append(const CAAudioBuffer& buffer) noexcept
-	{
-		return Insert(buffer, 0, buffer.frameLength_, frameLength_);
-	}
+	UInt32 Append(const CAAudioBuffer& buffer) noexcept;
 
 	/// Appends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
 	/// @param readOffset The location in buffer to start reading, in audio frames.
 	/// @return The number of frames appended
-	UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept
-	{
-		if(readOffset > buffer.frameLength_)
-			return 0;
-		return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), frameLength_);
-	}
+	UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept;
 
 	/// Appends a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
@@ -185,20 +145,14 @@ public:
 	/// @param readOffset The location in buffer to start reading, in audio frames.
 	/// @param frameLength The number of frames to append.
 	/// @return The number of frames appended
-	UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept
-	{
-		return Insert(buffer, readOffset, frameLength, frameLength_);
-	}
+	UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
 
 	/// Inserts the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
 	/// @param buffer A buffer of audio data.
 	/// @param writeOffset The location in this buffer list to start writing, in audio frames.
 	/// @return The number of frames inserted.
-	UInt32 Insert(const CAAudioBuffer& buffer, UInt32 writeOffset) noexcept
-	{
-		return Insert(buffer, 0, buffer.frameLength_, writeOffset);
-	}
+	UInt32 Insert(const CAAudioBuffer& buffer, UInt32 writeOffset) noexcept;
 
 	/// Inserts a portion of the contents of a buffer list.
 	/// @note The format of buffer must match the format of this buffer list.
@@ -212,20 +166,12 @@ public:
 	/// Deletes frames from the beginning of this buffer list.
 	/// @param frameLength The number of frames to delete.
 	/// @return The number of frames deleted.
-	UInt32 TrimFirst(UInt32 frameLength) noexcept
-	{
-		return Trim(0, frameLength);
-	}
+	UInt32 TrimFirst(UInt32 frameLength) noexcept;
 
 	/// Deletes frames from the end of this buffer list.
 	/// @param frameLength The number of frames to delete.
 	/// @return The number of frames deleted.
-	UInt32 TrimLast(UInt32 frameLength) noexcept
-	{
-		const UInt32 framesToTrim = std::min(frameLength, frameLength_);
-		SetFrameLength(frameLength_ - framesToTrim);
-		return framesToTrim;
-	}
+	UInt32 TrimLast(UInt32 frameLength) noexcept;
 
 	/// Deletes frames from this buffer list.
 	/// @param offset The location to start deleting, in audio frames.
@@ -235,18 +181,12 @@ public:
 
 	/// Fills the remainder of this buffer list with silence.
 	/// @return The number of frames of silence appended.
-	UInt32 FillRemainderWithSilence() noexcept
-	{
-		return InsertSilence(frameLength_, frameCapacity_ - frameLength_);
-	}
+	UInt32 FillRemainderWithSilence() noexcept;
 
 	/// Appends silence to this buffer list.
 	/// @param frameLength The number of frames to append.
 	/// @return The number of frames of silence appended.
-	UInt32 AppendSilence(UInt32 frameLength) noexcept
-	{
-		return InsertSilence(frameLength_, frameLength);
-	}
+	UInt32 AppendSilence(UInt32 frameLength) noexcept;
 
 	/// Inserts silence in this buffer list.
 	/// @param offset The location to start inserting, in audio frames.
@@ -257,34 +197,19 @@ public:
 	// MARK: AudioBufferList Access
 
 	/// Returns true if the managed AudioBufferList struct is not null.
-	explicit operator bool() const noexcept
-	{
-		return bufferList_ != nullptr;
-	}
+	explicit operator bool() const noexcept;
 
 	/// Returns a pointer to the managed AudioBufferList struct.
-	AudioBufferList * _Nullable operator->() noexcept
-	{
-		return bufferList_;
-	}
+	AudioBufferList * _Nullable operator->() noexcept;
 
 	/// Returns a pointer to the managed AudioBufferList struct.
-	operator AudioBufferList * const _Nullable () noexcept
-	{
-		return bufferList_;
-	}
+	operator AudioBufferList * const _Nullable () noexcept;
 
 	/// Returns a const pointer to the managed AudioBufferList struct.
-	const AudioBufferList * _Nullable operator->() const noexcept
-	{
-		return bufferList_;
-	}
+	const AudioBufferList * _Nullable operator->() const noexcept;
 
 	/// Returns a const pointer to the managed AudioBufferList struct.
-	operator const AudioBufferList * const _Nullable () const noexcept
-	{
-		return bufferList_;
-	}
+	operator const AudioBufferList * const _Nullable () const noexcept;
 
 	// MARK: AudioBufferList Management
 
@@ -311,5 +236,138 @@ private:
 	/// The number of valid frames in ``bufferList_``.
 	UInt32 frameLength_{0};
 };
+
+// MARK: - Implementation -
+
+// MARK: Buffer Management
+
+inline bool CAAudioBuffer::Clear() noexcept
+{
+	return SetFrameLength(0);
+}
+
+inline UInt32 CAAudioBuffer::FrameLength() const noexcept
+{
+	return frameLength_;
+}
+
+inline bool CAAudioBuffer::IsEmpty() const noexcept
+{
+	return frameLength_ == 0;
+}
+
+inline bool CAAudioBuffer::IsFull() const noexcept
+{
+	return frameLength_ == frameCapacity_;
+}
+
+inline UInt32 CAAudioBuffer::FrameCapacity() const noexcept
+{
+	return frameCapacity_;
+}
+
+// MARK: Format
+
+inline const CAStreamDescription& CAAudioBuffer::Format() const noexcept
+{
+	return format_;
+}
+
+// MARK: External Reading
+
+inline bool CAAudioBuffer::PrepareForReading() noexcept
+{
+	return SetFrameLength(frameCapacity_);
+}
+
+// MARK: Buffer Utilities
+
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer) noexcept
+{
+	return Insert(buffer, 0, buffer.frameLength_, 0);
+}
+
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept
+{
+	if(readOffset > buffer.frameLength_)
+		return 0;
+	return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), 0);
+}
+
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept
+{
+	return Insert(buffer, readOffset, frameLength, 0);
+}
+
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer) noexcept
+{
+	return Insert(buffer, 0, buffer.frameLength_, frameLength_);
+}
+
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept
+{
+	if(readOffset > buffer.frameLength_)
+		return 0;
+	return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), frameLength_);
+}
+
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept
+{
+	return Insert(buffer, readOffset, frameLength, frameLength_);
+}
+
+inline UInt32 CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 writeOffset) noexcept
+{
+	return Insert(buffer, 0, buffer.frameLength_, writeOffset);
+}
+
+inline UInt32 CAAudioBuffer::TrimFirst(UInt32 frameLength) noexcept
+{
+	return Trim(0, frameLength);
+}
+
+inline UInt32 CAAudioBuffer::TrimLast(UInt32 frameLength) noexcept
+{
+	const UInt32 framesToTrim = std::min(frameLength, frameLength_);
+	SetFrameLength(frameLength_ - framesToTrim);
+	return framesToTrim;
+}
+
+inline UInt32 CAAudioBuffer::FillRemainderWithSilence() noexcept
+{
+	return InsertSilence(frameLength_, frameCapacity_ - frameLength_);
+}
+
+inline UInt32 CAAudioBuffer::AppendSilence(UInt32 frameLength) noexcept
+{
+	return InsertSilence(frameLength_, frameLength);
+}
+
+// MARK: AudioBufferList Access
+
+inline CAAudioBuffer::operator bool() const noexcept
+{
+	return bufferList_ != nullptr;
+}
+
+inline AudioBufferList * _Nullable CAAudioBuffer::operator->() noexcept
+{
+	return bufferList_;
+}
+
+inline CAAudioBuffer::operator AudioBufferList * const _Nullable () noexcept
+{
+	return bufferList_;
+}
+
+inline const AudioBufferList * _Nullable CAAudioBuffer::operator->() const noexcept
+{
+	return bufferList_;
+}
+
+inline CAAudioBuffer::operator const AudioBufferList * const _Nullable () const noexcept
+{
+	return bufferList_;
+}
 
 } /* namespace CXXCoreAudio */
