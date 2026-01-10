@@ -62,40 +62,45 @@ struct CATimeStamp final : public AudioTimeStamp {
 	// MARK: Comparison
 
 	/// Returns true if other is equal to this.
-	bool operator==(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator==(const AudioTimeStamp& other) const noexcept;
 
 	/// Returns true if other is not equal to this.
-	bool operator!=(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator!=(const AudioTimeStamp& other) const noexcept;
 
 	/// Returns true if other is less than this.
-	bool operator<(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator<(const AudioTimeStamp& other) const noexcept;
 
 	/// Returns true if other is less than or equal to this.
-	bool operator<=(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator<=(const AudioTimeStamp& other) const noexcept;
 
 	/// Returns true if other is greater than or equal to this.
-	bool operator>=(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator>=(const AudioTimeStamp& other) const noexcept;
 
 	/// Returns true if other is greater than this.
-	bool operator>(const AudioTimeStamp& other) const noexcept;
+	[[nodiscard]] bool operator>(const AudioTimeStamp& other) const noexcept;
 
 	// MARK: Flags
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
-	explicit operator bool() const noexcept;
+	[[nodiscard]] explicit operator bool() const noexcept;
 
 	/// Returns true if the kAudioTimeStampNothingValid flag is clear.
-	bool IsValid() const noexcept;
+	[[nodiscard]] bool IsValid() const noexcept;
+
 	/// Returns true if the kAudioTimeStampSampleTimeValid flag is set.
-	bool SampleTimeIsValid() const noexcept;
+	[[nodiscard]] bool SampleTimeIsValid() const noexcept;
+
 	/// Returns true if the kAudioTimeStampHostTimeValid flag is set.
-	bool HostTimeIsValid() const noexcept;
+	[[nodiscard]] bool HostTimeIsValid() const noexcept;
+
 	/// Returns true if the kAudioTimeStampRateScalarValid flag is set.
-	bool RateScalarIsValid() const noexcept;
+	[[nodiscard]] bool RateScalarIsValid() const noexcept;
+
 	/// Returns true if the kAudioTimeStampWordClockTimeValid flag is set.
-	bool WordClockTimeIsValid() const noexcept;
+	[[nodiscard]] bool WordClockTimeIsValid() const noexcept;
+
 	/// Returns true if the kAudioTimeStampSMPTETimeValid flag is set.
-	bool SMPTETimeIsValid() const noexcept;
+	[[nodiscard]] bool SMPTETimeIsValid() const noexcept;
 };
 
 // MARK: - Implementation -

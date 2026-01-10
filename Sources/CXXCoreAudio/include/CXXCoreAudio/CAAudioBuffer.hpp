@@ -68,7 +68,7 @@ public:
 	bool Clear() noexcept;
 
 	/// Returns the length in audio frames of the data in this buffer list.
-	UInt32 FrameLength() const noexcept;
+	[[nodiscard]] UInt32 FrameLength() const noexcept;
 
 	/// Set the length in audio frames of the data in this buffer list.
 	/// @param frameLength The number of valid audio frames.
@@ -76,18 +76,18 @@ public:
 	bool SetFrameLength(UInt32 frameLength) noexcept;
 
 	/// Returns true if the frame length is zero.
-	bool IsEmpty() const noexcept;
+	[[nodiscard]] bool IsEmpty() const noexcept;
 
 	/// Returns true if the frame length is equal to the frame capacity.
-	bool IsFull() const noexcept;
+	[[nodiscard]] bool IsFull() const noexcept;
 
 	/// Returns the audio frame capacity.
-	UInt32 FrameCapacity() const noexcept;
+	[[nodiscard]] UInt32 FrameCapacity() const noexcept;
 
 	// MARK: Format
 
 	/// Returns the audio format of the buffer list.
-	const CAStreamDescription& Format() const noexcept;
+	[[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
 	// MARK: External Reading
 
@@ -197,19 +197,19 @@ public:
 	// MARK: AudioBufferList Access
 
 	/// Returns true if the managed AudioBufferList struct is not null.
-	explicit operator bool() const noexcept;
+	[[nodiscard]] explicit operator bool() const noexcept;
 
 	/// Returns a pointer to the managed AudioBufferList struct.
-	AudioBufferList * _Nullable operator->() noexcept;
+	[[nodiscard]] AudioBufferList * _Nullable operator->() noexcept;
 
 	/// Returns a pointer to the managed AudioBufferList struct.
-	operator AudioBufferList * const _Nullable () noexcept;
+	[[nodiscard]] operator AudioBufferList * const _Nullable () noexcept;
 
 	/// Returns a const pointer to the managed AudioBufferList struct.
-	const AudioBufferList * _Nullable operator->() const noexcept;
+	[[nodiscard]] const AudioBufferList * _Nullable operator->() const noexcept;
 
 	/// Returns a const pointer to the managed AudioBufferList struct.
-	operator const AudioBufferList * const _Nullable () const noexcept;
+	[[nodiscard]] operator const AudioBufferList * const _Nullable () const noexcept;
 
 	// MARK: AudioBufferList Management
 
@@ -224,7 +224,7 @@ public:
 
 	/// Releases ownership of managed AudioBufferList struct and returns it.
 	/// @note The caller assumes responsibility for deallocating the returned AudioBufferList using std::free.
-	AudioBufferList * _Nullable release() noexcept;
+	[[nodiscard]] AudioBufferList * _Nullable release() noexcept;
 
 private:
 	/// The managed AudioBufferList struct.
