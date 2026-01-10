@@ -87,7 +87,7 @@ public:
 	void Deallocate() noexcept;
 
 	/// Returns true if the buffer has allocated space for audio data.
-	explicit operator bool() const noexcept;
+	[[nodiscard]] explicit operator bool() const noexcept;
 
 	// MARK: Buffer Information
 
