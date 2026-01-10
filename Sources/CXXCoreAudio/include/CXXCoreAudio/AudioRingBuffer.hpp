@@ -1,13 +1,17 @@
 //
-// Copyright © 2013-2025 Stephen F. Booth
+// SPDX-FileCopyrightText: 2013 Stephen F. Booth <contact@sbooth.dev>
+// SPDX-License-Identifier: MIT
+//
 // Part of https://github.com/sbooth/CXXCoreAudio
-// MIT license
 //
 
 #pragma once
 
+#import <algorithm>
 #import <atomic>
+#import <cassert>
 #import <cstddef>
+#import <cstring>
 #import <limits>
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
@@ -82,70 +86,41 @@ public:
 	void Deallocate() noexcept;
 
 	/// Returns true if the buffer has allocated space for audio data.
-	explicit operator bool() const noexcept
-	{
-		return buffers_ != nullptr;
-	}
+	[[nodiscard]] explicit operator bool() const noexcept;
 
 	// MARK: Buffer Information
 
 	/// Returns the format of the audio stored in the buffer.
 	/// @note This method is safe to call from both producer and consumer.
 	/// @return The audio format of the buffer.
-	[[nodiscard]] const CAStreamDescription& Format() const noexcept
-	{
-		return format_;
-	}
+	[[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
 	/// Returns the capacity of the buffer.
 	/// @note This method is safe to call from both producer and consumer.
 	/// @return The buffer capacity in audio frames.
-	[[nodiscard]] size_type Capacity() const noexcept
-	{
-		return capacity_;
-	}
+	[[nodiscard]] size_type Capacity() const noexcept;
 
 	// MARK: Buffer Usage
 
 	/// Returns the amount of free space in the buffer.
 	/// @note The result of this method is only accurate when called from the producer.
 	/// @return The number of audio frames of free space available for writing.
-	[[nodiscard]] size_type FreeSpace() const noexcept
-	{
-		const auto writePos = writePosition_.load(std::memory_order_relaxed);
-		const auto readPos = readPosition_.load(std::memory_order_acquire);
-		return capacity_ - (writePos - readPos);
-	}
+	[[nodiscard]] size_type FreeSpace() const noexcept;
 
 	/// Returns true if the buffer is full.
 	/// @note The result of this method is only accurate when called from the producer.
 	/// @return true if the buffer is full.
-	[[nodiscard]] bool IsFull() const noexcept
-	{
-		const auto writePos = writePosition_.load(std::memory_order_relaxed);
-		const auto readPos = readPosition_.load(std::memory_order_acquire);
-		return (writePos - readPos) == capacity_;
-	}
+	[[nodiscard]] bool IsFull() const noexcept;
 
 	/// Returns the amount of audio in the buffer.
 	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return The number of audio frames available for reading.
-	[[nodiscard]] size_type AvailableFrames() const noexcept
-	{
-		const auto writePos = writePosition_.load(std::memory_order_acquire);
-		const auto readPos = readPosition_.load(std::memory_order_relaxed);
-		return writePos - readPos;
-	}
+	[[nodiscard]] size_type AvailableFrames() const noexcept;
 
 	/// Returns true if the buffer is empty.
 	/// @note The result of this method is only accurate when called from the consumer.
 	/// @return true if the buffer contains no data.
-	[[nodiscard]] bool IsEmpty() const noexcept
-	{
-		const auto writePos = writePosition_.load(std::memory_order_acquire);
-		const auto readPos = readPosition_.load(std::memory_order_relaxed);
-		return writePos == readPos;
-	}
+	[[nodiscard]] bool IsEmpty() const noexcept;
 
 	// MARK: Writing and Reading Audio
 
@@ -175,11 +150,8 @@ public:
 
 	/// Advances the read position to the write position, emptying the buffer.
 	/// @note This method is only safe to call from the consumer.
-	void Drain() noexcept
-	{
-		const auto writePos = writePosition_.load(std::memory_order_acquire);
-		readPosition_.store(writePos, std::memory_order_release);
-	}
+	/// @return The number of audio frames discarded.
+	size_type Drain() noexcept;
 
 private:
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
@@ -200,5 +172,187 @@ private:
 	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
 };
+
+// MARK: - Implementation -
+
+// MARK: Buffer Management
+
+inline AudioRingBuffer::operator bool() const noexcept
+{
+	return buffers_ != nullptr;
+}
+
+// MARK: Buffer Information
+
+inline const CAStreamDescription& AudioRingBuffer::Format() const noexcept
+{
+	return format_;
+}
+
+inline AudioRingBuffer::size_type AudioRingBuffer::Capacity() const noexcept
+{
+	return capacity_;
+}
+
+// MARK: Buffer Usage
+
+inline AudioRingBuffer::size_type AudioRingBuffer::FreeSpace() const noexcept
+{
+	const auto writePos = writePosition_.load(std::memory_order_relaxed);
+	const auto readPos = readPosition_.load(std::memory_order_acquire);
+	return capacity_ - (writePos - readPos);
+}
+
+inline bool AudioRingBuffer::IsFull() const noexcept
+{
+	const auto writePos = writePosition_.load(std::memory_order_relaxed);
+	const auto readPos = readPosition_.load(std::memory_order_acquire);
+	return (writePos - readPos) == capacity_;
+}
+
+inline AudioRingBuffer::size_type AudioRingBuffer::AvailableFrames() const noexcept
+{
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+	return writePos - readPos;
+}
+
+inline bool AudioRingBuffer::IsEmpty() const noexcept
+{
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+	return writePos == readPos;
+}
+
+// MARK: Writing and Reading Audio
+
+inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept
+{
+	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
+		return 0;
+
+	const auto writePos = writePosition_.load(std::memory_order_relaxed);
+	const auto readPos = readPosition_.load(std::memory_order_acquire);
+
+	const auto framesUsed = writePos - readPos;
+	const auto framesFree = capacity_ - framesUsed;
+	if(framesFree == 0) [[unlikely]]
+		return 0;
+
+	/// Copies non-interleaved audio to a buffer array from an AudioBufferList struct.
+	const auto copyToBuffersFromAudioBufferList = [](void * const _Nonnull * const _Nonnull dst, std::size_t dstOffset, const AudioBufferList * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept {
+		for(UInt32 i = 0; i < src->mNumberBuffers; ++i) {
+			assert(srcOffset + byteCount <= src->mBuffers[i].mDataByteSize);
+			std::memcpy(static_cast<unsigned char *>(dst[i]) + dstOffset,
+						static_cast<const unsigned char *>(src->mBuffers[i].mData) + srcOffset,
+						byteCount);
+		}
+	};
+
+	const auto framesToWrite = std::min(framesFree, frameCount);
+
+	const auto writeIndex = writePos & capacityMask_;
+	const auto framesToEnd = capacity_ - writeIndex;
+	if(framesToWrite <= framesToEnd) [[likely]]
+		copyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0, framesToWrite * format_.mBytesPerFrame);
+	else [[unlikely]] {
+		const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
+		copyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0, bytesToEnd);
+		copyToBuffersFromAudioBufferList(buffers_, 0, bufferList, bytesToEnd, (framesToWrite - framesToEnd) * format_.mBytesPerFrame);
+	}
+
+	writePosition_.store(writePos + framesToWrite, std::memory_order_release);
+
+	return framesToWrite;
+}
+
+inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const _Nonnull bufferList, size_type frameCount) noexcept
+{
+	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
+		return 0;
+
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+	const auto framesAvailable = writePos - readPos;
+	if(framesAvailable == 0) [[unlikely]] {
+		for(UInt32 i = 0; i < bufferList->mNumberBuffers; ++i)
+			std::memset(bufferList->mBuffers[i].mData, 0, bufferList->mBuffers[i].mDataByteSize);
+		return 0;
+	}
+
+	/// Copies non-interleaved audio to an AudioBufferList struct from a buffer array.
+	const auto copyToAudioBufferListFromBuffers = [](AudioBufferList * const _Nonnull dst, std::size_t dstOffset, const void * const _Nonnull * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept {
+		for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
+			assert(dstOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
+			std::memcpy(static_cast<unsigned char *>(dst->mBuffers[i].mData) + dstOffset,
+						static_cast<const unsigned char *>(src[i]) + srcOffset,
+						byteCount);
+		}
+	};
+
+	const auto framesToRead = std::min(framesAvailable, frameCount);
+
+	const auto readIndex = readPos & capacityMask_;
+	const auto framesToEnd = capacity_ - readIndex;
+	if(framesToRead <= framesToEnd) [[likely]]
+		copyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame, framesToRead * format_.mBytesPerFrame);
+	else [[unlikely]] {
+		const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
+		copyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame, bytesToEnd);
+		copyToAudioBufferListFromBuffers(bufferList, bytesToEnd, buffers_, 0, (framesToRead - framesToEnd) * format_.mBytesPerFrame);
+	}
+
+	readPosition_.store(readPos + framesToRead, std::memory_order_release);
+
+	// Fill remainder with silence if fewer than requested frames read
+	if(framesToRead != frameCount) {
+		const auto byteOffset = framesToRead * format_.mBytesPerFrame;
+		const auto byteCount = (frameCount - framesToRead) * format_.mBytesPerFrame;
+		for(UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {
+			assert(byteOffset + byteCount <= bufferList->mBuffers[i].mDataByteSize);
+			std::memset(static_cast<unsigned char *>(bufferList->mBuffers[i].mData) + byteOffset, 0, byteCount);
+		}
+	}
+
+	return framesToRead;
+}
+
+// MARK: Discarding Audio
+
+inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(size_type frameCount) noexcept
+{
+	if(frameCount == 0 || capacity_ == 0) [[unlikely]]
+		return 0;
+
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+	const auto framesAvailable = writePos - readPos;
+	if(framesAvailable == 0) [[unlikely]]
+		return 0;
+
+	const auto framesToSkip = std::min(framesAvailable, frameCount);
+
+	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
+
+	return framesToSkip;
+}
+
+inline AudioRingBuffer::size_type AudioRingBuffer::Drain() noexcept
+{
+	if(capacity_ == 0) [[unlikely]]
+		return 0;
+
+	const auto writePos = writePosition_.load(std::memory_order_acquire);
+	const auto readPos = readPosition_.load(std::memory_order_relaxed);
+
+	const auto framesAvailable = writePos - readPos;
+	if(framesAvailable == 0) [[unlikely]]
+		return 0;
+
+	readPosition_.store(writePos, std::memory_order_release);
+	return framesAvailable;
+}
 
 } /* namespace CXXCoreAudio */

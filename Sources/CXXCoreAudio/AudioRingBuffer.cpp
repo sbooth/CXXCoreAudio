@@ -1,13 +1,11 @@
 //
-// Copyright © 2013-2025 Stephen F. Booth
+// SPDX-FileCopyrightText: 2013 Stephen F. Booth <contact@sbooth.dev>
+// SPDX-License-Identifier: MIT
+//
 // Part of https://github.com/sbooth/CXXCoreAudio
-// MIT license
 //
 
-#import <algorithm>
-#import <cassert>
 #import <cstdlib>
-#import <cstring>
 #import <limits>
 #import <new>
 #import <stdexcept>
@@ -16,58 +14,6 @@
 #import "AudioRingBuffer.hpp"
 
 namespace {
-
-/// Copies non-interleaved audio to a buffer array from an AudioBufferList struct.
-/// @param dst The destination audio buffers.
-/// @param dstOffset The byte offset to begin writing.
-/// @param src The source AudioBufferList.
-/// @param srcOffset The byte offset to begin reading.
-/// @param byteCount The number of bytes per non-interleaved buffer to read and write.
-void CopyToBuffersFromAudioBufferList(void * const _Nonnull * const _Nonnull dst, std::size_t dstOffset, const AudioBufferList * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept
-{
-	for(UInt32 i = 0; i < src->mNumberBuffers; ++i) {
-		assert(srcOffset + byteCount <= src->mBuffers[i].mDataByteSize);
-		std::memcpy(static_cast<unsigned char *>(dst[i]) + dstOffset,
-					static_cast<const unsigned char *>(src->mBuffers[i].mData) + srcOffset,
-					byteCount);
-	}
-}
-
-/// Copies non-interleaved audio to an AudioBufferList struct from a buffer array.
-/// @param dst The destination AudioBufferList.
-/// @param dstOffset The byte offset to begin writing.
-/// @param src The source audio buffers.
-/// @param srcOffset The byte offset to begin reading.
-/// @param byteCount The number of bytes per non-interleaved buffer to read and write.
-void CopyToAudioBufferListFromBuffers(AudioBufferList * const _Nonnull dst, std::size_t dstOffset, const void * const _Nonnull * const _Nonnull src, std::size_t srcOffset, std::size_t byteCount) noexcept
-{
-	for(UInt32 i = 0; i < dst->mNumberBuffers; ++i) {
-		assert(dstOffset + byteCount <= dst->mBuffers[i].mDataByteSize);
-		std::memcpy(static_cast<unsigned char *>(dst->mBuffers[i].mData) + dstOffset,
-					static_cast<const unsigned char *>(src[i]) + srcOffset,
-					byteCount);
-	}
-}
-
-/// Zeroes the bytes in an AudioBufferList struct.
-/// @param abl The destination AudioBufferList.
-void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl) noexcept
-{
-	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i)
-		std::memset(abl->mBuffers[i].mData, 0, abl->mBuffers[i].mDataByteSize);
-}
-
-/// Zeroes a range of bytes in an AudioBufferList struct.
-/// @param abl The destination AudioBufferList.
-/// @param byteOffset The byte offset to begin writing zeroes.
-/// @param byteCount The number of bytes to set to zero.
-void ZeroAudioBufferList(AudioBufferList * const _Nonnull abl, std::size_t byteOffset, std::size_t byteCount) noexcept
-{
-	for(UInt32 i = 0; i < abl->mNumberBuffers; ++i) {
-		assert(byteOffset + byteCount <= abl->mBuffers[i].mDataByteSize);
-		std::memset(static_cast<unsigned char *>(abl->mBuffers[i].mData) + byteOffset, 0, byteCount);
-	}
-}
 
 /// Returns the number of leading 0-bits in x, starting at the most significant bit position.
 template <typename T>
@@ -209,92 +155,4 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept
 
 		format_.Reset();
 	}
-}
-
-// MARK: Writing and Reading Audio
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList * const bufferList, size_type frameCount) noexcept
-{
-	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
-		return 0;
-
-	const auto writePos = writePosition_.load(std::memory_order_relaxed);
-	const auto readPos = readPosition_.load(std::memory_order_acquire);
-
-	const auto framesUsed = writePos - readPos;
-	const auto framesFree = capacity_ - framesUsed;
-	if(framesFree == 0) [[unlikely]]
-		return 0;
-
-	const auto framesToWrite = std::min(framesFree, frameCount);
-
-	const auto writeIndex = writePos & capacityMask_;
-	const auto framesToEnd = capacity_ - writeIndex;
-	if(framesToWrite <= framesToEnd) [[likely]]
-		CopyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0, framesToWrite * format_.mBytesPerFrame);
-	else [[unlikely]] {
-		const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
-		CopyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0, bytesToEnd);
-		CopyToBuffersFromAudioBufferList(buffers_, 0, bufferList, bytesToEnd, (framesToWrite - framesToEnd) * format_.mBytesPerFrame);
-	}
-
-	writePosition_.store(writePos + framesToWrite, std::memory_order_release);
-
-	return framesToWrite;
-}
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList * const bufferList, size_type frameCount) noexcept
-{
-	if(!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
-		return 0;
-
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-
-	const auto availableFrames = writePos - readPos;
-	if(availableFrames == 0) [[unlikely]] {
-		ZeroAudioBufferList(bufferList);
-		return 0;
-	}
-
-	const auto framesToRead = std::min(availableFrames, frameCount);
-
-	const auto readIndex = readPos & capacityMask_;
-	const auto framesToEnd = capacity_ - readIndex;
-	if(framesToRead <= framesToEnd) [[likely]]
-		CopyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame, framesToRead * format_.mBytesPerFrame);
-	else [[unlikely]] {
-		const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
-		CopyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame, bytesToEnd);
-		CopyToAudioBufferListFromBuffers(bufferList, bytesToEnd, buffers_, 0, (framesToRead - framesToEnd) * format_.mBytesPerFrame);
-	}
-
-	readPosition_.store(readPos + framesToRead, std::memory_order_release);
-
-	// Fill remainder with silence if fewer than requested frames read
-	if(framesToRead != frameCount)
-		ZeroAudioBufferList(bufferList, framesToRead * format_.mBytesPerFrame, (frameCount - framesToRead) * format_.mBytesPerFrame);
-
-	return framesToRead;
-}
-
-// MARK: Discarding Audio
-
-CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(size_type frameCount) noexcept
-{
-	if(frameCount == 0 || capacity_ == 0) [[unlikely]]
-		return 0;
-
-	const auto writePos = writePosition_.load(std::memory_order_acquire);
-	const auto readPos = readPosition_.load(std::memory_order_relaxed);
-
-	const auto availableFrames = writePos - readPos;
-	if(availableFrames == 0) [[unlikely]]
-		return 0;
-
-	const auto framesToSkip = std::min(availableFrames, frameCount);
-
-	readPosition_.store(readPos + framesToSkip, std::memory_order_release);
-
-	return framesToSkip;
 }
