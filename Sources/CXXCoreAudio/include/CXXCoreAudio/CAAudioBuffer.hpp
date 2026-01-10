@@ -8,6 +8,9 @@
 #pragma once
 
 #import <algorithm>
+#if defined(__has_include) && __has_include(<span>)
+#import <span>
+#endif
 
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -210,6 +213,15 @@ public:
 
 	/// Returns a const pointer to the managed AudioBufferList struct.
 	[[nodiscard]] operator const AudioBufferList * const _Nullable () const noexcept;
+
+#if defined(__cpp_lib_span) && __cpp_lib_span >= 202002L
+	std::span<AudioBuffer *> AudioBuffers() noexcept
+	{
+		if(!mBufferList)
+			return {};
+		return {bufferList_->mBuffers[0], bufferList->mNumberBuffers};
+	}
+#endif
 
 	// MARK: AudioBufferList Management
 
