@@ -23,23 +23,25 @@ public:
 	CAValueRange(Float64 minimum, Float64 maximum) noexcept;
 
 	/// Returns true if this value range is valid.
-	bool IsValid() const noexcept;
+	[[nodiscard]] bool IsValid() const noexcept;
 
 	/// Returns true if this value range contains value.
-	bool Contains(Float64 value) const noexcept;
+	[[nodiscard]] bool Contains(Float64 value) const noexcept;
 
 	/// Clamps a value to within the range.
-	Float64 Clamp(Float64 value) const noexcept;
+	[[nodiscard]] Float64 Clamp(Float64 value) const noexcept;
 
 	/// Returns true if this value range intersects other.
-	bool Intersects(const AudioValueRange& other) const noexcept;
+	[[nodiscard]] bool Intersects(const AudioValueRange& other) const noexcept;
+
 	/// Returns true if this value range contains other.
-	bool Contains(const AudioValueRange& other) const noexcept;
+	[[nodiscard]] bool Contains(const AudioValueRange& other) const noexcept;
 
 	/// Returns true if this value range is equal to another.
-	bool operator==(const AudioValueRange& other) const noexcept;
+	[[nodiscard]] bool operator==(const AudioValueRange& other) const noexcept;
+
 	/// Returns true if this value range is not equal to another.
-	bool operator!=(const AudioValueRange& other) const noexcept;
+	[[nodiscard]] bool operator!=(const AudioValueRange& other) const noexcept;
 };
 
 // MARK: - Implementation -

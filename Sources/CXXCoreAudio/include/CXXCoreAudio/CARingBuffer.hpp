@@ -88,7 +88,7 @@ public:
 
 	/// Returns the usable capacity of the ring buffer.
 	/// @return The usable ring buffer capacity in audio frames.
-	uint32_t Capacity() const noexcept;
+	[[nodiscard]] uint32_t Capacity() const noexcept;
 
 	/// Gets the time bounds of the audio contained in the ring buffer.
 	/// @param startTime The starting sample time of audio contained in the buffer.
@@ -98,10 +98,10 @@ public:
 
 	/// Returns the unused portion of the ring buffer's capacity.
 	/// @return The unused portion of the ring buffer's capacity in audio frames or zero if unable to get enough CPU cycles to capture a consistent snapshot of the time bounds.
-	uint32_t UnusedSpace() const noexcept;
+	[[nodiscard]] uint32_t UnusedSpace() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
-	const CAStreamDescription& Format() const noexcept;
+	[[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
 	// MARK: Writing and Reading Audio
 
@@ -127,7 +127,7 @@ public:
 
 private:
 	/// Returns the byte offset of a frame number.
-	uint32_t FrameByteOffset(int64_t frameNumber) const noexcept;
+	[[nodiscard]] uint32_t FrameByteOffset(int64_t frameNumber) const noexcept;
 
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
@@ -163,6 +163,8 @@ private:
 	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
 };
+
+// MARK: - Implementation -
 
 inline const CAStreamDescription& CARingBuffer::Format() const noexcept
 {

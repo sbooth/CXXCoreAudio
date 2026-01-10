@@ -85,96 +85,96 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	// MARK: Comparison
 
 	/// Returns true if other is equal to this.
-	bool operator==(const AudioStreamBasicDescription& other) const noexcept;
+	[[nodiscard]] bool operator==(const AudioStreamBasicDescription& other) const noexcept;
 
 	/// Returns true if other is not equal to this.
-	bool operator!=(const AudioStreamBasicDescription& other) const noexcept;
+	[[nodiscard]] bool operator!=(const AudioStreamBasicDescription& other) const noexcept;
 
 	// MARK: Format Information
 
 	/// Returns the common PCM format described by this stream description or std::nullopt if none.
-	std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat() const noexcept;
+	[[nodiscard]] std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsNonInterleaved flag is set.
-	bool IsNonInterleaved() const noexcept;
+	[[nodiscard]] bool IsNonInterleaved() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsNonInterleaved flag is clear.
-	bool IsInterleaved() const noexcept;
+	[[nodiscard]] bool IsInterleaved() const noexcept;
 
 	/// Returns the number of interleaved channels.
-	UInt32 InterleavedChannelCount() const noexcept;
+	[[nodiscard]] UInt32 InterleavedChannelCount() const noexcept;
 
 	/// Returns the number of channel streams.
-	UInt32 ChannelStreamCount() const noexcept;
+	[[nodiscard]] UInt32 ChannelStreamCount() const noexcept;
 
 	/// Returns the number of channels.
-	UInt32 ChannelCount() const noexcept;
+	[[nodiscard]] UInt32 ChannelCount() const noexcept;
 
 	/// Returns true if mFormatID == kAudioFormatLinearPCM.
-	bool IsPCM() const noexcept;
+	[[nodiscard]] bool IsPCM() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsBigEndian flag is set.
-	bool IsBigEndian() const noexcept;
+	[[nodiscard]] bool IsBigEndian() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsBigEndian flag is clear.
-	bool IsLittleEndian() const noexcept;
+	[[nodiscard]] bool IsLittleEndian() const noexcept;
 
 	/// Returns true if this format is native-endian.
-	bool IsNativeEndian() const noexcept;
+	[[nodiscard]] bool IsNativeEndian() const noexcept;
 
 	/// Returns true if this format is linear PCM and the kAudioFormatFlagIsFloat flag is set.
-	bool IsFloat() const noexcept;
+	[[nodiscard]] bool IsFloat() const noexcept;
 
 	/// Returns true if this format is linear PCM and the kAudioFormatFlagIsFloat flag is clear.
-	bool IsInteger() const noexcept;
+	[[nodiscard]] bool IsInteger() const noexcept;
 
 	/// Returns true if this format is linear PCM and the kAudioFormatFlagIsSignedInteger flag is set.
-	bool IsSignedInteger() const noexcept;
+	[[nodiscard]] bool IsSignedInteger() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsPacked flag is set.
-	bool IsPacked() const noexcept;
+	[[nodiscard]] bool IsPacked() const noexcept;
 
 	/// Returns true if this format is implicitly packed.
 	///
 	/// A format is implicitly packed when ((mBitsPerChannel / 8) * InterleavedChannelCount()) == mBytesPerFrame
-	bool IsImplicitlyPacked() const noexcept;
+	[[nodiscard]] bool IsImplicitlyPacked() const noexcept;
 
 	/// Returns true if this format is linear PCM and the sample bits do not occupy the entire channel.
-	bool IsUnpackedPCM() const noexcept;
+	[[nodiscard]] bool IsUnpackedPCM() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsAlignedHigh flag is set.
-	bool IsAlignedHigh() const noexcept;
+	[[nodiscard]] bool IsAlignedHigh() const noexcept;
 
 	/// Returns true if this format is unpacked linear PCM or if mBitsPerChannel is not a multiple of 8.
-	bool IsUnaligned() const noexcept;
+	[[nodiscard]] bool IsUnaligned() const noexcept;
 
 	/// Returns the number of fractional bits.
-	UInt32 FractionalBits() const noexcept;
+	[[nodiscard]] UInt32 FractionalBits() const noexcept;
 
 	/// Returns true if this format is integer fixed-point linear PCM.
-	bool IsFixedPoint() const noexcept;
+	[[nodiscard]] bool IsFixedPoint() const noexcept;
 
 	/// Returns true if the kAudioFormatFlagIsNonMixable flag is set.
 	/// @note This flag is only used when interacting with HAL stream formats.
-	bool IsNonMixable() const noexcept;
+	[[nodiscard]] bool IsNonMixable() const noexcept;
 
 	/// Returns true if this format is linear PCM and the kAudioFormatFlagIsNonMixable flag is clear.
 	/// @note This flag is only used when interacting with HAL stream formats.
-	bool IsMixable() const noexcept;
+	[[nodiscard]] bool IsMixable() const noexcept;
 
 	/// Returns the sample word size in bytes.
-	UInt32 SampleWordSize() const noexcept;
+	[[nodiscard]] UInt32 SampleWordSize() const noexcept;
 
 	/// Returns the byte size of frameCount audio frames.
 	/// @note This is equivalent to frameCount * mBytesPerFrame.
-	UInt32 FrameCountToByteSize(UInt32 frameCount) const noexcept;
+	[[nodiscard]] UInt32 FrameCountToByteSize(UInt32 frameCount) const noexcept;
 
 	/// Returns the frame count of byteSize bytes.
 	/// @note This is equivalent to byteSize / mBytesPerFrame.
-	UInt32 ByteSizeToFrameCount(UInt32 byteSize) const noexcept;
+	[[nodiscard]] UInt32 ByteSizeToFrameCount(UInt32 byteSize) const noexcept;
 
 	/// Returns the duration of a single packet in seconds.
-	double PacketDuration() const noexcept;
+	[[nodiscard]] double PacketDuration() const noexcept;
 
 	// MARK: Format transformation
 
@@ -201,23 +201,23 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
 	/// @note The caller is responsible for releasing the returned string
-	CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED;
 
 	/// Returns a string representation of this format.
 	/// @note The caller is responsible for releasing the returned string.
-	CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
 	/// Returns an AVAudioFormat object initialized with this format and no channel layout.
-	operator AVAudioFormat * _Nullable () const noexcept;
+	[[nodiscard]] operator AVAudioFormat * _Nullable () const noexcept;
 
 	/// Returns the name of this format.
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
-	NSString * _Nullable FormatName() const noexcept;
+	[[nodiscard]] NSString * _Nullable FormatName() const noexcept;
 
 	/// Returns a string representation of this format.
-	NSString * _Nullable FormatDescription() const noexcept;
+	[[nodiscard]] NSString * _Nullable FormatDescription() const noexcept;
 #endif /* __OBJC__ */
 };
 
