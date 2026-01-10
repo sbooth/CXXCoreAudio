@@ -101,10 +101,7 @@ public:
 	uint32_t UnusedSpace() const noexcept;
 
 	/// Returns the format of the audio in this ring buffer.
-	const CAStreamDescription& Format() const noexcept
-	{
-		return format_;
-	}
+	const CAStreamDescription& Format() const noexcept;
 
 	// MARK: Writing and Reading Audio
 
@@ -130,10 +127,7 @@ public:
 
 private:
 	/// Returns the byte offset of a frame number.
-	uint32_t FrameByteOffset(int64_t frameNumber) const noexcept
-	{
-		return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
-	}
+	uint32_t FrameByteOffset(int64_t frameNumber) const noexcept;
 
 	/// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
 	void * _Nonnull * _Nullable buffers_{nullptr};
@@ -169,5 +163,15 @@ private:
 	/// The format of the audio this buffer contains.
 	CAStreamDescription format_{};
 };
+
+inline const CAStreamDescription& CARingBuffer::Format() const noexcept
+{
+	return format_;
+}
+
+inline uint32_t CARingBuffer::FrameByteOffset(int64_t frameNumber) const noexcept
+{
+	return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
+}
 
 } /* namespace CXXCoreAudio */
