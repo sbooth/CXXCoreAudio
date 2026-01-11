@@ -20,12 +20,9 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-namespace CXXCoreAudio {
+#import <CXXCoreAudio/malloc_ptr.hpp>
 
-/// A std::unique_ptr deleter using std::free.
-struct free_deleter {
-	void operator()(void * _Nonnull ptr) noexcept { std::free(ptr); }
-};
+namespace CXXCoreAudio {
 
 // MARK: AudioChannelLayout Helper Functions
 
@@ -33,13 +30,13 @@ struct free_deleter {
 /// @note The allocation is performed using std::malloc.
 /// @param numberChannelDescriptions The number of channel descriptions that will be stored in the channel layout.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] std::unique_ptr<AudioChannelLayout, free_deleter> AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
 
 /// Allocates and returns a copy of a variable-length AudioChannelLayout structure.
 /// @note The allocation is performed using std::malloc.
 /// @param other The AudioChannelLayout to copy.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] std::unique_ptr<AudioChannelLayout, free_deleter> CopyAudioChannelLayout(const AudioChannelLayout * _Nullable other) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> CopyAudioChannelLayout(const AudioChannelLayout * _Nullable other) noexcept;
 
 /// Returns the size required to hold a variable-length AudioChannelLayout structure with the specified number of channel descriptions.
 /// @return The required size in bytes.

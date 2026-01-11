@@ -211,7 +211,7 @@ cf_string_unique_ptr JoinStringArray(CFArrayRef array, CFStringRef delimiter) no
 
 // MARK: AudioChannelLayout Helper Functions
 
-std::unique_ptr<AudioChannelLayout, CXXCoreAudio::free_deleter> CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept
+CXXCoreAudio::malloc_ptr<AudioChannelLayout> CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept
 {
 	const auto layoutSize = AudioChannelLayoutSize(numberChannelDescriptions);
 	auto channelLayout = static_cast<AudioChannelLayout *>(std::malloc(layoutSize));
@@ -219,10 +219,10 @@ std::unique_ptr<AudioChannelLayout, CXXCoreAudio::free_deleter> CXXCoreAudio::Al
 		return nullptr;
 	std::memset(channelLayout, 0, layoutSize);
 	channelLayout->mNumberChannelDescriptions = numberChannelDescriptions;
-	return std::unique_ptr<AudioChannelLayout, free_deleter>{channelLayout};
+	return malloc_ptr<AudioChannelLayout>{channelLayout};
 }
 
-std::unique_ptr<AudioChannelLayout, CXXCoreAudio::free_deleter> CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayout *other) noexcept
+CXXCoreAudio::malloc_ptr<AudioChannelLayout> CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayout *other) noexcept
 {
 	if(!other)
 		return nullptr;

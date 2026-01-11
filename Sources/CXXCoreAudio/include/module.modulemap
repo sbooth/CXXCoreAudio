@@ -14,5 +14,6 @@ module CXXCoreAudio {
 	header "CXXCoreAudio/CAStreamDescription.hpp"
 	header "CXXCoreAudio/CATimeStamp.hpp"
 	header "CXXCoreAudio/CAValueRange.hpp"
+	header "CXXCoreAudio/malloc_ptr.hpp"
 	export *
 }
