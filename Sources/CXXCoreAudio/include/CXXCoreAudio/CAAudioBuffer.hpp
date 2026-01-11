@@ -12,15 +12,16 @@
 #import <CoreAudioTypes/CoreAudioTypes.h>
 
 #import <CXXCoreAudio/CAStreamDescription.hpp>
+#import <CXXCoreAudio/malloc_ptr.hpp>
 
 namespace CXXCoreAudio {
 
 /// Allocates and returns a variable-length AudioBufferList structure in a single allocation.
-/// @note The allocation is performed using std::malloc and should be deallocated using std::free.
+/// @note The allocation is performed using std::malloc.
 /// @param format The format of the audio the buffer list will contain.
 /// @param frameCapacity The desired buffer capacity in audio frames.
 /// @return An AudioBufferList struct or null if an error occurred or memory could not be allocated.
-AudioBufferList * _Nullable AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
+[[nodiscard]] malloc_ptr<AudioBufferList> AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
 /// A class managing an AudioBufferList structure along with a specific format, frame capacity, and frame length.
 class CAAudioBuffer final {

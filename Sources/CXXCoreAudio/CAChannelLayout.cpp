@@ -211,7 +211,7 @@ cf_string_unique_ptr JoinStringArray(CFArrayRef array, CFStringRef delimiter) no
 
 // MARK: AudioChannelLayout Helper Functions
 
-AudioChannelLayout * CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept
+CXXCoreAudio::malloc_ptr<AudioChannelLayout> CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept
 {
 	const auto layoutSize = AudioChannelLayoutSize(numberChannelDescriptions);
 	auto channelLayout = static_cast<AudioChannelLayout *>(std::malloc(layoutSize));
@@ -219,16 +219,16 @@ AudioChannelLayout * CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChann
 		return nullptr;
 	std::memset(channelLayout, 0, layoutSize);
 	channelLayout->mNumberChannelDescriptions = numberChannelDescriptions;
-	return channelLayout;
+	return malloc_ptr<AudioChannelLayout>{channelLayout};
 }
 
-AudioChannelLayout * CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayout *other) noexcept
+CXXCoreAudio::malloc_ptr<AudioChannelLayout> CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayout *other) noexcept
 {
 	if(!other)
 		return nullptr;
 	auto channelLayout = AllocateAudioChannelLayout(other->mNumberChannelDescriptions);
 	if(channelLayout)
-		std::memcpy(channelLayout, other, AudioChannelLayoutSize(other->mNumberChannelDescriptions));
+		std::memcpy(channelLayout.get(), other, AudioChannelLayoutSize(other->mNumberChannelDescriptions));
 	return channelLayout;
 }
 
@@ -393,17 +393,17 @@ CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CA
 		if(channelLayout_ && other.channelLayout_ && channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions)
 			memcpy(channelLayout_, other.channelLayout_, AudioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
 		else {
-			const auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
+			auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
 			if(other.channelLayout_ && !channelLayout)
 				throw std::bad_alloc();
-			reset(channelLayout);
+			reset(channelLayout.release());
 		}
 	}
 	return *this;
 }
 
 CXXCoreAudio::CAChannelLayout::CAChannelLayout(AudioChannelLayoutTag layoutTag)
-: channelLayout_{AllocateAudioChannelLayout(0)}
+: channelLayout_{AllocateAudioChannelLayout(0).release()}
 {
 	if(!channelLayout_)
 		throw std::bad_alloc();
@@ -411,7 +411,7 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(AudioChannelLayoutTag layoutTag)
 }
 
 CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> channelLabels)
-: channelLayout_{AllocateAudioChannelLayout(static_cast<UInt32>(channelLabels.size()))}
+: channelLayout_{AllocateAudioChannelLayout(static_cast<UInt32>(channelLabels.size())).release()}
 {
 	if(!channelLayout_)
 		throw std::bad_alloc();
@@ -425,16 +425,16 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> ch
 	UInt32 dataSize = sizeof tag;
 	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_TagForChannelLayout, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout_)), channelLayout_, &dataSize, &tag);
 	if(result == noErr) {
-		const auto channelLayout = AllocateAudioChannelLayout(0);
+		auto channelLayout = AllocateAudioChannelLayout(0);
 		if(!channelLayout)
 			throw std::bad_alloc();
-		reset(channelLayout);
+		reset(channelLayout.release());
 		channelLayout_->mChannelLayoutTag = tag;
 	}
 }
 
 CXXCoreAudio::CAChannelLayout::CAChannelLayout(const AudioChannelLayout *other)
-: channelLayout_{CopyAudioChannelLayout(other)}
+: channelLayout_{CopyAudioChannelLayout(other).release()}
 {
 	if(other && !channelLayout_)
 		throw std::bad_alloc();
@@ -442,10 +442,10 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(const AudioChannelLayout *other)
 
 CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const AudioChannelLayout *other)
 {
-	const auto channelLayout = CopyAudioChannelLayout(other);
+	auto channelLayout = CopyAudioChannelLayout(other);
 	if(other && !channelLayout)
 		throw std::bad_alloc();
-	reset(channelLayout);
+	reset(channelLayout.release());
 	return *this;
 }
 

@@ -19,21 +19,23 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
+#import <CXXCoreAudio/malloc_ptr.hpp>
+
 namespace CXXCoreAudio {
 
 // MARK: AudioChannelLayout Helper Functions
 
 /// Allocates and returns a new variable-length AudioChannelLayout structure with the specified number of channel descriptions.
-/// @note The allocation is performed using std::malloc and should be deallocated using std::free.
+/// @note The allocation is performed using std::malloc.
 /// @param numberChannelDescriptions The number of channel descriptions that will be stored in the channel layout.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] AudioChannelLayout * _Nullable AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
 
 /// Allocates and returns a copy of a variable-length AudioChannelLayout structure.
-/// @note The allocation is performed using std::malloc and should be deallocated using std::free.
+/// @note The allocation is performed using std::malloc.
 /// @param other The AudioChannelLayout to copy.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] AudioChannelLayout * _Nullable CopyAudioChannelLayout(const AudioChannelLayout * _Nullable other) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> CopyAudioChannelLayout(const AudioChannelLayout * _Nullable other) noexcept;
 
 /// Returns the size required to hold a variable-length AudioChannelLayout structure with the specified number of channel descriptions.
 /// @return The required size in bytes.

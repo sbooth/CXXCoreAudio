@@ -13,7 +13,7 @@
 
 #import "CAAudioBuffer.hpp"
 
-AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept
+CXXCoreAudio::malloc_ptr<AudioBufferList> CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept
 {
 	if(format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame))
 		return nullptr;
@@ -42,7 +42,7 @@ AudioBufferList * CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDe
 		abl->mBuffers[i].mData = reinterpret_cast<void *>(address + bufferListSize + (bufferDataSize * i));
 	}
 
-	return abl;
+	return malloc_ptr<AudioBufferList>{abl};
 }
 
 #if false
@@ -106,9 +106,10 @@ bool CXXCoreAudio::CAAudioBuffer::Allocate(const AudioStreamBasicDescription& fo
 
 	Deallocate();
 
-	bufferList_ = AllocateAudioBufferList(format, frameCapacity);
-	if(!bufferList_)
+	auto bufferList = AllocateAudioBufferList(format, frameCapacity);
+	if(!bufferList)
 		return false;
+	bufferList_ = bufferList.release();
 
 	format_ = format;
 	frameCapacity_ = frameCapacity;
