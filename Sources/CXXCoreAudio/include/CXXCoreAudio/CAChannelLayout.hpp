@@ -19,6 +19,7 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
+#import <CXXCFRef/CFRef.hpp>
 #import <CXXCoreAudio/malloc_ptr.hpp>
 
 namespace CXXCoreAudio {
@@ -74,12 +75,10 @@ namespace CXXCoreAudio {
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-/// @note The caller is responsible for releasing the returned string.
-[[nodiscard]] CFStringRef _Nullable CopyAudioChannelLayoutName(const AudioChannelLayout * _Nullable channelLayout, bool simpleName = false) noexcept CF_RETURNS_RETAINED;
+[[nodiscard]] CXXCFRef::CFString CopyAudioChannelLayoutName(const AudioChannelLayout * _Nullable channelLayout, bool simpleName = false) noexcept;
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
-/// @note The caller is responsible for releasing the returned string.
-[[nodiscard]] CFStringRef _Nullable CopyAudioChannelLayoutDescription(const AudioChannelLayout * _Nullable channelLayout) noexcept CF_RETURNS_RETAINED;
+[[nodiscard]] CXXCFRef::CFString CopyAudioChannelLayoutDescription(const AudioChannelLayout * _Nullable channelLayout) noexcept;
 
 #ifdef __OBJC__
 /// Returns true if two the AVAudioChannelLayout objects are equivalent.
@@ -247,14 +246,12 @@ public:
 	/// Returns the name of this channel layout.
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-	/// @note The caller is responsible for releasing the returned string
-	[[nodiscard]] CFStringRef _Nullable CopyLayoutName(bool simpleName = false) const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CXXCFRef::CFString CopyLayoutName(bool simpleName = false) const noexcept;
 
 	/// Returns a string representation of this channel layout
 	///
 	/// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-	/// @note The caller is responsible for releasing the returned string
-	[[nodiscard]] CFStringRef _Nullable CopyLayoutDescription() const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CXXCFRef::CFString CopyLayoutDescription() const noexcept;
 
 #ifdef __OBJC__
 	/// Returns an AVAudioChannelLayout object initialized with the managed AudioChannelLayout struct.
@@ -318,13 +315,15 @@ inline bool AVAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout * _Nullable 
 
 inline NSString * _Nullable AudioChannelLayoutName(const AudioChannelLayout * _Nullable channelLayout, bool simpleName) noexcept
 {
-	return (__bridge_transfer NSString *)CopyAudioChannelLayoutName(channelLayout, simpleName);
+	auto layoutName = CopyAudioChannelLayoutName(channelLayout, simpleName);
+	return (__bridge_transfer NSString *)layoutName.release();
 }
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
 inline NSString * _Nullable AudioChannelLayoutDescription(const AudioChannelLayout * _Nullable channelLayout) noexcept
 {
-	return (__bridge_transfer NSString *)CopyAudioChannelLayoutDescription(channelLayout);
+	auto layoutDescription = CopyAudioChannelLayoutDescription(channelLayout);
+	return (__bridge_transfer NSString *)layoutDescription.release();
 }
 #endif /* __OBJC__ */
 
@@ -404,12 +403,12 @@ inline CAChannelLayout::operator const AudioChannelLayout * const _Nullable () c
 
 // MARK: Channel Layout Name and Description
 
-inline CFStringRef _Nullable CAChannelLayout::CopyLayoutName(bool simpleName) const noexcept CF_RETURNS_RETAINED
+inline CXXCFRef::CFString CAChannelLayout::CopyLayoutName(bool simpleName) const noexcept
 {
 	return CopyAudioChannelLayoutName(channelLayout_, simpleName);
 }
 
-inline CFStringRef _Nullable CAChannelLayout::CopyLayoutDescription() const noexcept CF_RETURNS_RETAINED
+inline CXXCFRef::CFString CAChannelLayout::CopyLayoutDescription() const noexcept
 {
 	return CopyAudioChannelLayoutDescription(channelLayout_);
 }
@@ -422,12 +421,14 @@ inline CAChannelLayout::operator AVAudioChannelLayout * _Nullable () const noexc
 
 inline NSString * _Nullable CAChannelLayout::LayoutName(bool simpleName) const noexcept
 {
-	return (__bridge_transfer NSString *)CopyLayoutName(simpleName);
+	auto layoutName = CopyLayoutName(simpleName);
+	return (__bridge_transfer NSString *)layoutName.release();
 }
 
 inline NSString * _Nullable CAChannelLayout::LayoutDescription() const noexcept
 {
-	return (__bridge_transfer NSString *)CopyLayoutDescription();
+	auto layoutDescription = CopyLayoutDescription();
+	return (__bridge_transfer NSString *)layoutDescription.release();
 }
 #endif /* __OBJC__ */
 
