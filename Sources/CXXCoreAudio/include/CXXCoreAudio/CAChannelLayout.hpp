@@ -421,14 +421,12 @@ inline CAChannelLayout::operator AVAudioChannelLayout * _Nullable () const noexc
 
 inline NSString * _Nullable CAChannelLayout::LayoutName(bool simpleName) const noexcept
 {
-	auto layoutName = CopyLayoutName(simpleName);
-	return (__bridge_transfer NSString *)layoutName.release();
+	return AudioChannelLayoutName(channelLayout_, simpleName);
 }
 
 inline NSString * _Nullable CAChannelLayout::LayoutDescription() const noexcept
 {
-	auto layoutDescription = CopyLayoutDescription();
-	return (__bridge_transfer NSString *)layoutDescription.release();
+	return AudioChannelLayoutDescription(channelLayout_);
 }
 #endif /* __OBJC__ */
 
