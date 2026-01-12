@@ -113,19 +113,21 @@ std::optional<CXXCoreAudio::CACommonPCMFormat> CXXCoreAudio::IdentifyCommonPCMFo
 	return std::nullopt;
 }
 
-CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept
+CXXCFRef::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept
 {
 	CFStringRef name = nullptr;
 	UInt32 dataSize = sizeof name;
 	OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription, &streamDescription, &dataSize, &name);
 	if(result != noErr)
 		return nullptr;
-	return name;
+	return CXXCFRef::CFString{name};
 }
 
-CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
+CXXCFRef::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
 {
-	CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
+	CXXCFRef::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+	if(!result)
+		return nullptr;
 
 	// Channels and sample rate
 	CFStringAppendFormat(result, nullptr, CFSTR("%u ch @ %g Hz, "), streamDescription.mChannelsPerFrame, streamDescription.mSampleRate);
@@ -152,7 +154,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 		else
 			CFStringAppendCString(result, "interleaved", kCFStringEncodingASCII);
 
-		return result;
+		return CXXCFRef::CFString{result.release()};
 	}
 
 	if(streamDescription.mFormatID == kAudioFormatLinearPCM) {
@@ -233,7 +235,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(const
 		CFStringAppendFormat(result, nullptr, CFSTR(", %u bits/channel, %u bytes/packet, %u frames/packet, %u bytes/frame"), streamDescription.mBitsPerChannel, streamDescription.mBytesPerPacket, streamDescription.mFramesPerPacket, streamDescription.mBytesPerFrame);
 	}
 
-	return result;
+	return CXXCFRef::CFString{result.release()};
 }
 
 CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame, bool isInterleaved) noexcept

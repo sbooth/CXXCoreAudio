@@ -19,6 +19,8 @@
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
+#import <CXXCFRef/CFRef.hpp>
+
 namespace CXXCoreAudio {
 
 /// Common PCM audio formats.
@@ -39,12 +41,10 @@ enum class CACommonPCMFormat {
 std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept;
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
-/// @note The caller is responsible for releasing the returned string.
-CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
+CXXCFRef::CFString CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
-/// @note The caller is responsible for releasing the returned string.
-CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
+CXXCFRef::CFString CopyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
@@ -201,11 +201,11 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
 	/// @note The caller is responsible for releasing the returned string
-	[[nodiscard]] CFStringRef _Nullable CopyFormatName() const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CXXCFRef::CFString CopyFormatName() const noexcept;
 
 	/// Returns a string representation of this format.
 	/// @note The caller is responsible for releasing the returned string.
-	[[nodiscard]] CFStringRef _Nullable CopyFormatDescription() const noexcept CF_RETURNS_RETAINED;
+	[[nodiscard]] CXXCFRef::CFString CopyFormatDescription() const noexcept;
 
 #ifdef __OBJC__
 	/// Returns an AVAudioFormat object initialized with this format and no channel layout.
@@ -226,12 +226,14 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 #ifdef __OBJC__
 inline NSString * _Nullable AudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept
 {
-	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatName(streamDescription);
+	auto formatName = CopyAudioStreamBasicDescriptionFormatName(streamDescription);
+	return (__bridge_transfer NSString *)formatName.release();
 }
 
 inline NSString * _Nullable AudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription& streamDescription) noexcept
 {
-	return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatDescription(streamDescription);
+	auto formatDescription = CopyAudioStreamBasicDescriptionFormatDescription(streamDescription);
+	return (__bridge_transfer NSString *)formatDescription.release();
 }
 #endif /* __OBJC__ */
 
@@ -406,12 +408,12 @@ inline void CAStreamDescription::Reset() noexcept
 
 // MARK: Format Name and Description
 
-inline CFStringRef _Nullable CAStreamDescription::CopyFormatName() const noexcept
+inline CXXCFRef::CFString CAStreamDescription::CopyFormatName() const noexcept
 {
 	return CopyAudioStreamBasicDescriptionFormatName(*this);
 }
 
-inline CFStringRef _Nullable CAStreamDescription::CopyFormatDescription() const noexcept
+inline CXXCFRef::CFString CAStreamDescription::CopyFormatDescription() const noexcept
 {
 	return CopyAudioStreamBasicDescriptionFormatDescription(*this);
 }
@@ -424,12 +426,12 @@ inline CAStreamDescription::operator AVAudioFormat * _Nullable () const noexcept
 
 inline NSString * _Nullable CAStreamDescription::FormatName() const noexcept
 {
-	return (__bridge_transfer NSString *)CopyFormatName();
+	return AudioStreamBasicDescriptionFormatName(*this);
 }
 
 inline NSString * _Nullable CAStreamDescription::FormatDescription() const noexcept
 {
-	return (__bridge_transfer NSString *)CopyFormatDescription();
+	return AudioStreamBasicDescriptionFormatDescription(*this);
 }
 #endif /* __OBJC__ */
 
