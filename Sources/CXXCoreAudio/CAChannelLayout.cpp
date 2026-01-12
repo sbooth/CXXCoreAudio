@@ -299,7 +299,7 @@ CXXCFRef::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioCh
 		// kAudioFormatProperty_ChannelLayoutName returns '!fmt' for kAudioChannelLabel_UseCoordinates
 		if(layoutName) {
 			CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions, %@"), channelLayout->mNumberChannelDescriptions, layoutName.get());
-			return CXXCFRef::CFString{result};
+			return CXXCFRef::CFString{result.release()};
 		}
 
 		CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"), channelLayout->mNumberChannelDescriptions);
@@ -338,7 +338,7 @@ CXXCFRef::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioCh
 			CFStringAppendFormat(result, nullptr, CFSTR(", %@"), layoutName.get());
 	}
 
-	return CXXCFRef::CFString{result};
+	return CXXCFRef::CFString{result.release()};
 }
 
 // Constants
