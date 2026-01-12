@@ -200,11 +200,9 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 	/// Returns the name of this format.
 	///
 	/// This is the value of kAudioFormatProperty_FormatName.
-	/// @note The caller is responsible for releasing the returned string
 	[[nodiscard]] CXXCFRef::CFString CopyFormatName() const noexcept;
 
 	/// Returns a string representation of this format.
-	/// @note The caller is responsible for releasing the returned string.
 	[[nodiscard]] CXXCFRef::CFString CopyFormatDescription() const noexcept;
 
 #ifdef __OBJC__
