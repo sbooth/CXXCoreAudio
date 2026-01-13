@@ -192,6 +192,8 @@ cf_string_unique_ptr JoinStringArray(CFArrayRef array, CFStringRef delimiter) no
 		return nullptr;
 
 	cf_type_ref_unique_ptr<CFMutableStringRef> result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+	if(!result)
+		return nullptr;
 
 	const CFIndex count = CFArrayGetCount(array);
 	for(CFIndex i = 0; i < count; ++i) {
@@ -285,12 +287,13 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutName(const AudioChannelLayout * 
 {
 	if(!channelLayout)
 		return nullptr;
-	CFStringRef name = nullptr;
-	UInt32 dataSize = sizeof name;
-	OSStatus result = AudioFormatGetProperty(simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout)), channelLayout, &dataSize, &name);
+	const auto property = simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName;
+	CFStringRef layoutName = nullptr;
+	UInt32 dataSize = sizeof layoutName;
+	OSStatus result = AudioFormatGetProperty(property, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout)), channelLayout, &dataSize, &layoutName);
 	if(result != noErr)
 		return nullptr;
-	return name;
+	return layoutName;
 }
 
 CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept
@@ -314,6 +317,9 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 		CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"), channelLayout->mNumberChannelDescriptions);
 
 		cf_type_ref_unique_ptr<CFMutableArrayRef> array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
+		if(!array)
+			// Allocation failed; return the partial description without per-channel names
+			return result;
 
 		const AudioChannelDescription *desc = channelLayout->mChannelDescriptions;
 		for(UInt32 i = 0; i < channelLayout->mNumberChannelDescriptions; ++i, ++desc) {
@@ -326,7 +332,8 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 				else
 					coordinateString.reset(CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"), desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2], desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
 
-				CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
+				if(coordinateString)
+					CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
 			} else {
 				if(const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName)
 					CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(channelName.get()));
@@ -335,8 +342,8 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 			}
 		}
 
-		auto channelNamesString = JoinStringArray(array.get(), CFSTR(" "));
-		CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
+		if(auto channelNamesString = JoinStringArray(array.get(), CFSTR(" ")); channelNamesString)
+			CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
 	} else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
 		CFStringAppendFormat(result, nullptr, CFSTR("Bitmap %#x (%u ch)"), channelLayout->mChannelBitmap, __builtin_popcount(channelLayout->mChannelBitmap));
 		if(layoutName)
