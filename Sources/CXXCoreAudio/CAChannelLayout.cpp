@@ -305,6 +305,9 @@ CXXCFRef::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioCh
 		CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"), channelLayout->mNumberChannelDescriptions);
 
 		CXXCFRef::CFMutableArray array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
+		if(!array)
+			// Allocation failed; return the partial description without per-channel names
+			return CXXCFRef::CFString{result.release()};
 
 		const AudioChannelDescription *desc = channelLayout->mChannelDescriptions;
 		for(UInt32 i = 0; i < channelLayout->mNumberChannelDescriptions; ++i, ++desc) {
@@ -317,17 +320,18 @@ CXXCFRef::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioCh
 				else
 					coordinateString.reset(CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"), desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2], desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
 
-				CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
+				if(coordinateString)
+					CFArrayAppendValue(array, coordinateString.get());
 			} else {
 				if(const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName)
-					CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(channelName.get()));
+					CFArrayAppendValue(array, channelName.get());
 				else
-					CFArrayAppendValue(array.get(), CFSTR("?"));
+					CFArrayAppendValue(array, CFSTR("?"));
 			}
 		}
 
-		auto channelNamesString = JoinStringArray(array.get(), CFSTR(" "));
-		CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
+		if(auto channelNamesString = JoinStringArray(array, CFSTR(" ")); channelNamesString)
+			CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
 	} else if(channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
 		CFStringAppendFormat(result, nullptr, CFSTR("Bitmap %#x (%u ch)"), channelLayout->mChannelBitmap, __builtin_popcount(channelLayout->mChannelBitmap));
 		if(layoutName)
