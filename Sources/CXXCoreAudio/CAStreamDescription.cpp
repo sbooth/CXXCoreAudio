@@ -138,8 +138,8 @@ CXXCoreAudio::IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamD
         (streamDescription.mFormatFlags & kAudioFormatFlagIsBigEndian) != kAudioFormatFlagsNativeEndian ||
         ((streamDescription.mBitsPerChannel / 8) *
          (((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0)
-              ? streamDescription.mChannelsPerFrame
-              : 1)) != streamDescription.mBytesPerFrame)
+                ? streamDescription.mChannelsPerFrame
+                : 1)) != streamDescription.mBytesPerFrame)
         return std::nullopt;
 
     if ((streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger) {
@@ -175,7 +175,7 @@ CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
 }
 
 CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
-    const AudioStreamBasicDescription& streamDescription) noexcept {
+      const AudioStreamBasicDescription& streamDescription) noexcept {
     CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
 
     // Channels and sample rate
@@ -218,20 +218,20 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
             CFStringAppendFormat(result, nullptr, CFSTR("%d-bit"), streamDescription.mBitsPerChannel);
 
         const auto interleavedChannelCount = ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0)
-                                                 ? streamDescription.mChannelsPerFrame
-                                                 : 1;
+                                                   ? streamDescription.mChannelsPerFrame
+                                                   : 1;
         const auto sampleWordSize =
-            (interleavedChannelCount == 0 || streamDescription.mBytesPerFrame % interleavedChannelCount != 0)
-                ? 0
-                : streamDescription.mBytesPerFrame / interleavedChannelCount;
+              (interleavedChannelCount == 0 || streamDescription.mBytesPerFrame % interleavedChannelCount != 0)
+                    ? 0
+                    : streamDescription.mBytesPerFrame / interleavedChannelCount;
 
         // Endianness
         if (sampleWordSize > 1)
             CFStringAppendCString(result,
                                   (streamDescription.mFormatFlags & kAudioFormatFlagIsBigEndian) ==
-                                          kAudioFormatFlagIsBigEndian
-                                      ? " big-endian"
-                                      : " little-endian",
+                                              kAudioFormatFlagIsBigEndian
+                                        ? " big-endian"
+                                        : " little-endian",
                                   kCFStringEncodingASCII);
 
         // Sign
@@ -239,9 +239,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         if (isInteger)
             CFStringAppendCString(result,
                                   (streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) ==
-                                          kAudioFormatFlagIsSignedInteger
-                                      ? " signed"
-                                      : " unsigned",
+                                              kAudioFormatFlagIsSignedInteger
+                                        ? " signed"
+                                        : " unsigned",
                                   kCFStringEncodingASCII);
 
         // Integer or floating
@@ -257,9 +257,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
                      (streamDescription.mBitsPerChannel & 7) != 0)
                 CFStringAppendCString(result,
                                       (streamDescription.mFormatFlags & kAudioFormatFlagIsAlignedHigh) ==
-                                              kAudioFormatFlagIsAlignedHigh
-                                          ? ", high-aligned"
-                                          : ", low-aligned",
+                                                  kAudioFormatFlagIsAlignedHigh
+                                            ? ", high-aligned"
+                                            : ", low-aligned",
                                       kCFStringEncodingASCII);
 
             CFStringAppendFormat(result, nullptr, CFSTR(" in %d bytes"), sampleWordSize);
@@ -351,7 +351,7 @@ CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonP
 }
 
 bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(
-    AudioStreamBasicDescription& format) const noexcept {
+      AudioStreamBasicDescription& format) const noexcept {
     if (!IsPCM() || mChannelsPerFrame == 0)
         return false;
     format = *this;

@@ -107,30 +107,35 @@ struct CATimeStamp final : public AudioTimeStamp {
 
 // MARK: Creation and Destruction
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
+  : AudioTimeStamp{} {
     mSampleTime = sampleTime;
     mFlags = kAudioTimeStampSampleTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept
+  : AudioTimeStamp{} {
     mHostTime = hostTime;
     mFlags = kAudioTimeStampHostTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept
+  : AudioTimeStamp{} {
     mSampleTime = sampleTime;
     mHostTime = hostTime;
     mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept
+  : AudioTimeStamp{} {
     mSampleTime = sampleTime;
     mHostTime = hostTime;
     mRateScalar = rateScalar;
     mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
 }
 
-inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept : AudioTimeStamp(other) {}
+inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept
+  : AudioTimeStamp(other) {}
 
 inline CATimeStamp& CATimeStamp::operator=(const AudioTimeStamp& other) noexcept {
     AudioTimeStamp::operator=(other);

@@ -100,11 +100,12 @@ bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& 
     const auto maxAudioBufferFrameCount = std::numeric_limits<UInt32>::max() / format.mBytesPerFrame;
     /// Values larger than this will exceed the maximum allocation size
     const auto maxAllocationFrameCount =
-        ((std::numeric_limits<std::size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) / format.mBytesPerFrame;
+          ((std::numeric_limits<std::size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) /
+          format.mBytesPerFrame;
 
     /// The maximum size per channel buffer in audio frames
     const auto maxChannelBufferFrameSize =
-        std::min(static_cast<std::size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
+          std::min(static_cast<std::size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
 
     // Round to nearest power of two
     const auto channelBufferFrameSize = bit_ceil(minFrameCapacity);

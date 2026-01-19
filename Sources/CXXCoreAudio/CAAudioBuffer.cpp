@@ -39,7 +39,7 @@ CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format,
 
     for (UInt32 i = 0; i < bufferCount; ++i) {
         abl->mBuffers[i].mNumberChannels =
-            (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : format.mChannelsPerFrame;
+              (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : format.mChannelsPerFrame;
         abl->mBuffers[i].mDataByteSize = bufferDataSize;
         abl->mBuffers[i].mData = reinterpret_cast<void *>(address + bufferListSize + (bufferDataSize * i));
     }
@@ -172,7 +172,7 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 r
         return 0;
 
     const auto framesToInsert =
-        std::min(frameCapacity_ - frameLength_, std::min(frameLength, buffer.frameLength_ - readOffset));
+          std::min(frameCapacity_ - frameLength_, std::min(frameLength, buffer.frameLength_ - readOffset));
     const auto framesToMove = frameLength_ - writeOffset;
     if (framesToMove) {
         const auto moveToOffset = writeOffset + framesToInsert;
@@ -187,11 +187,11 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 r
     if (framesToInsert) {
         for (UInt32 i = 0; i < buffer.bufferList_->mNumberBuffers; ++i)
             std::memcpy(
-                reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(bufferList_->mBuffers[i].mData) +
-                                         (writeOffset * format_.mBytesPerFrame)),
-                reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(buffer.bufferList_->mBuffers[i].mData) +
-                                               (readOffset * format_.mBytesPerFrame)),
-                framesToInsert * format_.mBytesPerFrame);
+                  reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(bufferList_->mBuffers[i].mData) +
+                                           (writeOffset * format_.mBytesPerFrame)),
+                  reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(buffer.bufferList_->mBuffers[i].mData) +
+                                                 (readOffset * format_.mBytesPerFrame)),
+                  framesToInsert * format_.mBytesPerFrame);
 
         SetFrameLength(frameLength_ + framesToInsert);
     }
@@ -266,8 +266,8 @@ bool CXXCoreAudio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const Audio
     if (frameLength > frameCapacity)
         return false;
     if (bufferList->mNumberBuffers != (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved)
-            ? format.mChannelsPerFrame
-            : 1)
+              ? format.mChannelsPerFrame
+              : 1)
         return false;
 
     for (UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {

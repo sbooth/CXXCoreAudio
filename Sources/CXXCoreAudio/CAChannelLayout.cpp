@@ -395,8 +395,8 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
         return false;
 
     const AudioChannelLayout *layouts[] = {
-        lhs,
-        rhs,
+          lhs,
+          rhs,
     };
     UInt32 layoutsEquivalent = 0;
     UInt32 propertySize = sizeof layoutsEquivalent;
@@ -412,7 +412,7 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutName(const AudioChannelLayout *c
     if (!channelLayout)
         return nullptr;
     const auto property =
-        simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName;
+          simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName;
     CFStringRef layoutName = nullptr;
     UInt32 dataSize = sizeof layoutName;
     OSStatus result = AudioFormatGetProperty(property, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout)),
@@ -444,7 +444,7 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
                              channelLayout->mNumberChannelDescriptions);
 
         cf_type_ref_unique_ptr<CFMutableArrayRef> array{
-            CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
+              CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
         if (!array)
             // Allocation failed; return the partial description without per-channel names
             return result;
@@ -455,19 +455,19 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
                 cf_string_unique_ptr coordinateString{};
                 if (desc->mChannelFlags & kAudioChannelFlags_RectangularCoordinates)
                     coordinateString.reset(
-                        CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[x: %g, y: %g, z: %g%s]"),
-                                                 desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
-                                                 desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[x: %g, y: %g, z: %g%s]"),
+                                                   desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
+                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
                 else if (desc->mChannelFlags & kAudioChannelFlags_SphericalCoordinates)
                     coordinateString.reset(
-                        CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[r: %g, θ: %g, φ: %g%s]"),
-                                                 desc->mCoordinates[2], desc->mCoordinates[1], desc->mCoordinates[0],
-                                                 desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[r: %g, θ: %g, φ: %g%s]"),
+                                                   desc->mCoordinates[2], desc->mCoordinates[1], desc->mCoordinates[0],
+                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
                 else
                     coordinateString.reset(
-                        CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"),
-                                                 desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
-                                                 desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"),
+                                                   desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
+                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
 
                 if (coordinateString)
                     CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
@@ -500,7 +500,7 @@ CFStringRef CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLa
 // Constants
 const CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::Mono = CAChannelLayout(kAudioChannelLayoutTag_Mono);
 const CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::Stereo =
-    CAChannelLayout(kAudioChannelLayoutTag_Stereo);
+      CAChannelLayout(kAudioChannelLayoutTag_Stereo);
 
 CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::ChannelLayoutWithBitmap(AudioChannelBitmap channelBitmap) {
     CAChannelLayout channelLayout{kAudioChannelLayoutTag_UseChannelBitmap};
@@ -529,7 +529,8 @@ CXXCoreAudio::CAChannelLayout::ChannelLayoutWithChannelLabels(std::vector<AudioC
     return CAChannelLayout{channelLabels};
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout& other) : CAChannelLayout{} {
+CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout& other)
+  : CAChannelLayout{} {
     *this = other;
 }
 
@@ -594,7 +595,8 @@ CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const Au
     return *this;
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout&& other) noexcept : channelLayout_{other.release()} {}
+CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout&& other) noexcept
+  : channelLayout_{other.release()} {}
 
 CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(CAChannelLayout&& other) noexcept {
     reset(other.release());
