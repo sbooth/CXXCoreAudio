@@ -49,9 +49,9 @@ CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription &format,
 
 #if false
 CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const CAAudioBuffer& other)
-: CAAudioBuffer{other.format_, other.frameCapacity_}
+  : CAAudioBuffer{other.format_, other.frameCapacity_}
 {
-	Insert(other, 0);
+    Insert(other, 0);
 }
 #endif
 
@@ -64,12 +64,12 @@ CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(CAAudioBuffer &&other) noexcept
 #if false
 CXXCoreAudio::CAAudioBuffer& CXXCoreAudio::CAAudioBuffer::operator=(const CAAudioBuffer& other)
 {
-	if(this != &other) {
-		if(!Allocate(other.format_, other.frameCapacity_))
-			throw std::bad_alloc();
-		Insert(other, 0);
-	}
-	return *this;
+    if(this != &other) {
+	    if(!Allocate(other.format_, other.frameCapacity_))
+    	    throw std::bad_alloc();
+	    Insert(other, 0);
+    }
+    return *this;
 }
 #endif
 
@@ -165,7 +165,7 @@ bool CXXCoreAudio::CAAudioBuffer::InferFrameLength() {
 UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength,
                                            UInt32 writeOffset) noexcept {
     if (format_ != buffer.format_)
-        //		throw std::invalid_argument("invalid audio format");
+        //	    throw std::invalid_argument("invalid audio format");
         return 0;
 
     if (readOffset > buffer.frameLength_ || writeOffset > frameLength_ || frameLength == 0 || buffer.frameLength_ == 0)
@@ -221,7 +221,7 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Trim(UInt32 offset, UInt32 frameLength) noex
 
 UInt32 CXXCoreAudio::CAAudioBuffer::InsertSilence(UInt32 offset, UInt32 frameLength) noexcept {
     if (!(format_.IsFloat() || format_.IsSignedInteger()))
-        //		throw std::logic_error("Inserting silence for unsigned integer samples not supported");
+        //	    throw std::logic_error("Inserting silence for unsigned integer samples not supported");
         return 0;
 
     if (offset > frameLength_ || frameLength == 0)
