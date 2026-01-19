@@ -1,11 +1,8 @@
----
 BasedOnStyle: LLVM
 BreakBeforeBraces: Attach
 IndentWidth: 4
 ColumnLimit: 120
 UseTab: Never
----
-Language: Cpp
 
 AllowShortFunctionsOnASingleLine: Empty
 AllowShortBlocksOnASingleLine: Empty
@@ -21,16 +18,15 @@ MaxEmptyLinesToKeep: 1
 
 IncludeBlocks: Regroup    
 IncludeCategories:
-  - Regex: '^".*\.(h|hpp|hh|m|mm)"$'
+  - Regex: '^".*"$'
     Priority: 1
   - Regex: '^<CXXCoreAudio/'
     Priority: 2
-  - Regex: '^<(Core[A-Z]+|Foundation|AppKit|UIKit|Cocoa|Audio(Toolbox|Unit)|AVF[A-Z]+|Metal|GameKit|SceneKit|SwiftUI|Combine|QuartzCore|Accelerate)/'
+  - Regex: '^<(CoreAudioTypes|CoreFoundation|AudioToolbox|Foundation|AVFAudio)/'
     Priority: 3
-  - Regex: '^<(sys|mach|dispatch|objc|os|pthread|libkern|IOKit|xpc|Availability|TargetConditionals)/'
-    Priority: 3
+  - Regex: '^<libkern/'
+    Priority: 5
   - Regex: '^<[^./>]+>$'
     Priority: 10
   - Regex: '.*'
     Priority:        20
-...

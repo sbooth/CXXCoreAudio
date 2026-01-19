@@ -8,6 +8,7 @@
 #import "CAStreamDescription.hpp"
 
 #import <AudioToolbox/AudioFormat.h>
+
 #import <libkern/OSByteOrder.h>
 
 namespace {
