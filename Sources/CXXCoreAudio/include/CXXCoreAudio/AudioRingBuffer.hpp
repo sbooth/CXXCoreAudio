@@ -252,10 +252,10 @@ CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList *const _Nonnull buffe
 
     const auto writeIndex = writePos & capacityMask_;
     const auto framesToEnd = capacity_ - writeIndex;
-    if (framesToWrite <= framesToEnd) [[likely]]
+    if (framesToWrite <= framesToEnd) [[likely]] {
         copyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0,
                                          framesToWrite * format_.mBytesPerFrame);
-    else [[unlikely]] {
+    } else [[unlikely]] {
         const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
         copyToBuffersFromAudioBufferList(buffers_, writeIndex * format_.mBytesPerFrame, bufferList, 0, bytesToEnd);
         copyToBuffersFromAudioBufferList(buffers_, 0, bufferList, bytesToEnd,
@@ -297,10 +297,10 @@ CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList *const _Nonnull bufferList, 
 
     const auto readIndex = readPos & capacityMask_;
     const auto framesToEnd = capacity_ - readIndex;
-    if (framesToRead <= framesToEnd) [[likely]]
+    if (framesToRead <= framesToEnd) [[likely]] {
         copyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame,
                                          framesToRead * format_.mBytesPerFrame);
-    else [[unlikely]] {
+    } else [[unlikely]] {
         const auto bytesToEnd = framesToEnd * format_.mBytesPerFrame;
         copyToAudioBufferListFromBuffers(bufferList, 0, buffers_, readIndex * format_.mBytesPerFrame, bytesToEnd);
         copyToAudioBufferListFromBuffers(bufferList, bytesToEnd, buffers_, 0,

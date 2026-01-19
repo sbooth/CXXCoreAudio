@@ -274,8 +274,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
-        } else
+        } else {
             CFStringAppendFormat(result, nullptr, CFSTR("0x%.08x"), streamDescription.mFormatID);
+        }
 
         CFStringAppendCString(result, ", ", kCFStringEncodingASCII);
 
@@ -302,9 +303,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
 
         CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
     } else {
-        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString)
+        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString) {
             CFStringAppend(result, formatIDString);
-        else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else

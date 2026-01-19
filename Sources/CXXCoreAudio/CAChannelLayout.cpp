@@ -536,10 +536,10 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout &other) : C
 CXXCoreAudio::CAChannelLayout &CXXCoreAudio::CAChannelLayout::operator=(const CAChannelLayout &other) {
     if (this != &other) {
         if (channelLayout_ && other.channelLayout_ &&
-            channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions)
+            channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions) {
             memcpy(channelLayout_, other.channelLayout_,
                    AudioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
-        else {
+        } else {
             auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
             if (other.channelLayout_ && !channelLayout)
                 throw std::bad_alloc();

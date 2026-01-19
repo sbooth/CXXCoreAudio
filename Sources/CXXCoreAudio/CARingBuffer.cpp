@@ -234,14 +234,13 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList *const bufferList, 
 
     const auto endWrite = sampleTime + static_cast<int64_t>(frameCount);
 
-    // Going backwards, throw everything out
-    if (sampleTime < endTime())
+    if (sampleTime < endTime()) {
+        // Going backwards, throw everything out
         setTimeBounds(sampleTime, sampleTime);
-    // The buffer has not yet wrapped and will not need to
-    else if (endWrite - startTime() <= static_cast<int64_t>(capacity_))
-        ;
-    // Advance the start time past the region about to be overwritten
-    else {
+    } else if (endWrite - startTime() <= static_cast<int64_t>(capacity_)) {
+        // The buffer has not yet wrapped and will not need to
+    } else {
+        // Advance the start time past the region about to be overwritten
         const int64_t newStart =
             endWrite - static_cast<int64_t>(capacity_); // one buffer of time behind the write position
         const int64_t newEnd = std::max(newStart, endTime());
@@ -262,16 +261,17 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList *const bufferList, 
         // Zero the range of samples being skipped
         offset0 = FrameByteOffset(curEnd);
         offset1 = FrameByteOffset(sampleTime);
-        if (offset0 < offset1)
+        if (offset0 < offset1) {
             zeroByteRange(offset0, offset1 - offset0);
-        else {
+        } else {
             zeroByteRange(offset0, (capacity_ * format_.mBytesPerFrame) - offset0);
             zeroByteRange(0, offset1);
         }
 
         offset0 = offset1;
-    } else
+    } else {
         offset0 = FrameByteOffset(sampleTime);
+    }
 
     /// Copies non-interleaved audio from _buffers to an AudioBufferList.
     const auto storeABL = [&](uint32_t dstOffset, const AudioBufferList *const _Nonnull bufferList, uint32_t srcOffset,
@@ -285,9 +285,9 @@ bool CXXCoreAudio::CARingBuffer::Write(const AudioBufferList *const bufferList, 
     };
 
     offset1 = FrameByteOffset(endWrite);
-    if (offset0 < offset1)
+    if (offset0 < offset1) {
         storeABL(offset0, bufferList, 0, offset1 - offset0);
-    else {
+    } else {
         const auto byteCount = (capacity_ * format_.mBytesPerFrame) - offset0;
         storeABL(offset0, bufferList, 0, byteCount);
         storeABL(0, bufferList, byteCount, offset1);
