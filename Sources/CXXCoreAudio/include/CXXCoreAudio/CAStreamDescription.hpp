@@ -35,26 +35,26 @@ enum class CACommonPCMFormat {
 // MARK: AudioStreamBasicDescription Helper Functions
 
 /// Returns the common PCM format described by an AudioStreamBasicDescription structure or std::nullopt if none.
-std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept;
+std::optional<CACommonPCMFormat> IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept;
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatName(
-    const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+    const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable CopyAudioStreamBasicDescriptionFormatDescription(
-    const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+    const AudioStreamBasicDescription& streamDescription) noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 NSString *_Nullable AudioStreamBasicDescriptionFormatName(
-    const AudioStreamBasicDescription &streamDescription) noexcept;
+    const AudioStreamBasicDescription& streamDescription) noexcept;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 NSString *_Nullable AudioStreamBasicDescriptionFormatDescription(
-    const AudioStreamBasicDescription &streamDescription) noexcept;
+    const AudioStreamBasicDescription& streamDescription) noexcept;
 #endif /* __OBJC__ */
 
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
@@ -69,16 +69,16 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
                         bool isInterleaved) noexcept;
 
     /// Creates a copy of an existing stream description.
-    CAStreamDescription(const CAStreamDescription &other) noexcept = default;
+    CAStreamDescription(const CAStreamDescription& other) noexcept = default;
 
     /// Creates a stream description copied from an AudioStreamBasicDescription.
-    CAStreamDescription(const AudioStreamBasicDescription &other) noexcept;
+    CAStreamDescription(const AudioStreamBasicDescription& other) noexcept;
 
     /// Assignment operator
-    CAStreamDescription &operator=(const CAStreamDescription &other) noexcept = default;
+    CAStreamDescription& operator=(const CAStreamDescription& other) noexcept = default;
 
     /// Assignment operator
-    CAStreamDescription &operator=(const AudioStreamBasicDescription &other) noexcept;
+    CAStreamDescription& operator=(const AudioStreamBasicDescription& other) noexcept;
 
     /// Destructor
     ~CAStreamDescription() noexcept = default;
@@ -86,10 +86,10 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
     // MARK: Comparison
 
     /// Returns true if other is equal to this.
-    [[nodiscard]] bool operator==(const AudioStreamBasicDescription &other) const noexcept;
+    [[nodiscard]] bool operator==(const AudioStreamBasicDescription& other) const noexcept;
 
     /// Returns true if other is not equal to this.
-    [[nodiscard]] bool operator!=(const AudioStreamBasicDescription &other) const noexcept;
+    [[nodiscard]] bool operator!=(const AudioStreamBasicDescription& other) const noexcept;
 
     // MARK: Format Information
 
@@ -182,16 +182,16 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
     /// Sets format to the equivalent non-interleaved format of this.
     /// @note Fails for non-PCM formats.
     /// @return true on success, false otherwise.
-    bool GetNonInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept;
+    bool GetNonInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
     /// Sets format to the equivalent interleaved format of this.
     /// @note Fails for non-PCM formats.
-    bool GetInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept;
+    bool GetInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
     /// Sets format to the equivalent standard format of this.
     /// @note Fails for non-PCM formats.
     /// @return true on success, false otherwise.
-    bool GetStandardEquivalent(AudioStreamBasicDescription &format) const noexcept;
+    bool GetStandardEquivalent(AudioStreamBasicDescription& format) const noexcept;
 
     /// Resets the stream description to the default state.
     void Reset() noexcept;
@@ -226,22 +226,22 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 
 #ifdef __OBJC__
 inline NSString *_Nullable AudioStreamBasicDescriptionFormatName(
-    const AudioStreamBasicDescription &streamDescription) noexcept {
+    const AudioStreamBasicDescription& streamDescription) noexcept {
     return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatName(streamDescription);
 }
 
 inline NSString *_Nullable AudioStreamBasicDescriptionFormatDescription(
-    const AudioStreamBasicDescription &streamDescription) noexcept {
+    const AudioStreamBasicDescription& streamDescription) noexcept {
     return (__bridge_transfer NSString *)CopyAudioStreamBasicDescriptionFormatDescription(streamDescription);
 }
 #endif /* __OBJC__ */
 
 // MARK: Creation and Destruction
 
-inline CAStreamDescription::CAStreamDescription(const AudioStreamBasicDescription &other) noexcept
+inline CAStreamDescription::CAStreamDescription(const AudioStreamBasicDescription& other) noexcept
   : AudioStreamBasicDescription(other) {}
 
-inline CAStreamDescription &CAStreamDescription::operator=(const AudioStreamBasicDescription &other) noexcept {
+inline CAStreamDescription& CAStreamDescription::operator=(const AudioStreamBasicDescription& other) noexcept {
     AudioStreamBasicDescription::operator=(other);
     return *this;
 }
@@ -249,11 +249,11 @@ inline CAStreamDescription &CAStreamDescription::operator=(const AudioStreamBasi
 // MARK: Comparison
 
 /// Returns true if other is equal to this.
-inline bool CAStreamDescription::operator==(const AudioStreamBasicDescription &other) const noexcept {
+inline bool CAStreamDescription::operator==(const AudioStreamBasicDescription& other) const noexcept {
     return !std::memcmp(this, &other, sizeof(AudioStreamBasicDescription));
 }
 
-inline bool CAStreamDescription::operator!=(const AudioStreamBasicDescription &other) const noexcept {
+inline bool CAStreamDescription::operator!=(const AudioStreamBasicDescription& other) const noexcept {
     return !operator==(other);
 }
 

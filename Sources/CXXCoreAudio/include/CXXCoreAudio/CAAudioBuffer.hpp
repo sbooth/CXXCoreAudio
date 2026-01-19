@@ -21,7 +21,7 @@ namespace CXXCoreAudio {
 /// @param format The format of the audio the buffer list will contain.
 /// @param frameCapacity The desired buffer capacity in audio frames.
 /// @return An AudioBufferList struct or null if an error occurred or memory could not be allocated.
-[[nodiscard]] malloc_ptr<AudioBufferList> AllocateAudioBufferList(const AudioStreamBasicDescription &format,
+[[nodiscard]] malloc_ptr<AudioBufferList> AllocateAudioBufferList(const AudioStreamBasicDescription& format,
                                                                   UInt32 frameCapacity) noexcept;
 
 /// A class managing an AudioBufferList structure along with a specific format, frame capacity, and frame length.
@@ -34,16 +34,16 @@ class CAAudioBuffer final {
     CAAudioBuffer() noexcept = default;
 
     // This class is non-copyable
-    CAAudioBuffer(const CAAudioBuffer &) = delete;
+    CAAudioBuffer(const CAAudioBuffer&) = delete;
 
     /// Creates a buffer list by moving the contents of another.
-    CAAudioBuffer(CAAudioBuffer &&other) noexcept;
+    CAAudioBuffer(CAAudioBuffer&& other) noexcept;
 
     // This class is non-assignable
-    CAAudioBuffer &operator=(const CAAudioBuffer &) = delete;
+    CAAudioBuffer& operator=(const CAAudioBuffer&) = delete;
 
     /// Replaces the buffer list with the moved contents of another.
-    CAAudioBuffer &operator=(CAAudioBuffer &&other) noexcept;
+    CAAudioBuffer& operator=(CAAudioBuffer&& other) noexcept;
 
     /// Destroys the buffer list and releases all associated resources.
     ~CAAudioBuffer() noexcept;
@@ -52,7 +52,7 @@ class CAAudioBuffer final {
     /// @param format The format of the audio the buffer list will contain.
     /// @param frameCapacity The desired buffer capacity in audio frames.
     /// @throw std::invalid_argument, std::bad_alloc
-    CAAudioBuffer(const AudioStreamBasicDescription &format, UInt32 frameCapacity);
+    CAAudioBuffer(const AudioStreamBasicDescription& format, UInt32 frameCapacity);
 
     // MARK: Buffer Management
 
@@ -60,7 +60,7 @@ class CAAudioBuffer final {
     /// @param format The format of the audio the buffer list will contain.
     /// @param frameCapacity The desired buffer capacity in audio frames.
     /// @return true on success, false if an error occurred or memory could not be allocated.
-    bool Allocate(const AudioStreamBasicDescription &format, UInt32 frameCapacity) noexcept;
+    bool Allocate(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept;
 
     /// Deallocates the memory associated with this buffer list and sets the frame length and frame capacity to zero.
     void Deallocate() noexcept;
@@ -89,7 +89,7 @@ class CAAudioBuffer final {
     // MARK: Format
 
     /// Returns the audio format of the buffer list.
-    [[nodiscard]] const CAStreamDescription &Format() const noexcept;
+    [[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
     // MARK: External Reading
 
@@ -111,14 +111,14 @@ class CAAudioBuffer final {
     /// @note The format of buffer must match the format of this buffer list.
     /// @param buffer A buffer of audio data.
     /// @return The number of frames prepended.
-    UInt32 Prepend(const CAAudioBuffer &buffer) noexcept;
+    UInt32 Prepend(const CAAudioBuffer& buffer) noexcept;
 
     /// Prepends a portion of the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
     /// @param buffer A buffer of audio data.
     /// @param readOffset The location in buffer to start reading, in audio frames.
     /// @return The number of frames prepended.
-    UInt32 Prepend(const CAAudioBuffer &buffer, UInt32 readOffset) noexcept;
+    UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept;
 
     /// Prepends a portion of the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
@@ -126,20 +126,20 @@ class CAAudioBuffer final {
     /// @param readOffset The location in buffer to start reading, in audio frames.
     /// @param frameLength The number of frames to prepend.
     /// @return The number of frames prepended
-    UInt32 Prepend(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
+    UInt32 Prepend(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
 
     /// Appends the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
     /// @param buffer A buffer of audio data.
     /// @return The number of frames appended.
-    UInt32 Append(const CAAudioBuffer &buffer) noexcept;
+    UInt32 Append(const CAAudioBuffer& buffer) noexcept;
 
     /// Appends a portion of the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
     /// @param buffer A buffer of audio data.
     /// @param readOffset The location in buffer to start reading, in audio frames.
     /// @return The number of frames appended
-    UInt32 Append(const CAAudioBuffer &buffer, UInt32 readOffset) noexcept;
+    UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept;
 
     /// Appends a portion of the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
@@ -147,14 +147,14 @@ class CAAudioBuffer final {
     /// @param readOffset The location in buffer to start reading, in audio frames.
     /// @param frameLength The number of frames to append.
     /// @return The number of frames appended
-    UInt32 Append(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
+    UInt32 Append(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept;
 
     /// Inserts the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
     /// @param buffer A buffer of audio data.
     /// @param writeOffset The location in this buffer list to start writing, in audio frames.
     /// @return The number of frames inserted.
-    UInt32 Insert(const CAAudioBuffer &buffer, UInt32 writeOffset) noexcept;
+    UInt32 Insert(const CAAudioBuffer& buffer, UInt32 writeOffset) noexcept;
 
     /// Inserts a portion of the contents of a buffer list.
     /// @note The format of buffer must match the format of this buffer list.
@@ -163,7 +163,7 @@ class CAAudioBuffer final {
     /// @param frameLength The number of frames to insert.
     /// @param writeOffset The location in this buffer list to start writing, in audio frames.
     /// @return The number of frames inserted.
-    UInt32 Insert(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength, UInt32 writeOffset) noexcept;
+    UInt32 Insert(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength, UInt32 writeOffset) noexcept;
 
     /// Deletes frames from the beginning of this buffer list.
     /// @param frameLength The number of frames to delete.
@@ -222,7 +222,7 @@ class CAAudioBuffer final {
     /// @param frameCapacity The frame capacity of bufferList.
     /// @param frameLength The number of valid audio frames in bufferList.
     /// @return true on success, false otherwise.
-    bool adopt(AudioBufferList *_Nonnull bufferList, const AudioStreamBasicDescription &format, UInt32 frameCapacity,
+    bool adopt(AudioBufferList *_Nonnull bufferList, const AudioStreamBasicDescription& format, UInt32 frameCapacity,
                UInt32 frameLength) noexcept;
 
     /// Releases ownership of managed AudioBufferList struct and returns it.
@@ -266,7 +266,7 @@ inline UInt32 CAAudioBuffer::FrameCapacity() const noexcept {
 
 // MARK: Format
 
-inline const CAStreamDescription &CAAudioBuffer::Format() const noexcept {
+inline const CAStreamDescription& CAAudioBuffer::Format() const noexcept {
     return format_;
 }
 
@@ -278,35 +278,35 @@ inline bool CAAudioBuffer::PrepareForReading() noexcept {
 
 // MARK: Buffer Utilities
 
-inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer &buffer) noexcept {
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer) noexcept {
     return Insert(buffer, 0, buffer.frameLength_, 0);
 }
 
-inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer &buffer, UInt32 readOffset) noexcept {
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept {
     if (readOffset > buffer.frameLength_)
         return 0;
     return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), 0);
 }
 
-inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength) noexcept {
+inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept {
     return Insert(buffer, readOffset, frameLength, 0);
 }
 
-inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer &buffer) noexcept {
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer) noexcept {
     return Insert(buffer, 0, buffer.frameLength_, frameLength_);
 }
 
-inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer &buffer, UInt32 readOffset) noexcept {
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept {
     if (readOffset > buffer.frameLength_)
         return 0;
     return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), frameLength_);
 }
 
-inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength) noexcept {
+inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength) noexcept {
     return Insert(buffer, readOffset, frameLength, frameLength_);
 }
 
-inline UInt32 CAAudioBuffer::Insert(const CAAudioBuffer &buffer, UInt32 writeOffset) noexcept {
+inline UInt32 CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 writeOffset) noexcept {
     return Insert(buffer, 0, buffer.frameLength_, writeOffset);
 }
 

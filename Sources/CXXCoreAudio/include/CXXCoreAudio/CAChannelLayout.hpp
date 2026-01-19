@@ -70,10 +70,10 @@ namespace CXXCoreAudio {
                                                     const AudioChannelLayout *_Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equal.
-[[nodiscard]] bool operator==(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept;
+[[nodiscard]] bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are not equal.
-[[nodiscard]] bool operator!=(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept;
+[[nodiscard]] bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept;
 
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
@@ -156,7 +156,7 @@ class CAChannelLayout final {
 
     /// Creates a copy of a channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout(const CAChannelLayout &other);
+    CAChannelLayout(const CAChannelLayout& other);
 
     /// Creates a channel layout with a copy of an AudioChannelLayout.
     /// @throw std::bad_alloc if memory could not be allocated.
@@ -164,17 +164,17 @@ class CAChannelLayout final {
 
     /// Replaces the channel layout with a copy of a channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout &operator=(const CAChannelLayout &other);
+    CAChannelLayout& operator=(const CAChannelLayout& other);
 
     /// Replaces the channel layout with a copy of an AudioChannelLayout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout &operator=(const AudioChannelLayout *_Nullable other);
+    CAChannelLayout& operator=(const AudioChannelLayout *_Nullable other);
 
     /// Creates a channel layout by moving the contents of another.
-    CAChannelLayout(CAChannelLayout &&other) noexcept;
+    CAChannelLayout(CAChannelLayout&& other) noexcept;
 
     /// Replaces the channel layout with the moved contents of another.
-    CAChannelLayout &operator=(CAChannelLayout &&other) noexcept;
+    CAChannelLayout& operator=(CAChannelLayout&& other) noexcept;
 
     /// Destroys the channel layout and releases all associated resources.
     ~CAChannelLayout() noexcept;
@@ -191,7 +191,7 @@ class CAChannelLayout final {
     ///
     /// This function performs a bitwise comparison based on the number of channel descriptions.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEqual(const CAChannelLayout &other) const noexcept;
+    [[nodiscard]] bool IsEqual(const CAChannelLayout& other) const noexcept;
 
     /// Returns true if the channel layout is equal to an AudioChannelLayout.
     [[nodiscard]] bool operator==(const AudioChannelLayout *_Nullable other) const noexcept;
@@ -200,10 +200,10 @@ class CAChannelLayout final {
     [[nodiscard]] bool operator!=(const AudioChannelLayout *_Nullable other) const noexcept;
 
     /// Returns true if the channel layout is equal to another.
-    [[nodiscard]] bool operator==(const CAChannelLayout &other) const noexcept;
+    [[nodiscard]] bool operator==(const CAChannelLayout& other) const noexcept;
 
     /// Returns true if the channel layout is not equal to another.
-    [[nodiscard]] bool operator!=(const CAChannelLayout &other) const noexcept;
+    [[nodiscard]] bool operator!=(const CAChannelLayout& other) const noexcept;
 
     // MARK: Equivalence
 
@@ -223,7 +223,7 @@ class CAChannelLayout final {
     /// 2) One is empty and the other has a mono or stereo layout tag.
     /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEquivalent(const CAChannelLayout &other) const noexcept;
+    [[nodiscard]] bool IsEquivalent(const CAChannelLayout& other) const noexcept;
 
     // MARK: Functionality
 
@@ -235,7 +235,7 @@ class CAChannelLayout final {
     /// @param channelMap A std::vector to receive the channel map on success
     /// @return true on success, false otherwise
     /// @throw std::bad_alloc if memory could not be allocated.
-    bool MapToLayout(const CAChannelLayout &outputLayout, std::vector<SInt32> &channelMap) const;
+    bool MapToLayout(const CAChannelLayout& outputLayout, std::vector<SInt32>& channelMap) const;
 
     // MARK: AudioChannelLayout access
 
@@ -285,7 +285,7 @@ class CAChannelLayout final {
 
     /// Swaps the managed AudioChannelLayout struct with the managed AudioChannelLayout struct from another audio
     /// channel layout.
-    void swap(CAChannelLayout &other) noexcept;
+    void swap(CAChannelLayout& other) noexcept;
 
     /// Releases ownership of the managed AudioChannelLayout struct and returns it.
     /// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout struct using std::free.
@@ -309,11 +309,11 @@ inline size_t AudioChannelLayoutSize(const AudioChannelLayout *_Nullable channel
     return AudioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
 }
 
-inline bool operator==(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept {
+inline bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept {
     return AudioChannelLayoutsAreEqual(&lhs, &rhs);
 }
 
-inline bool operator!=(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept {
+inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept {
     return !operator==(lhs, rhs);
 }
 
@@ -340,7 +340,7 @@ inline bool CAChannelLayout::IsEqual(const AudioChannelLayout *_Nullable other) 
     return AudioChannelLayoutsAreEqual(channelLayout_, other);
 }
 
-inline bool CAChannelLayout::IsEqual(const CAChannelLayout &other) const noexcept {
+inline bool CAChannelLayout::IsEqual(const CAChannelLayout& other) const noexcept {
     return IsEqual(other.channelLayout_);
 }
 
@@ -352,11 +352,11 @@ inline bool CAChannelLayout::operator!=(const AudioChannelLayout *_Nullable othe
     return !operator==(other);
 }
 
-inline bool CAChannelLayout::operator==(const CAChannelLayout &other) const noexcept {
+inline bool CAChannelLayout::operator==(const CAChannelLayout& other) const noexcept {
     return operator==(other.channelLayout_);
 }
 
-inline bool CAChannelLayout::operator!=(const CAChannelLayout &other) const noexcept {
+inline bool CAChannelLayout::operator!=(const CAChannelLayout& other) const noexcept {
     return !operator==(other.channelLayout_);
 }
 
@@ -366,7 +366,7 @@ inline bool CAChannelLayout::IsEquivalent(const AudioChannelLayout *_Nullable ot
     return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
 }
 
-inline bool CAChannelLayout::IsEquivalent(const CAChannelLayout &other) const noexcept {
+inline bool CAChannelLayout::IsEquivalent(const CAChannelLayout& other) const noexcept {
     return IsEquivalent(other.channelLayout_);
 }
 
@@ -427,7 +427,7 @@ inline void CAChannelLayout::reset(AudioChannelLayout *_Nullable channelLayout) 
     std::free(std::exchange(channelLayout_, channelLayout));
 }
 
-inline void CAChannelLayout::swap(CAChannelLayout &other) noexcept {
+inline void CAChannelLayout::swap(CAChannelLayout& other) noexcept {
     std::swap(channelLayout_, other.channelLayout_);
 }
 

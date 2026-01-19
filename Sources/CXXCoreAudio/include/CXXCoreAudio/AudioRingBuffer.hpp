@@ -50,23 +50,23 @@ class AudioRingBuffer final {
     /// @param minFrameCapacity The desired minimum capacity in audio frames.
     /// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer capacity is not
     /// supported.
-    AudioRingBuffer(const AudioStreamBasicDescription &format, size_type minFrameCapacity);
+    AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity);
 
     // This class is non-copyable
-    AudioRingBuffer(const AudioRingBuffer &) = delete;
+    AudioRingBuffer(const AudioRingBuffer&) = delete;
 
     /// Creates a ring buffer by moving the contents of another ring buffer.
     /// @note This method is not thread safe for the ring buffer being moved.
     /// @param other The ring buffer to move.
-    AudioRingBuffer(AudioRingBuffer &&other) noexcept;
+    AudioRingBuffer(AudioRingBuffer&& other) noexcept;
 
     // This class is non-assignable
-    AudioRingBuffer &operator=(const AudioRingBuffer &) = delete;
+    AudioRingBuffer& operator=(const AudioRingBuffer&) = delete;
 
     /// Moves the contents of another ring buffer into this ring buffer.
     /// @note This method is not thread safe.
     /// @param other The ring buffer to move.
-    AudioRingBuffer &operator=(AudioRingBuffer &&other) noexcept;
+    AudioRingBuffer& operator=(AudioRingBuffer&& other) noexcept;
 
     /// Destroys the ring buffer and releases all associated resources.
     ~AudioRingBuffer() noexcept;
@@ -83,7 +83,7 @@ class AudioRingBuffer final {
     /// @param minFrameCapacity The desired minimum capacity in audio frames.
     /// @return true on success, false if memory could not be allocated, the audio format is not supported, or the
     /// buffer capacity is not supported.
-    bool Allocate(const AudioStreamBasicDescription &format, size_type minFrameCapacity) noexcept;
+    bool Allocate(const AudioStreamBasicDescription& format, size_type minFrameCapacity) noexcept;
 
     /// Frees any space allocated for audio data.
     /// @note This method is not thread safe.
@@ -97,7 +97,7 @@ class AudioRingBuffer final {
     /// Returns the format of the audio stored in the buffer.
     /// @note This method is safe to call from both producer and consumer.
     /// @return The audio format of the buffer.
-    [[nodiscard]] const CAStreamDescription &Format() const noexcept;
+    [[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
     /// Returns the capacity of the buffer.
     /// @note This method is safe to call from both producer and consumer.
@@ -188,7 +188,7 @@ inline AudioRingBuffer::operator bool() const noexcept {
 
 // MARK: Buffer Information
 
-inline const CAStreamDescription &AudioRingBuffer::Format() const noexcept {
+inline const CAStreamDescription& AudioRingBuffer::Format() const noexcept {
     return format_;
 }
 

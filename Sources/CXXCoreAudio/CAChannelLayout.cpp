@@ -529,11 +529,11 @@ CXXCoreAudio::CAChannelLayout::ChannelLayoutWithChannelLabels(std::vector<AudioC
     return CAChannelLayout{channelLabels};
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout &other) : CAChannelLayout{} {
+CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout& other) : CAChannelLayout{} {
     *this = other;
 }
 
-CXXCoreAudio::CAChannelLayout &CXXCoreAudio::CAChannelLayout::operator=(const CAChannelLayout &other) {
+CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CAChannelLayout& other) {
     if (this != &other) {
         if (channelLayout_ && other.channelLayout_ &&
             channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions) {
@@ -586,7 +586,7 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(const AudioChannelLayout *other)
         throw std::bad_alloc();
 }
 
-CXXCoreAudio::CAChannelLayout &CXXCoreAudio::CAChannelLayout::operator=(const AudioChannelLayout *other) {
+CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const AudioChannelLayout *other) {
     auto channelLayout = CopyAudioChannelLayout(other);
     if (other && !channelLayout)
         throw std::bad_alloc();
@@ -594,9 +594,9 @@ CXXCoreAudio::CAChannelLayout &CXXCoreAudio::CAChannelLayout::operator=(const Au
     return *this;
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout &&other) noexcept : channelLayout_{other.release()} {}
+CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout&& other) noexcept : channelLayout_{other.release()} {}
 
-CXXCoreAudio::CAChannelLayout &CXXCoreAudio::CAChannelLayout::operator=(CAChannelLayout &&other) noexcept {
+CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(CAChannelLayout&& other) noexcept {
     reset(other.release());
     return *this;
 }
@@ -607,8 +607,8 @@ CXXCoreAudio::CAChannelLayout::~CAChannelLayout() noexcept {
 
 // MARK: Functionality
 
-bool CXXCoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout &outputLayout,
-                                                std::vector<SInt32> &channelMap) const {
+bool CXXCoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLayout,
+                                                std::vector<SInt32>& channelMap) const {
     // No valid map exists for empty/unknown layouts
     if (!channelLayout_ || !outputLayout.channelLayout_)
         return false;

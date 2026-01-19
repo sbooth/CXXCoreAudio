@@ -41,23 +41,23 @@ class CARingBuffer final {
     /// @param size The desired buffer capacity per channel, in audio frames.
     /// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not
     /// supported.
-    CARingBuffer(const AudioStreamBasicDescription &format, uint32_t size);
+    CARingBuffer(const AudioStreamBasicDescription& format, uint32_t size);
 
     // This class is non-copyable
-    CARingBuffer(const CARingBuffer &) = delete;
+    CARingBuffer(const CARingBuffer&) = delete;
 
     /// Creates a ring buffer by moving the contents of another ring buffer.
     /// @note This method is not thread safe for the ring buffer being moved.
     /// @param other The ring buffer to move.
-    CARingBuffer(CARingBuffer &&other) noexcept;
+    CARingBuffer(CARingBuffer&& other) noexcept;
 
     // This class is non-assignable
-    CARingBuffer &operator=(const CARingBuffer &) = delete;
+    CARingBuffer& operator=(const CARingBuffer&) = delete;
 
     /// Moves the contents of another ring buffer into this ring buffer.
     /// @note This method is not thread safe.
     /// @param other The ring buffer to move.
-    CARingBuffer &operator=(CARingBuffer &&other) noexcept;
+    CARingBuffer& operator=(CARingBuffer&& other) noexcept;
 
     /// Destroys the ring buffer and releases all associated resources.
     ~CARingBuffer() noexcept;
@@ -80,7 +80,7 @@ class CARingBuffer final {
     /// @param size The desired buffer capacity per channel, in audio frames.
     /// @return true on success, false if memory could not be allocated, the audio format is not supported, or the
     /// buffer size is not supported.
-    bool Allocate(const AudioStreamBasicDescription &format, uint32_t size) noexcept;
+    bool Allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept;
 
     /// Frees any space allocated for data.
     /// @note This method is not thread safe.
@@ -101,7 +101,7 @@ class CARingBuffer final {
     /// @param endTime The end sample time of audio contained in the buffer.
     /// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time
     /// bounds.
-    bool GetTimeBounds(int64_t &startTime, int64_t &endTime) const noexcept;
+    bool GetTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
 
     /// Returns the unused portion of the ring buffer's capacity.
     /// @return The unused portion of the ring buffer's capacity in audio frames or zero if unable to get enough CPU
@@ -109,7 +109,7 @@ class CARingBuffer final {
     [[nodiscard]] uint32_t UnusedSpace() const noexcept;
 
     /// Returns the format of the audio in this ring buffer.
-    [[nodiscard]] const CAStreamDescription &Format() const noexcept;
+    [[nodiscard]] const CAStreamDescription& Format() const noexcept;
 
     // MARK: Writing and Reading Audio
 
@@ -174,7 +174,7 @@ class CARingBuffer final {
 
 // MARK: - Implementation -
 
-inline const CAStreamDescription &CARingBuffer::Format() const noexcept {
+inline const CAStreamDescription& CARingBuffer::Format() const noexcept {
     return format_;
 }
 

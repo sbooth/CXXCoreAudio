@@ -48,7 +48,7 @@ constexpr T bit_ceil(T x) noexcept {
 
 // MARK: Creation and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription &format, size_type minFrameCapacity) {
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]]
         throw std::invalid_argument("unsupported audio format");
@@ -58,7 +58,7 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription
         throw std::bad_alloc();
 }
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
   : buffers_{std::exchange(other.buffers_, nullptr)},
     capacity_{std::exchange(other.capacity_, 0)},
     capacityMask_{std::exchange(other.capacityMask_, 0)},
@@ -66,7 +66,7 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
     readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
     format_{std::exchange(other.format_, {})} {}
 
-CXXCoreAudio::AudioRingBuffer &CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
+CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer&& other) noexcept {
     if (this != &other) [[likely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -88,7 +88,7 @@ CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept {
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription &format,
+bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& format,
                                              size_type minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]]

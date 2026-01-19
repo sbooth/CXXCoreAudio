@@ -32,16 +32,16 @@ struct CAValueRange final : public AudioValueRange {
     [[nodiscard]] Float64 Clamp(Float64 value) const noexcept;
 
     /// Returns true if this value range intersects other.
-    [[nodiscard]] bool Intersects(const AudioValueRange &other) const noexcept;
+    [[nodiscard]] bool Intersects(const AudioValueRange& other) const noexcept;
 
     /// Returns true if this value range contains other.
-    [[nodiscard]] bool Contains(const AudioValueRange &other) const noexcept;
+    [[nodiscard]] bool Contains(const AudioValueRange& other) const noexcept;
 
     /// Returns true if this value range is equal to another.
-    [[nodiscard]] bool operator==(const AudioValueRange &other) const noexcept;
+    [[nodiscard]] bool operator==(const AudioValueRange& other) const noexcept;
 
     /// Returns true if this value range is not equal to another.
-    [[nodiscard]] bool operator!=(const AudioValueRange &other) const noexcept;
+    [[nodiscard]] bool operator!=(const AudioValueRange& other) const noexcept;
 };
 
 // MARK: - Implementation -
@@ -63,19 +63,19 @@ inline Float64 CAValueRange::Clamp(Float64 value) const noexcept {
     return std::clamp(value, mMinimum, mMaximum);
 }
 
-inline bool CAValueRange::Intersects(const AudioValueRange &other) const noexcept {
+inline bool CAValueRange::Intersects(const AudioValueRange& other) const noexcept {
     return mMinimum <= other.mMaximum && other.mMinimum <= mMaximum;
 }
 
-inline bool CAValueRange::Contains(const AudioValueRange &other) const noexcept {
+inline bool CAValueRange::Contains(const AudioValueRange& other) const noexcept {
     return mMinimum <= other.mMinimum && other.mMaximum <= mMaximum;
 }
 
-inline bool CAValueRange::operator==(const AudioValueRange &other) const noexcept {
+inline bool CAValueRange::operator==(const AudioValueRange& other) const noexcept {
     return mMinimum == other.mMinimum && mMaximum == other.mMaximum;
 }
 
-inline bool CAValueRange::operator!=(const AudioValueRange &other) const noexcept {
+inline bool CAValueRange::operator!=(const AudioValueRange& other) const noexcept {
     return !operator==(other);
 }
 
