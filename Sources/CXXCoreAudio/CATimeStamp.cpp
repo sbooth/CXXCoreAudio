@@ -10,11 +10,11 @@
 // MARK: Comparison
 
 bool CXXCoreAudio::CATimeStamp::operator==(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
         return mSampleTime == other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    if (hostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
         return mHostTime == other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    if (wordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
         return mWordClockTime == other.mWordClockTime;
     return false;
 }
@@ -24,11 +24,11 @@ bool CXXCoreAudio::CATimeStamp::operator!=(const AudioTimeStamp& other) const no
 }
 
 bool CXXCoreAudio::CATimeStamp::operator<(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
         return mSampleTime < other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    if (hostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
         return mHostTime < other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    if (wordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
         return mWordClockTime < other.mWordClockTime;
     return false;
 }
@@ -38,11 +38,11 @@ bool CXXCoreAudio::CATimeStamp::operator<=(const AudioTimeStamp& other) const no
 }
 
 bool CXXCoreAudio::CATimeStamp::operator>(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
         return mSampleTime > other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    if (hostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
         return mHostTime > other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    if (wordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
         return mWordClockTime > other.mWordClockTime;
     return false;
 }

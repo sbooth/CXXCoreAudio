@@ -11,16 +11,16 @@ import Testing
 @Suite struct CXXCoreAudioTests {
     @Test func timeStamp() async {
         let ts = CXXCoreAudio.CATimeStamp(22050.0)
-        #expect(ts.IsValid())
-        #expect(ts.SampleTimeIsValid())
-        #expect(!ts.HostTimeIsValid())
+        #expect(ts.isValid())
+        #expect(ts.sampleTimeIsValid())
+        #expect(!ts.hostTimeIsValid())
     }
 
     @Test func valueRange() async {
         let vr = CXXCoreAudio.CAValueRange()
-        #expect(vr.IsValid())
-        #expect(vr.Contains(0))
-        #expect(!vr.Contains(1))
+        #expect(vr.isValid())
+        #expect(vr.contains(0))
+        #expect(!vr.contains(1))
     }
 
     @Test func streamDescription() async {
@@ -52,23 +52,23 @@ import Testing
     @Test func ringBuffer() async {
         let empty = CXXCoreAudio.AudioRingBuffer()
         #expect(empty.__convertToBool() == false)
-        #expect(empty.Capacity() == 0)
-        #expect(empty.AvailableFrames() == 0)
-        #expect(empty.FreeSpace() == empty.Capacity())
+        #expect(empty.capacity() == 0)
+        #expect(empty.availableFrames() == 0)
+        #expect(empty.freeSpace() == empty.capacity())
 
         var rb = CXXCoreAudio.AudioRingBuffer()
         let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
-        #expect(rb.Allocate(std2ch, 512) == true)
+        #expect(rb.allocate(std2ch, 512) == true)
         #expect(rb.__convertToBool() == true)
-        #expect(rb.Capacity() == 512)
-        #expect(rb.AvailableFrames() == 0)
-        #expect(rb.FreeSpace() == rb.Capacity())
+        #expect(rb.capacity() == 512)
+        #expect(rb.availableFrames() == 0)
+        #expect(rb.freeSpace() == rb.capacity())
 
-        rb.Deallocate()
+        rb.deallocate()
         #expect(rb.__convertToBool() == false)
-        #expect(rb.Capacity() == 0)
-        #expect(rb.AvailableFrames() == 0)
-        #expect(rb.FreeSpace() == rb.Capacity())
+        #expect(rb.capacity() == 0)
+        #expect(rb.availableFrames() == 0)
+        #expect(rb.freeSpace() == rb.capacity())
     }
 
     @Test func tsRingBuffer() async {

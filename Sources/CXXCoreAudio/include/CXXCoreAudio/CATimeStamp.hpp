@@ -85,22 +85,22 @@ struct CATimeStamp final : public AudioTimeStamp {
     [[nodiscard]] explicit operator bool() const noexcept;
 
     /// Returns true if the kAudioTimeStampNothingValid flag is clear.
-    [[nodiscard]] bool IsValid() const noexcept;
+    [[nodiscard]] bool isValid() const noexcept;
 
     /// Returns true if the kAudioTimeStampSampleTimeValid flag is set.
-    [[nodiscard]] bool SampleTimeIsValid() const noexcept;
+    [[nodiscard]] bool sampleTimeIsValid() const noexcept;
 
     /// Returns true if the kAudioTimeStampHostTimeValid flag is set.
-    [[nodiscard]] bool HostTimeIsValid() const noexcept;
+    [[nodiscard]] bool hostTimeIsValid() const noexcept;
 
     /// Returns true if the kAudioTimeStampRateScalarValid flag is set.
-    [[nodiscard]] bool RateScalarIsValid() const noexcept;
+    [[nodiscard]] bool rateScalarIsValid() const noexcept;
 
     /// Returns true if the kAudioTimeStampWordClockTimeValid flag is set.
-    [[nodiscard]] bool WordClockTimeIsValid() const noexcept;
+    [[nodiscard]] bool wordClockTimeIsValid() const noexcept;
 
     /// Returns true if the kAudioTimeStampSMPTETimeValid flag is set.
-    [[nodiscard]] bool SMPTETimeIsValid() const noexcept;
+    [[nodiscard]] bool smpteTimeIsValid() const noexcept;
 };
 
 // MARK: - Implementation -
@@ -136,30 +136,30 @@ inline CATimeStamp& CATimeStamp::operator=(const AudioTimeStamp& other) noexcept
 // MARK: Flags
 
 inline CATimeStamp::operator bool() const noexcept {
-    return IsValid();
+    return isValid();
 }
 
-inline bool CATimeStamp::IsValid() const noexcept {
+inline bool CATimeStamp::isValid() const noexcept {
     return mFlags != kAudioTimeStampNothingValid;
 }
 
-inline bool CATimeStamp::SampleTimeIsValid() const noexcept {
+inline bool CATimeStamp::sampleTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid;
 }
 
-inline bool CATimeStamp::HostTimeIsValid() const noexcept {
+inline bool CATimeStamp::hostTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampHostTimeValid) == kAudioTimeStampHostTimeValid;
 }
 
-inline bool CATimeStamp::RateScalarIsValid() const noexcept {
+inline bool CATimeStamp::rateScalarIsValid() const noexcept {
     return (mFlags & kAudioTimeStampRateScalarValid) == kAudioTimeStampRateScalarValid;
 }
 
-inline bool CATimeStamp::WordClockTimeIsValid() const noexcept {
+inline bool CATimeStamp::wordClockTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampWordClockTimeValid) == kAudioTimeStampWordClockTimeValid;
 }
 
-inline bool CATimeStamp::SMPTETimeIsValid() const noexcept {
+inline bool CATimeStamp::smpteTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid;
 }
 
