@@ -23,7 +23,7 @@ class CARingBuffer final {
     // MARK: Creation and Destruction
 
     /// Creates an empty ring buffer.
-    /// @note ``Allocate`` must be called before the object may be used.
+    /// @note ``allocate`` must be called before the object may be used.
     CARingBuffer() noexcept = default;
 
     /// Creates a ring buffer with the specified buffer size.
@@ -80,36 +80,36 @@ class CARingBuffer final {
     /// @param size The desired buffer capacity per channel, in audio frames.
     /// @return true on success, false if memory could not be allocated, the audio format is not supported, or the
     /// buffer size is not supported.
-    bool Allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept;
+    bool allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept;
 
     /// Frees any space allocated for data.
     /// @note This method is not thread safe.
-    void Deallocate() noexcept;
+    void deallocate() noexcept;
 
     /// Resets the buffer start and end times to zero, emptying the buffer.
     /// @note This method is not thread safe.
-    void Reset() noexcept;
+    void reset() noexcept;
 
     // MARK: Buffer Information
 
     /// Returns the usable capacity of the ring buffer.
     /// @return The usable ring buffer capacity in audio frames.
-    [[nodiscard]] uint32_t Capacity() const noexcept;
+    [[nodiscard]] uint32_t capacity() const noexcept;
 
     /// Gets the time bounds of the audio contained in the ring buffer.
     /// @param startTime The starting sample time of audio contained in the buffer.
     /// @param endTime The end sample time of audio contained in the buffer.
     /// @return true on success, false if unable to get enough CPU cycles to capture a consistent snapshot of the time
     /// bounds.
-    bool GetTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
+    bool getTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept;
 
     /// Returns the unused portion of the ring buffer's capacity.
     /// @return The unused portion of the ring buffer's capacity in audio frames or zero if unable to get enough CPU
     /// cycles to capture a consistent snapshot of the time bounds.
-    [[nodiscard]] uint32_t UnusedSpace() const noexcept;
+    [[nodiscard]] uint32_t unusedSpace() const noexcept;
 
     /// Returns the format of the audio in this ring buffer.
-    [[nodiscard]] const CAStreamDescription& Format() const noexcept;
+    [[nodiscard]] const CAStreamDescription& format() const noexcept;
 
     // MARK: Writing and Reading Audio
 
@@ -119,7 +119,7 @@ class CARingBuffer final {
     /// @param frameCount The desired number of audio frames to write.
     /// @param sampleTime The sample time of the first frame to write.
     /// @return true on success, false on error.
-    bool Write(const AudioBufferList *const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
+    bool write(const AudioBufferList *const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
 
     /// Reads audio from the ring buffer.
     ///
@@ -131,11 +131,11 @@ class CARingBuffer final {
     /// @param frameCount The desired number of audio frames to read.
     /// @param sampleTime The sample time of the first frame to read.
     /// @return true on success, false on error.
-    bool Read(AudioBufferList *const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
+    bool read(AudioBufferList *const _Nonnull bufferList, uint32_t frameCount, int64_t sampleTime) noexcept;
 
   private:
     /// Returns the byte offset of a frame number.
-    [[nodiscard]] uint32_t FrameByteOffset(int64_t frameNumber) const noexcept;
+    [[nodiscard]] uint32_t frameByteOffset(int64_t frameNumber) const noexcept;
 
     /// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
     void *_Nonnull *_Nullable buffers_{nullptr};
@@ -174,11 +174,11 @@ class CARingBuffer final {
 
 // MARK: - Implementation -
 
-inline const CAStreamDescription& CARingBuffer::Format() const noexcept {
+inline const CAStreamDescription& CARingBuffer::format() const noexcept {
     return format_;
 }
 
-inline uint32_t CARingBuffer::FrameByteOffset(int64_t frameNumber) const noexcept {
+inline uint32_t CARingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
     return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
 }
 
