@@ -24,6 +24,8 @@ IncludeCategories:
   - Regex: '^".*"$'
     Priority: 1
   - Regex: '^<CXXCoreAudio/'
+    Priority: 1
+  - Regex: '^<cxx_cf/'
     Priority: 2
   - Regex: '^<(CoreAudioTypes|CoreFoundation|AudioToolbox|Foundation|AVFAudio)/'
     Priority: 3

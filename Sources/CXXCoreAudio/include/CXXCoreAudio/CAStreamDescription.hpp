@@ -7,10 +7,10 @@
 
 #pragma once
 
+#import <cxx_cf/CFRef.hpp>
+
 #import <CoreAudioTypes/CoreAudioTypes.h>
 #import <CoreFoundation/CFString.h>
-
-#import <cxx_cf/CFRef.hpp>
 #ifdef __OBJC__
 #import <AVFAudio/AVFAudio.h>
 #import <Foundation/NSString.h>
