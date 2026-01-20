@@ -1,0 +1,35 @@
+BasedOnStyle: LLVM
+
+Standard: c++17
+
+IndentWidth: 4
+ContinuationIndentWidth: 6
+TabWidth: 4
+UseTab: Never
+
+ColumnLimit: 120
+
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortBlocksOnASingleLine: Empty
+
+ConstructorInitializerIndentWidth: 2
+PackConstructorInitializers: NextLineOnly
+
+ReferenceAlignment: Left
+
+BreakTemplateDeclarations: true
+
+IncludeBlocks: Regroup
+IncludeCategories:
+  - Regex: '^".*"$'
+    Priority: 1
+  - Regex: '^<CXXCoreAudio/'
+    Priority: 2
+  - Regex: '^<(CoreAudioTypes|CoreFoundation|AudioToolbox|Foundation|AVFAudio)/'
+    Priority: 3
+  - Regex: '^<libkern/'
+    Priority: 5
+  - Regex: '^<[^./>]+>$'
+    Priority: 10
+  - Regex: '.*'
+    Priority: 20
