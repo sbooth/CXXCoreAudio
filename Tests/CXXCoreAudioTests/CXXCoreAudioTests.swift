@@ -25,13 +25,13 @@ import Testing
 
     @Test func streamDescription() async {
         let fmt = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
-        #expect(fmt.IsPCM() == true)
-        #expect(fmt.IsFloat() == true)
-        #expect(fmt.IsInteger() == false)
+        #expect(fmt.isPCM() == true)
+        #expect(fmt.isFloat() == true)
+        #expect(fmt.isInteger() == false)
         #expect(fmt.mSampleRate == 44100)
-        #expect(fmt.ChannelCount() == 2)
-        #expect(fmt.IsInterleaved() == false)
-        #expect(fmt.IsNonInterleaved() == true)
+        #expect(fmt.channelCount() == 2)
+        #expect(fmt.isInterleaved() == false)
+        #expect(fmt.isNonInterleaved() == true)
     }
 
     @Test func channelLayout() async {
