@@ -14,7 +14,9 @@ namespace CXXCoreAudio {
 
 /// A std::unique_ptr deleter using std::free.
 struct free_deleter {
-	void operator()(void * _Nullable ptr) noexcept { std::free(ptr); }
+    void operator()(void *_Nullable ptr) noexcept {
+        std::free(ptr);
+    }
 };
 
 /// A std::unique_ptr managing an allocation from std::malloc.
