@@ -171,7 +171,7 @@ CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
                                              &streamDescription, &dataSize, &name);
     if (result != noErr)
         return nullptr;
-    return cxx_cf::CFString{name};
+    return cxx_cf::CFString(name);
 }
 
 cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
@@ -206,7 +206,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         else
             CFStringAppendCString(result, "interleaved", kCFStringEncodingASCII);
 
-        return cxx_cf::CFString{result.release()};
+        return cxx_cf::CFString(result.release());
     }
 
     if (streamDescription.mFormatID == kAudioFormatLinearPCM) {
@@ -323,7 +323,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
                              streamDescription.mFramesPerPacket, streamDescription.mBytesPerFrame);
     }
 
-    return cxx_cf::CFString{result.release()};
+    return cxx_cf::CFString(result.release());
 }
 
 CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate,

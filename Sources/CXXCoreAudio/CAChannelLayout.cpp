@@ -289,7 +289,7 @@ cxx_cf::CFString CopyChannelLabelName(AudioChannelLabel channelLabel, bool short
     OSStatus result = AudioFormatGetProperty(property, sizeof channelLabel, &channelLabel, &dataSize, &channelName);
     if (result != noErr)
         return nullptr;
-    return cxx_cf::CFString{channelName};
+    return cxx_cf::CFString(channelName);
 }
 
 /// Joins strings from array separated by delimiter.
@@ -312,7 +312,7 @@ cxx_cf::CFString JoinStringArray(CFArrayRef array, CFStringRef delimiter) noexce
             CFStringAppend(result, delimiter);
     }
 
-    return cxx_cf::CFString{result.release()};
+    return cxx_cf::CFString(result.release());
 }
 
 } /* namespace */
@@ -405,7 +405,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutName(const AudioChannelLayo
                                              channelLayout, &dataSize, &layoutName);
     if (result != noErr)
         return nullptr;
-    return cxx_cf::CFString{layoutName};
+    return cxx_cf::CFString(layoutName);
 }
 
 cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept {
@@ -423,7 +423,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
         if (layoutName) {
             CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions, %@"),
                                  channelLayout->mNumberChannelDescriptions, layoutName.get());
-            return cxx_cf::CFString{result.release()};
+            return cxx_cf::CFString(result.release());
         }
 
         CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"),
@@ -432,7 +432,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
         cxx_cf::CFMutableArray array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
         if (!array)
             // Allocation failed; return the partial description without per-channel names
-            return cxx_cf::CFString{result.release()};
+            return cxx_cf::CFString(result.release());
 
         const AudioChannelDescription *desc = channelLayout->mChannelDescriptions;
         for (UInt32 i = 0; i < channelLayout->mNumberChannelDescriptions; ++i, ++desc) {
@@ -479,7 +479,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
             CFStringAppendFormat(result, nullptr, CFSTR(", %@"), layoutName.get());
     }
 
-    return cxx_cf::CFString{result.release()};
+    return cxx_cf::CFString(result.release());
 }
 
 // Constants
