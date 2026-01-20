@@ -156,6 +156,6 @@ void CXXCoreAudio::AudioRingBuffer::deallocate() noexcept {
         writePosition_.store(0, std::memory_order_relaxed);
         readPosition_.store(0, std::memory_order_relaxed);
 
-        format_.Reset();
+        format_.reset();
     }
 }

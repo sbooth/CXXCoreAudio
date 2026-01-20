@@ -45,8 +45,8 @@ import Testing
 
     @Test func audioBuffer() async {
         let empty = CXXCoreAudio.CAAudioBuffer()
-        #expect(empty.FrameLength() == 0)
-        #expect(empty.FrameCapacity() == 0)
+        #expect(empty.frameLength() == 0)
+        #expect(empty.frameCapacity() == 0)
     }
 
     @Test func ringBuffer() async {
@@ -73,18 +73,18 @@ import Testing
 
     @Test func tsRingBuffer() async {
         let empty = CXXCoreAudio.CARingBuffer()
-        #expect(empty.Capacity() == 0)
-        #expect(empty.UnusedSpace() == empty.Capacity())
+        #expect(empty.capacity() == 0)
+        #expect(empty.unusedSpace() == empty.capacity())
         var start: Int64 = 0, end: Int64 = 0
-        #expect(empty.GetTimeBounds(&start, &end) == true)
+        #expect(empty.getTimeBounds(&start, &end) == true)
         #expect(start == 0)
         #expect(end == 0)
 
         var rb = CXXCoreAudio.CARingBuffer()
         let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
-        #expect(rb.Allocate(std2ch, 512) == true)
-        #expect(rb.Capacity() == 511)
-        #expect(rb.UnusedSpace() == rb.Capacity())
+        #expect(rb.allocate(std2ch, 512) == true)
+        #expect(rb.capacity() == 511)
+        #expect(rb.unusedSpace() == rb.capacity())
 
         let mono8bit = AudioStreamBasicDescription(mSampleRate: 22050, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagIsPacked|kAudioFormatFlagsNativeEndian|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 1, mFramesPerPacket: 1, mBytesPerFrame: 1, mChannelsPerFrame: 1, mBitsPerChannel: 8, mReserved: 0)
 
@@ -113,18 +113,18 @@ import Testing
 
         memset(output_abl[0].mData, 0, 128)
 
-        #expect(rb.Allocate(mono8bit, 256) == true)
+        #expect(rb.allocate(mono8bit, 256) == true)
 
-        #expect(rb.Write(input_abl.unsafePointer, 128, 0) == true)
-        #expect(rb.GetTimeBounds(&start, &end) == true)
+        #expect(rb.write(input_abl.unsafePointer, 128, 0) == true)
+        #expect(rb.getTimeBounds(&start, &end) == true)
         #expect(start == 0)
         #expect(end == 128)
 
-        #expect(rb.Read(output_abl.unsafeMutablePointer, 128, 0) == true)
+        #expect(rb.read(output_abl.unsafeMutablePointer, 128, 0) == true)
         #expect(output_abl[0].mDataByteSize == 128)
         #expect(memcmp(input_abl[0].mData, output_abl[0].mData, 128) == 0)
 
-        #expect(rb.Read(output_abl.unsafeMutablePointer, 128, 64) == true)
+        #expect(rb.read(output_abl.unsafeMutablePointer, 128, 64) == true)
         #expect(output_abl[0].mDataByteSize == 64)
 
         #expect(memcmp(input_abl[0].mData?.advanced(by: 64), output_abl[0].mData, 64) == 0)

@@ -159,7 +159,7 @@ void CXXCoreAudio::CARingBuffer::deallocate() noexcept {
         }
         timeBoundsQueueCounter_.store(0, std::memory_order_relaxed);
 
-        format_.Reset();
+        format_.reset();
     }
 }
 
@@ -253,7 +253,7 @@ bool CXXCoreAudio::CARingBuffer::write(const AudioBufferList *const bufferList, 
 
     /// Zeroes a range of bytes in buffers_
     const auto zeroByteRange = [&](uint32_t byteOffset, uint32_t byteCount) noexcept {
-        const auto bufferCount = format_.ChannelStreamCount();
+        const auto bufferCount = format_.channelStreamCount();
         for (uint32_t i = 0; i < bufferCount; ++i)
             std::memset(static_cast<unsigned char *>(buffers_[i]) + byteOffset, 0, byteCount);
     };

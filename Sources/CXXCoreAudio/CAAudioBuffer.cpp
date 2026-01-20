@@ -122,7 +122,7 @@ void CXXCoreAudio::CAAudioBuffer::deallocate() noexcept {
         std::free(bufferList_);
         bufferList_ = nullptr;
 
-        format_.Reset();
+        format_.reset();
 
         frameCapacity_ = 0;
         frameLength_ = 0;
@@ -218,7 +218,7 @@ UInt32 CXXCoreAudio::CAAudioBuffer::trim(UInt32 offset, UInt32 frameLength) noex
 }
 
 UInt32 CXXCoreAudio::CAAudioBuffer::insertSilence(UInt32 offset, UInt32 frameLength) noexcept {
-    if (!(format_.IsFloat() || format_.IsSignedInteger()))
+    if (!(format_.isFloat() || format_.isSignedInteger()))
         // throw std::logic_error("Inserting silence for unsigned integer samples not supported");
         return 0;
 
@@ -282,7 +282,7 @@ bool CXXCoreAudio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const Audio
 }
 
 AudioBufferList *CXXCoreAudio::CAAudioBuffer::release() noexcept {
-    format_.Reset();
+    format_.reset();
     frameCapacity_ = 0;
     frameLength_ = 0;
     return std::exchange(bufferList_, nullptr);
