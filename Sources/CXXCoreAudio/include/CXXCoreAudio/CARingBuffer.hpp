@@ -157,9 +157,9 @@ class CARingBuffer final {
     };
 
     /// The number of elements in the time bounds queue.
-    static const uint32_t sTimeBoundsQueueSize{32};
+    static constexpr uint32_t sTimeBoundsQueueSize{32};
     /// Mask value used to wrap time bounds counters.
-    static const uint32_t sTimeBoundsQueueMask{sTimeBoundsQueueSize - 1};
+    static constexpr uint32_t sTimeBoundsQueueMask{sTimeBoundsQueueSize - 1};
 
     /// Array of TimeBounds structures.
     TimeBounds timeBoundsQueue_[sTimeBoundsQueueSize];
