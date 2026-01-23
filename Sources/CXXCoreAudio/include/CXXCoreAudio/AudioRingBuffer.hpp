@@ -226,16 +226,18 @@ inline bool AudioRingBuffer::IsEmpty() const noexcept {
 
 inline CXXCoreAudio::AudioRingBuffer::size_type
 CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept {
-    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
+    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
+    }
 
     const auto writePos = writePosition_.load(std::memory_order_relaxed);
     const auto readPos = readPosition_.load(std::memory_order_acquire);
 
     const auto framesUsed = writePos - readPos;
     const auto framesFree = capacity_ - framesUsed;
-    if (framesFree == 0) [[unlikely]]
+    if (framesFree == 0) [[unlikely]] {
         return 0;
+    }
 
     /// Copies non-interleaved audio to a buffer array from an AudioBufferList struct.
     const auto copyToBuffersFromAudioBufferList = [](void *const _Nonnull *const _Nonnull dst, std::size_t dstOffset,
@@ -269,16 +271,18 @@ CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList *const _Nonnull buffe
 
 inline CXXCoreAudio::AudioRingBuffer::size_type
 CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept {
-    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]]
+    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
+    }
 
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
     const auto framesAvailable = writePos - readPos;
     if (framesAvailable == 0) [[unlikely]] {
-        for (UInt32 i = 0; i < bufferList->mNumberBuffers; ++i)
+        for (UInt32 i = 0; i < bufferList->mNumberBuffers; ++i) {
             std::memset(bufferList->mBuffers[i].mData, 0, bufferList->mBuffers[i].mDataByteSize);
+        }
         return 0;
     }
 
@@ -325,15 +329,17 @@ CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList *const _Nonnull bufferList, 
 // MARK: Discarding Audio
 
 inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(size_type frameCount) noexcept {
-    if (frameCount == 0 || capacity_ == 0) [[unlikely]]
+    if (frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
+    }
 
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
     const auto framesAvailable = writePos - readPos;
-    if (framesAvailable == 0) [[unlikely]]
+    if (framesAvailable == 0) [[unlikely]] {
         return 0;
+    }
 
     const auto framesToSkip = std::min(framesAvailable, frameCount);
 
@@ -343,15 +349,17 @@ inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::S
 }
 
 inline AudioRingBuffer::size_type AudioRingBuffer::Drain() noexcept {
-    if (capacity_ == 0) [[unlikely]]
+    if (capacity_ == 0) [[unlikely]] {
         return 0;
+    }
 
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
 
     const auto framesAvailable = writePos - readPos;
-    if (framesAvailable == 0) [[unlikely]]
+    if (framesAvailable == 0) [[unlikely]] {
         return 0;
+    }
 
     readPosition_.store(writePos, std::memory_order_release);
     return framesAvailable;

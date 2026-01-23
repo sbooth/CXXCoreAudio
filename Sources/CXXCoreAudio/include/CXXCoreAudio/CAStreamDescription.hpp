@@ -349,8 +349,9 @@ inline bool CAStreamDescription::IsMixable() const noexcept {
 
 inline UInt32 CAStreamDescription::SampleWordSize() const noexcept {
     const auto interleavedChannelCount = InterleavedChannelCount();
-    if (interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0)
+    if (interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0) {
         return 0;
+    }
     return mBytesPerFrame / interleavedChannelCount;
 }
 
