@@ -5,13 +5,13 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "AudioRingBuffer.hpp"
+#include "AudioRingBuffer.hpp"
 
-#import <cstdlib>
-#import <limits>
-#import <new>
-#import <stdexcept>
-#import <utility>
+#include <cstdlib>
+#include <limits>
+#include <new>
+#include <stdexcept>
+#include <utility>
 
 namespace {
 
@@ -19,16 +19,18 @@ namespace {
 template <typename T>
 constexpr int clz(T x) noexcept {
     static_assert(std::is_unsigned_v<T>, "Only unsigned types supported");
-    if (x == 0)
+    if (x == 0) {
         return sizeof(T) * CHAR_BIT;
-    if constexpr (sizeof(T) < sizeof(unsigned int))
+    }
+    if constexpr (sizeof(T) < sizeof(unsigned int)) {
         return __builtin_clz(x) - (sizeof(unsigned int) - sizeof(T)) * CHAR_BIT;
-    else if constexpr (sizeof(T) == sizeof(unsigned int))
+    } else if constexpr (sizeof(T) == sizeof(unsigned int)) {
         return __builtin_clz(x);
-    else if constexpr (sizeof(T) == sizeof(unsigned long))
+    } else if constexpr (sizeof(T) == sizeof(unsigned long)) {
         return __builtin_clzl(x);
-    else
+    } else {
         return __builtin_clzll(x);
+    }
 }
 
 /// Calculates and returns the smallest integral power of two not less than x.
@@ -37,8 +39,9 @@ constexpr int clz(T x) noexcept {
 template <typename T>
 constexpr T bit_ceil(T x) noexcept {
     static_assert(std::is_unsigned_v<T>, "Only unsigned types supported");
-    if (x < 2)
+    if (x < 2) {
         return 1;
+    }
     const auto n = std::numeric_limits<T>::digits - clz(x - 1);
     assert(n != std::numeric_limits<T>::digits);
     return T{1} << n;
@@ -50,12 +53,15 @@ constexpr T bit_ceil(T x) noexcept {
 
 CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, SizeType minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
-        format.mChannelsPerFrame == 0) [[unlikely]]
+        format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
-    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]]
+    }
+    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]] {
         throw std::invalid_argument("capacity out of range");
-    if (!allocate(format, minFrameCapacity)) [[unlikely]]
+    }
+    if (!allocate(format, minFrameCapacity)) [[unlikely]] {
         throw std::bad_alloc();
+    }
 }
 
 CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
@@ -91,10 +97,12 @@ CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept {
 bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& format,
                                              SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
-        format.mChannelsPerFrame == 0) [[unlikely]]
+        format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
-    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]]
+    }
+    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]] {
         return false;
+    }
 
     /// Values larger than this will overflow AudioBuffer.mDataByteSize
     const auto maxAudioBufferFrameCount = std::numeric_limits<UInt32>::max() / format.mBytesPerFrame;
@@ -109,8 +117,9 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& 
 
     // Round to nearest power of two
     const auto channelBufferFrameSize = bit_ceil(minFrameCapacity);
-    if (channelBufferFrameSize > maxChannelBufferFrameSize) [[unlikely]]
+    if (channelBufferFrameSize > maxChannelBufferFrameSize) [[unlikely]] {
         return false;
+    }
 
     deallocate();
 
@@ -118,8 +127,9 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& 
     const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
 
     auto allocation = std::malloc(allocationSize);
-    if (!allocation) [[unlikely]]
+    if (!allocation) [[unlikely]] {
         return false;
+    }
 
     // Zero the entire allocation
     std::memset(allocation, 0, allocationSize);
