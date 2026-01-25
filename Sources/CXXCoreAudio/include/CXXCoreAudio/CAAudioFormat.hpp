@@ -6,23 +6,26 @@
 
 #pragma once
 
+#include <CXXCoreAudio/CAChannelLayout.hpp>
+#include <CXXCoreAudio/CAStreamDescription.hpp>
+
 #ifdef __OBJC__
 #import <AVFAudio/AVFAudio.h>
 #endif /* __OBJC__ */
-
-#import <CXXCoreAudio/CAChannelLayout.hpp>
-#import <CXXCoreAudio/CAStreamDescription.hpp>
 
 namespace CXXCoreAudio {
 
 /// A class representing an audio format with both a stream description and channel layout.
 class CAAudioFormat final {
   public:
-    CAAudioFormat() noexcept = delete;
-    CAAudioFormat(const CAAudioFormat& other) = default;
-    CAAudioFormat(CAAudioFormat&& other) = default;
-    CAAudioFormat& operator=(const CAAudioFormat& other) = default;
-    CAAudioFormat& operator=(CAAudioFormat&& other) = default;
+    CAAudioFormat() = delete;
+
+    CAAudioFormat(const CAAudioFormat& other) noexcept = default;
+    CAAudioFormat& operator=(const CAAudioFormat& other) noexcept = default;
+
+    CAAudioFormat(CAAudioFormat&& other) noexcept = default;
+    CAAudioFormat& operator=(CAAudioFormat&& other) noexcept = default;
+
     ~CAAudioFormat() noexcept = default;
 
     /// Creates an audio format with the specified stream description and no channel layout.
