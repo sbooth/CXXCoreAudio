@@ -20,7 +20,7 @@ namespace CXXCoreAudio {
 /// This class is thread safe when used from one reader thread and one writer thread.
 class CARingBuffer final {
   public:
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty ring buffer.
     /// @note ``Allocate`` must be called before the object may be used.
