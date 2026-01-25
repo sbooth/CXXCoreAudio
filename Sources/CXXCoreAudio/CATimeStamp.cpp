@@ -5,17 +5,20 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CATimeStamp.hpp"
+#include "CATimeStamp.hpp"
 
 // MARK: Comparison
 
 bool CXXCoreAudio::CATimeStamp::operator==(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime == other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    }
+    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid)) {
         return mHostTime == other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    }
+    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid)) {
         return mWordClockTime == other.mWordClockTime;
+    }
     return false;
 }
 
@@ -24,12 +27,15 @@ bool CXXCoreAudio::CATimeStamp::operator!=(const AudioTimeStamp& other) const no
 }
 
 bool CXXCoreAudio::CATimeStamp::operator<(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime < other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    }
+    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid)) {
         return mHostTime < other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    }
+    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid)) {
         return mWordClockTime < other.mWordClockTime;
+    }
     return false;
 }
 
@@ -38,12 +44,15 @@ bool CXXCoreAudio::CATimeStamp::operator<=(const AudioTimeStamp& other) const no
 }
 
 bool CXXCoreAudio::CATimeStamp::operator>(const AudioTimeStamp& other) const noexcept {
-    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid))
+    if (SampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime > other.mSampleTime;
-    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid))
+    }
+    if (HostTimeIsValid() && (other.mFlags & kAudioTimeStampHostTimeValid)) {
         return mHostTime > other.mHostTime;
-    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid))
+    }
+    if (WordClockTimeIsValid() && (other.mFlags & kAudioTimeStampWordClockTimeValid)) {
         return mWordClockTime > other.mWordClockTime;
+    }
     return false;
 }
 

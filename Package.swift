@@ -27,7 +27,7 @@ let package = Package(
             dependencies: [
                 "CXXCFRef",
             ],
-            cSettings: [
+            cxxSettings: [
                 .headerSearchPath("include/CXXCoreAudio"),
             ],
             linkerSettings: [

@@ -7,20 +7,21 @@
 
 #pragma once
 
-#import <CXXCoreAudio/malloc_ptr.hpp>
+#include <CXXCoreAudio/malloc_ptr.hpp>
 
-#import <cxx_cf/CFRef.hpp>
+#include <cxx_cf/CFRef.hpp>
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
-#import <CoreFoundation/CFString.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreFoundation/CFString.h>
+
 #ifdef __OBJC__
 #import <AVFAudio/AVFAudio.h>
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-#import <cstdlib>
-#import <utility>
-#import <vector>
+#include <cstdlib>
+#include <utility>
+#include <vector>
 
 namespace CXXCoreAudio {
 
@@ -301,8 +302,9 @@ constexpr size_t AudioChannelLayoutSize(UInt32 numberChannelDescriptions) noexce
 }
 
 inline size_t AudioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept {
-    if (!channelLayout)
+    if (!channelLayout) {
         return 0;
+    }
     return AudioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
 }
 

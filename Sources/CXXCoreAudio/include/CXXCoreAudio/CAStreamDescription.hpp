@@ -7,18 +7,19 @@
 
 #pragma once
 
-#import <cxx_cf/CFRef.hpp>
+#include <cxx_cf/CFRef.hpp>
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
-#import <CoreFoundation/CFString.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreFoundation/CFString.h>
+
 #ifdef __OBJC__
 #import <AVFAudio/AVFAudio.h>
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-#import <cassert>
-#import <cstring>
-#import <optional>
+#include <cassert>
+#include <cstring>
+#include <optional>
 
 namespace CXXCoreAudio {
 
@@ -349,8 +350,9 @@ inline bool CAStreamDescription::IsMixable() const noexcept {
 
 inline UInt32 CAStreamDescription::SampleWordSize() const noexcept {
     const auto interleavedChannelCount = InterleavedChannelCount();
-    if (interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0)
+    if (interleavedChannelCount == 0 || mBytesPerFrame % interleavedChannelCount != 0) {
         return 0;
+    }
     return mBytesPerFrame / interleavedChannelCount;
 }
 

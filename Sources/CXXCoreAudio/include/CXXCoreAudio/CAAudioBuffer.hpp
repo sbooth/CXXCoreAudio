@@ -7,12 +7,12 @@
 
 #pragma once
 
-#import <CXXCoreAudio/CAStreamDescription.hpp>
-#import <CXXCoreAudio/malloc_ptr.hpp>
+#include <CXXCoreAudio/CAStreamDescription.hpp>
+#include <CXXCoreAudio/malloc_ptr.hpp>
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
 
-#import <algorithm>
+#include <algorithm>
 
 namespace CXXCoreAudio {
 
@@ -283,8 +283,9 @@ inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer) noexcept {
 }
 
 inline UInt32 CAAudioBuffer::Prepend(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept {
-    if (readOffset > buffer.frameLength_)
+    if (readOffset > buffer.frameLength_) {
         return 0;
+    }
     return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), 0);
 }
 
@@ -297,8 +298,9 @@ inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer) noexcept {
 }
 
 inline UInt32 CAAudioBuffer::Append(const CAAudioBuffer& buffer, UInt32 readOffset) noexcept {
-    if (readOffset > buffer.frameLength_)
+    if (readOffset > buffer.frameLength_) {
         return 0;
+    }
     return Insert(buffer, readOffset, (buffer.frameLength_ - readOffset), frameLength_);
 }
 

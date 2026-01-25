@@ -5,11 +5,11 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CAStreamDescription.hpp"
+#include "CAStreamDescription.hpp"
 
-#import <AudioToolbox/AudioFormat.h>
+#include <AudioToolbox/AudioFormat.h>
 
-#import <libkern/OSByteOrder.h>
+#include <libkern/OSByteOrder.h>
 
 namespace {
 
@@ -117,11 +117,12 @@ CFStringRef _Nullable CreateFourCharCodeString(UInt32 fourcc) noexcept CF_RETURN
     u.ui32 = OSSwapHostToBigInt32(fourcc);
 
     if (IsPrintableASCII(u.str[0]) && IsPrintableASCII(u.str[1]) && IsPrintableASCII(u.str[2]) &&
-        IsPrintableASCII(u.str[3]))
+        IsPrintableASCII(u.str[3])) {
         return CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("'%.4s'"), u.str);
-    else
+    } else {
         return CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("0x%.02x%.02x%.02x%.02x"), u.str[0],
                                         u.str[1], u.str[2], u.str[3]);
+    }
 }
 
 } /* namespace */
@@ -130,8 +131,9 @@ std::optional<CXXCoreAudio::CACommonPCMFormat>
 CXXCoreAudio::IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept {
     if (streamDescription.mFramesPerPacket != 1 ||
         streamDescription.mBytesPerFrame != streamDescription.mBytesPerPacket ||
-        streamDescription.mChannelsPerFrame == 0)
+        streamDescription.mChannelsPerFrame == 0) {
         return std::nullopt;
+    }
 
     // Exclude non-PCM, non-native endian, non-implicitly packed formats
     if (streamDescription.mFormatID != kAudioFormatLinearPCM ||
@@ -139,25 +141,31 @@ CXXCoreAudio::IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamD
         ((streamDescription.mBitsPerChannel / 8) *
          (((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0)
                 ? streamDescription.mChannelsPerFrame
-                : 1)) != streamDescription.mBytesPerFrame)
+                : 1)) != streamDescription.mBytesPerFrame) {
         return std::nullopt;
+    }
 
     if ((streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger) {
         // Disqualify fixed point
         if ((streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == 0 &&
             ((streamDescription.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
-             kLinearPCMFormatFlagsSampleFractionShift) > 0)
+             kLinearPCMFormatFlagsSampleFractionShift) > 0) {
             return std::nullopt;
+        }
 
-        if (streamDescription.mBitsPerChannel == 16)
+        if (streamDescription.mBitsPerChannel == 16) {
             return CACommonPCMFormat::int16;
-        if (streamDescription.mBitsPerChannel == 32)
+        }
+        if (streamDescription.mBitsPerChannel == 32) {
             return CACommonPCMFormat::int32;
+        }
     } else if ((streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
-        if (streamDescription.mBitsPerChannel == 32)
+        if (streamDescription.mBitsPerChannel == 32) {
             return CACommonPCMFormat::float32;
-        if (streamDescription.mBitsPerChannel == 64)
+        }
+        if (streamDescription.mBitsPerChannel == 64) {
             return CACommonPCMFormat::float64;
+        }
     }
 
     return std::nullopt;
@@ -169,8 +177,9 @@ CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
     UInt32 dataSize = sizeof name;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
                                              &streamDescription, &dataSize, &name);
-    if (result != noErr)
+    if (result != noErr) {
         return nullptr;
+    }
     return cxx_cf::CFString(name);
 }
 
@@ -201,10 +210,11 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
             break;
         }
 
-        if ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved)
+        if ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved) {
             CFStringAppendCString(result, "deinterleaved", kCFStringEncodingASCII);
-        else
+        } else {
             CFStringAppendCString(result, "interleaved", kCFStringEncodingASCII);
+        }
 
         return cxx_cf::CFString(result.release());
     }
@@ -213,11 +223,12 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         // Bit depth
         const auto fractionalBits = (streamDescription.mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >>
                                     kLinearPCMFormatFlagsSampleFractionShift;
-        if (fractionalBits > 0)
+        if (fractionalBits > 0) {
             CFStringAppendFormat(result, nullptr, CFSTR("%d.%d-bit"),
                                  streamDescription.mBitsPerChannel - fractionalBits, fractionalBits);
-        else
+        } else {
             CFStringAppendFormat(result, nullptr, CFSTR("%d-bit"), streamDescription.mBitsPerChannel);
+        }
 
         const auto interleavedChannelCount = ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0)
                                                    ? streamDescription.mChannelsPerFrame
@@ -228,23 +239,25 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
                     : streamDescription.mBytesPerFrame / interleavedChannelCount;
 
         // Endianness
-        if (sampleWordSize > 1)
+        if (sampleWordSize > 1) {
             CFStringAppendCString(result,
                                   (streamDescription.mFormatFlags & kAudioFormatFlagIsBigEndian) ==
                                               kAudioFormatFlagIsBigEndian
                                         ? " big-endian"
                                         : " little-endian",
                                   kCFStringEncodingASCII);
+        }
 
         // Sign
         auto isInteger = (streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == 0;
-        if (isInteger)
+        if (isInteger) {
             CFStringAppendCString(result,
                                   (streamDescription.mFormatFlags & kAudioFormatFlagIsSignedInteger) ==
                                               kAudioFormatFlagIsSignedInteger
                                         ? " signed"
                                         : " unsigned",
                                   kCFStringEncodingASCII);
+        }
 
         // Integer or floating
         CFStringAppendCString(result, isInteger ? " integer" : " float", kCFStringEncodingASCII);
@@ -252,28 +265,32 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         // Packedness and alignment
         if (sampleWordSize > 0) {
             // Implicitly packed
-            if (((streamDescription.mBitsPerChannel / 8) * interleavedChannelCount) == streamDescription.mBytesPerFrame)
+            if (((streamDescription.mBitsPerChannel / 8) * interleavedChannelCount) ==
+                streamDescription.mBytesPerFrame) {
                 CFStringAppendCString(result, ", packed", kCFStringEncodingASCII);
+            }
             // Unaligned
             else if ((sampleWordSize << 3) != streamDescription.mBitsPerChannel ||
-                     (streamDescription.mBitsPerChannel & 7) != 0)
+                     (streamDescription.mBitsPerChannel & 7) != 0) {
                 CFStringAppendCString(result,
                                       (streamDescription.mFormatFlags & kAudioFormatFlagIsAlignedHigh) ==
                                                   kAudioFormatFlagIsAlignedHigh
                                             ? ", high-aligned"
                                             : ", low-aligned",
                                       kCFStringEncodingASCII);
+            }
 
             CFStringAppendFormat(result, nullptr, CFSTR(" in %d bytes"), sampleWordSize);
         }
 
-        if ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved)
+        if ((streamDescription.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved) {
             CFStringAppendCString(result, ", deinterleaved", kCFStringEncodingASCII);
+        }
     } else if (streamDescription.mFormatID == kAudioFormatAppleLossless ||
                streamDescription.mFormatID == kAudioFormatFLAC) {
-        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString)
+        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString) {
             CFStringAppend(result, formatIDString);
-        else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
@@ -298,10 +315,11 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
             break;
         }
 
-        if (sourceBitDepth != 0)
+        if (sourceBitDepth != 0) {
             CFStringAppendFormat(result, nullptr, CFSTR("from %d-bit source, "), sourceBitDepth);
-        else
+        } else {
             CFStringAppendCString(result, "from UNKNOWN source bit depth, ", kCFStringEncodingASCII);
+        }
 
         CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
     } else {
@@ -310,12 +328,14 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         } else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
-        } else
+        } else {
             CFStringAppendFormat(result, nullptr, CFSTR("0x%.08x"), streamDescription.mFormatID);
+        }
 
         // Format flags
-        if (streamDescription.mFormatFlags != 0)
+        if (streamDescription.mFormatFlags != 0) {
             CFStringAppendFormat(result, nullptr, CFSTR(" (%#x)"), streamDescription.mFormatFlags);
+        }
 
         CFStringAppendFormat(result, nullptr,
                              CFSTR(", %u bits/channel, %u bytes/packet, %u frames/packet, %u bytes/frame"),
@@ -354,8 +374,9 @@ CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonP
 
 bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(
       AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM() || mChannelsPerFrame == 0)
+    if (!IsPCM() || mChannelsPerFrame == 0) {
         return false;
+    }
     format = *this;
     if (IsInterleaved()) {
         format.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
@@ -366,8 +387,9 @@ bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(
 }
 
 bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM())
+    if (!IsPCM()) {
         return false;
+    }
     format = *this;
     if (!IsInterleaved()) {
         format.mFormatFlags &= ~kAudioFormatFlagIsNonInterleaved;
@@ -378,8 +400,9 @@ bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(AudioStreamBasi
 }
 
 bool CXXCoreAudio::CAStreamDescription::GetStandardEquivalent(AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM())
+    if (!IsPCM()) {
         return false;
+    }
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
     FillOutASBDForLPCM(format, mSampleRate, mChannelsPerFrame, 32, 32, true,
