@@ -51,15 +51,15 @@ constexpr T bit_ceil(T x) noexcept {
 
 // MARK: Construction and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity) {
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, SizeType minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
     }
-    if (minFrameCapacity < min_capacity || minFrameCapacity > max_capacity) [[unlikely]] {
+    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]] {
         throw std::invalid_argument("capacity out of range");
     }
-    if (!Allocate(format, minFrameCapacity)) [[unlikely]] {
+    if (!allocate(format, minFrameCapacity)) [[unlikely]] {
         throw std::bad_alloc();
     }
 }
@@ -94,13 +94,13 @@ CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept {
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& format,
-                                             size_type minFrameCapacity) noexcept {
+bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& format,
+                                             SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
     }
-    if (minFrameCapacity < min_capacity || minFrameCapacity > max_capacity) [[unlikely]] {
+    if (minFrameCapacity < minCapacity || minFrameCapacity > maxCapacity) [[unlikely]] {
         return false;
     }
 
@@ -121,7 +121,7 @@ bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& 
         return false;
     }
 
-    Deallocate();
+    deallocate();
 
     const auto channelBufferByteSize = channelBufferFrameSize * format.mBytesPerFrame;
     const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
@@ -155,7 +155,7 @@ bool CXXCoreAudio::AudioRingBuffer::Allocate(const AudioStreamBasicDescription& 
     return true;
 }
 
-void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept {
+void CXXCoreAudio::AudioRingBuffer::deallocate() noexcept {
     if (buffers_) [[likely]] {
         std::free(buffers_);
         buffers_ = nullptr;
@@ -166,6 +166,6 @@ void CXXCoreAudio::AudioRingBuffer::Deallocate() noexcept {
         writePosition_.store(0, std::memory_order_relaxed);
         readPosition_.store(0, std::memory_order_relaxed);
 
-        format_.Reset();
+        format_.reset();
     }
 }

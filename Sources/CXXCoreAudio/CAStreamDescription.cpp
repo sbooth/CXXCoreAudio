@@ -14,7 +14,7 @@
 namespace {
 
 /// Returns a descriptive format name for formatID or nullptr if unknown.
-CFStringRef _Nullable GetFormatIDName(AudioFormatID formatID) noexcept {
+CFStringRef _Nullable getFormatIDName(AudioFormatID formatID) noexcept {
     switch (formatID) {
     case kAudioFormatLinearPCM:
         return CFSTR("Linear PCM");
@@ -104,20 +104,20 @@ CFStringRef _Nullable GetFormatIDName(AudioFormatID formatID) noexcept {
 }
 
 /// Returns true if c is a printable ASCII character.
-constexpr bool IsPrintableASCII(unsigned char c) noexcept {
+constexpr bool isPrintableASCII(unsigned char c) noexcept {
     return c > 0x1f && c < 0x7f;
 }
 
 /// Creates a string representation of a four-character code.
-CFStringRef _Nullable CreateFourCharCodeString(UInt32 fourcc) noexcept CF_RETURNS_RETAINED {
+CFStringRef _Nullable createFourCharCodeString(UInt32 fourcc) noexcept CF_RETURNS_RETAINED {
     union {
         UInt32 ui32;
         unsigned char str[4];
     } u;
     u.ui32 = OSSwapHostToBigInt32(fourcc);
 
-    if (IsPrintableASCII(u.str[0]) && IsPrintableASCII(u.str[1]) && IsPrintableASCII(u.str[2]) &&
-        IsPrintableASCII(u.str[3])) {
+    if (isPrintableASCII(u.str[0]) && isPrintableASCII(u.str[1]) && isPrintableASCII(u.str[2]) &&
+        isPrintableASCII(u.str[3])) {
         return CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("'%.4s'"), u.str);
     } else {
         return CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("0x%.02x%.02x%.02x%.02x"), u.str[0],
@@ -128,7 +128,7 @@ CFStringRef _Nullable CreateFourCharCodeString(UInt32 fourcc) noexcept CF_RETURN
 } /* namespace */
 
 std::optional<CXXCoreAudio::CACommonPCMFormat>
-CXXCoreAudio::IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept {
+CXXCoreAudio::identifyCommonPCMFormat(const AudioStreamBasicDescription& streamDescription) noexcept {
     if (streamDescription.mFramesPerPacket != 1 ||
         streamDescription.mBytesPerFrame != streamDescription.mBytesPerPacket ||
         streamDescription.mChannelsPerFrame == 0) {
@@ -172,7 +172,7 @@ CXXCoreAudio::IdentifyCommonPCMFormat(const AudioStreamBasicDescription& streamD
 }
 
 CFStringRef
-CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept {
+CXXCoreAudio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept {
     CFStringRef name = nullptr;
     UInt32 dataSize = sizeof name;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
@@ -183,7 +183,7 @@ CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
     return name;
 }
 
-CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
+CFStringRef CXXCoreAudio::copyAudioStreamBasicDescriptionFormatDescription(
       const AudioStreamBasicDescription& streamDescription) noexcept {
     CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
 
@@ -192,7 +192,7 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
                          streamDescription.mSampleRate);
 
     // Shorter description for common formats
-    if (const auto commonPCMFormat = IdentifyCommonPCMFormat(streamDescription); commonPCMFormat.has_value()) {
+    if (const auto commonPCMFormat = identifyCommonPCMFormat(streamDescription); commonPCMFormat.has_value()) {
         switch (commonPCMFormat.value()) {
         case CACommonPCMFormat::int16:
             CFStringAppendCString(result, "Int16, ", kCFStringEncodingASCII);
@@ -286,9 +286,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
         }
     } else if (streamDescription.mFormatID == kAudioFormatAppleLossless ||
                streamDescription.mFormatID == kAudioFormatFLAC) {
-        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
@@ -321,9 +321,9 @@ CFStringRef CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
 
         CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
     } else {
-        if (CFStringRef formatIDString = GetFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = CreateFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
@@ -370,13 +370,13 @@ CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonP
 #pragma clang diagnostic pop
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(
+bool CXXCoreAudio::CAStreamDescription::getNonInterleavedEquivalent(
       AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM() || mChannelsPerFrame == 0) {
+    if (!isPCM() || mChannelsPerFrame == 0) {
         return false;
     }
     format = *this;
-    if (IsInterleaved()) {
+    if (isInterleaved()) {
         format.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
         format.mBytesPerPacket /= mChannelsPerFrame;
         format.mBytesPerFrame /= mChannelsPerFrame;
@@ -384,12 +384,12 @@ bool CXXCoreAudio::CAStreamDescription::GetNonInterleavedEquivalent(
     return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM()) {
+bool CXXCoreAudio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasicDescription& format) const noexcept {
+    if (!isPCM()) {
         return false;
     }
     format = *this;
-    if (!IsInterleaved()) {
+    if (!isInterleaved()) {
         format.mFormatFlags &= ~kAudioFormatFlagIsNonInterleaved;
         format.mBytesPerPacket *= mChannelsPerFrame;
         format.mBytesPerFrame *= mChannelsPerFrame;
@@ -397,8 +397,8 @@ bool CXXCoreAudio::CAStreamDescription::GetInterleavedEquivalent(AudioStreamBasi
     return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::GetStandardEquivalent(AudioStreamBasicDescription& format) const noexcept {
-    if (!IsPCM()) {
+bool CXXCoreAudio::CAStreamDescription::getStandardEquivalent(AudioStreamBasicDescription& format) const noexcept {
+    if (!isPCM()) {
         return false;
     }
 #pragma clang diagnostic push
