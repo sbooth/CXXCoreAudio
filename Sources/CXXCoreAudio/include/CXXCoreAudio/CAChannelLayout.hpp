@@ -15,8 +15,8 @@
 #include <vector>
 
 #ifdef __OBJC__
-#include <AVFAudio/AVFAudio.h>
-#include <Foundation/NSString.h>
+#import <AVFAudio/AVFAudio.h>
+#import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
 #include <CXXCoreAudio/malloc_ptr.hpp>
