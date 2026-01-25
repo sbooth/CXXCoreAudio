@@ -32,7 +32,7 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept {
 
 } /* namespace */
 
-// MARK: Creation and Destruction
+// MARK: Construction and Destruction
 
 CXXCoreAudio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription& format, uint32_t size) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||

@@ -13,7 +13,7 @@ namespace CXXCoreAudio {
 
 /// A class extending the functionality of an AudioTimeStamp structure.
 struct CATimeStamp final : public AudioTimeStamp {
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty time stamp.
     CATimeStamp() noexcept = default;
@@ -105,7 +105,7 @@ struct CATimeStamp final : public AudioTimeStamp {
 
 // MARK: - Implementation -
 
-// MARK: Creation and Destruction
+// MARK: Construction and Destruction
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
   : AudioTimeStamp{.mSampleTime = sampleTime, .mFlags = kAudioTimeStampSampleTimeValid} {}

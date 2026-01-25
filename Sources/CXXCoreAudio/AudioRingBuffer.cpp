@@ -49,7 +49,7 @@ constexpr T bit_ceil(T x) noexcept {
 
 } /* namespace */
 
-// MARK: Creation and Destruction
+// MARK: Construction and Destruction
 
 CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
