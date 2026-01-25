@@ -13,7 +13,7 @@ namespace CXXCoreAudio {
 
 /// A class extending the functionality of an AudioTimeStamp structure.
 struct CATimeStamp final : public AudioTimeStamp {
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty time stamp.
     CATimeStamp() noexcept = default;
@@ -105,25 +105,34 @@ struct CATimeStamp final : public AudioTimeStamp {
 
 // MARK: - Implementation -
 
-// MARK: Creation and Destruction
+// MARK: Construction and Destruction
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime, .mFlags = kAudioTimeStampSampleTimeValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mFlags = kAudioTimeStampSampleTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept
-  : AudioTimeStamp{.mHostTime = hostTime, .mFlags = kAudioTimeStampHostTimeValid} {}
+  : AudioTimeStamp{} {
+    mHostTime = hostTime;
+    mFlags = kAudioTimeStampHostTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime,
-                   .mHostTime = hostTime,
-                   .mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mHostTime = hostTime;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime,
-                   .mHostTime = hostTime,
-                   .mRateScalar = rateScalar,
-                   .mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid |
-                             kAudioTimeStampRateScalarValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mHostTime = hostTime;
+    mRateScalar = rateScalar;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
+}
 
 inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept
   : AudioTimeStamp(other) {}
