@@ -108,22 +108,31 @@ struct CATimeStamp final : public AudioTimeStamp {
 // MARK: Construction and Destruction
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime, .mFlags = kAudioTimeStampSampleTimeValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mFlags = kAudioTimeStampSampleTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept
-  : AudioTimeStamp{.mHostTime = hostTime, .mFlags = kAudioTimeStampHostTimeValid} {}
+  : AudioTimeStamp{} {
+    mHostTime = hostTime;
+    mFlags = kAudioTimeStampHostTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime,
-                   .mHostTime = hostTime,
-                   .mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mHostTime = hostTime;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
+}
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept
-  : AudioTimeStamp{.mSampleTime = sampleTime,
-                   .mHostTime = hostTime,
-                   .mRateScalar = rateScalar,
-                   .mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid |
-                             kAudioTimeStampRateScalarValid} {}
+  : AudioTimeStamp{} {
+    mSampleTime = sampleTime;
+    mHostTime = hostTime;
+    mRateScalar = rateScalar;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
+}
 
 inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept
   : AudioTimeStamp(other) {}
