@@ -138,7 +138,7 @@ class CAChannelLayout final {
     /// @throw std::bad_alloc if memory could not be allocated.
     static CAChannelLayout channelLayoutWithChannelLabels(std::vector<AudioChannelLabel> channelLabels);
 
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty channel layout.
     CAChannelLayout() noexcept = default;

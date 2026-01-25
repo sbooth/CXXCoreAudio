@@ -60,7 +60,7 @@ NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
 
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
 struct CAStreamDescription final : public AudioStreamBasicDescription {
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty stream description.
     CAStreamDescription() noexcept = default;
@@ -237,7 +237,7 @@ inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
 }
 #endif /* __OBJC__ */
 
-// MARK: Creation and Destruction
+// MARK: Construction and Destruction
 
 inline CAStreamDescription::CAStreamDescription(const AudioStreamBasicDescription& other) noexcept
   : AudioStreamBasicDescription(other) {}

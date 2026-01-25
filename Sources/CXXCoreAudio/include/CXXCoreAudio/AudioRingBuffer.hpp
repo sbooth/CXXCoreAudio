@@ -35,7 +35,7 @@ class AudioRingBuffer final {
     /// The maximum supported buffer capacity in audio frames.
     static constexpr SizeType maxCapacity = SizeType{1} << (std::numeric_limits<SizeType>::digits - 1);
 
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty ring buffer.
     /// @note ``allocate`` must be called before the object may be used.

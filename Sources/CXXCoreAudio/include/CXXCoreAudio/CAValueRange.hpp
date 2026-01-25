@@ -47,7 +47,7 @@ struct CAValueRange final : public AudioValueRange {
 // MARK: - Implementation -
 
 inline CAValueRange::CAValueRange(Float64 minimum, Float64 maximum) noexcept
-  : AudioValueRange{.mMinimum = minimum, .mMaximum = maximum} {}
+  : AudioValueRange{minimum, maximum} {}
 
 inline bool CAValueRange::isValid() const noexcept {
     return mMaximum >= mMinimum;

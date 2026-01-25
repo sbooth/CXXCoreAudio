@@ -27,7 +27,7 @@ namespace CXXCoreAudio {
 /// A class managing an AudioBufferList structure along with a specific format, frame capacity, and frame length.
 class CAAudioBuffer final {
   public:
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty buffer list.
     /// @note ``allocate`` must be called before the object may be used.
