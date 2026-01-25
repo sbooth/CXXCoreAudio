@@ -5,11 +5,11 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CAStreamDescription.hpp"
+#include "CAStreamDescription.hpp"
 
-#import <AudioToolbox/AudioFormat.h>
+#include <AudioToolbox/AudioFormat.h>
 
-#import <libkern/OSByteOrder.h>
+#include <libkern/OSByteOrder.h>
 
 namespace {
 

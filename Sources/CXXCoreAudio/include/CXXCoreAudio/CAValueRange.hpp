@@ -7,9 +7,9 @@
 
 #pragma once
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
 
-#import <algorithm>
+#include <algorithm>
 
 namespace CXXCoreAudio {
 

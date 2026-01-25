@@ -5,16 +5,16 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CARingBuffer.hpp"
+#include "CARingBuffer.hpp"
 
-#import <algorithm>
-#import <cassert>
-#import <cstdlib>
-#import <cstring>
-#import <limits>
-#import <new>
-#import <stdexcept>
-#import <utility>
+#include <algorithm>
+#include <cassert>
+#include <cstdlib>
+#include <cstring>
+#include <limits>
+#include <new>
+#include <stdexcept>
+#include <utility>
 
 namespace {
 

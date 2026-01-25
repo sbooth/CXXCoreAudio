@@ -5,13 +5,13 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "AudioRingBuffer.hpp"
+#include "AudioRingBuffer.hpp"
 
-#import <cstdlib>
-#import <limits>
-#import <new>
-#import <stdexcept>
-#import <utility>
+#include <cstdlib>
+#include <limits>
+#include <new>
+#include <stdexcept>
+#include <utility>
 
 namespace {
 

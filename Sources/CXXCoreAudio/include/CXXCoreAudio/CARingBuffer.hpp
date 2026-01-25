@@ -7,11 +7,11 @@
 
 #pragma once
 
-#import <CXXCoreAudio/CAStreamDescription.hpp>
+#include <CXXCoreAudio/CAStreamDescription.hpp>
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
 
-#import <atomic>
+#include <atomic>
 
 namespace CXXCoreAudio {
 

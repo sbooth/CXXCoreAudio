@@ -7,16 +7,16 @@
 
 #pragma once
 
-#import <CoreAudioTypes/CoreAudioTypes.h>
-#import <CoreFoundation/CFString.h>
+#include <CoreAudioTypes/CoreAudioTypes.h>
+#include <CoreFoundation/CFString.h>
 #ifdef __OBJC__
-#import <AVFAudio/AVFAudio.h>
-#import <Foundation/NSString.h>
+#include <AVFAudio/AVFAudio.h>
+#include <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-#import <cassert>
-#import <cstring>
-#import <optional>
+#include <cassert>
+#include <cstring>
+#include <optional>
 
 namespace CXXCoreAudio {
 
