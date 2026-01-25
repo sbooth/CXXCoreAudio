@@ -6,6 +6,7 @@ Assorted C++ classes simplifying common operations in Core Audio.
 | --- | --- |
 | [AudioRingBuffer](Sources/CXXCoreAudio/include/CXXCoreAudio/AudioRingBuffer.hpp) | A lock-free SPSC audio ring buffer supporting non-interleaved audio. |
 | [CAAudioBuffer](Sources/CXXCoreAudio/include/CXXCoreAudio/CAAudioBuffer.hpp) | An [`AudioBufferList`](https://developer.apple.com/documentation/coreaudiotypes/audiobufferlist?language=objc) with a specific format, frame capacity, and frame length. |
+| [CAAudioFormat](Sources/CXXCoreAudio/include/CXXCoreAudio/CAAudioFormat.hpp) | An audio format with a specific stream description and channel layout. |
 | [CAChannelLayout](Sources/CXXCoreAudio/include/CXXCoreAudio/CAChannelLayout.hpp) | Simplifies use of the variable-length [`AudioChannelLayout`](https://developer.apple.com/documentation/coreaudiotypes/audiochannellayout?language=objc). |
 | [CARingBuffer](Sources/CXXCoreAudio/include/CXXCoreAudio/CARingBuffer.hpp) | A lock-free timestamped SPSC audio ring buffer supporting non-interleaved audio. |
 | [CAStreamDescription](Sources/CXXCoreAudio/include/CXXCoreAudio/CAStreamDescription.hpp) | Extends the functionality of an [`AudioStreamBasicDescription`](https://developer.apple.com/documentation/coreaudiotypes/audiostreambasicdescription?language=objc). |
