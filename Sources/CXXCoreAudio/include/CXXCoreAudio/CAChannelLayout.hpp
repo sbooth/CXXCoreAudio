@@ -435,4 +435,5 @@ inline void CAChannelLayout::swap(CAChannelLayout& other) noexcept {
 inline AudioChannelLayout *_Nullable CAChannelLayout::release() noexcept {
     return std::exchange(channelLayout_, nullptr);
 }
+
 } /* namespace CXXCoreAudio */
