@@ -5,13 +5,13 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CAAudioBuffer.hpp"
+#include "CAAudioBuffer.hpp"
 
-#import <algorithm>
-#import <cstdlib>
-#import <limits>
-#import <new>
-#import <utility>
+#include <algorithm>
+#include <cstdlib>
+#include <limits>
+#include <new>
+#include <utility>
 
 CXXCoreAudio::malloc_ptr<AudioBufferList>
 CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept {

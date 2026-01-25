@@ -7,8 +7,8 @@
 
 #pragma once
 
-#import <cstdlib>
-#import <memory>
+#include <cstdlib>
+#include <memory>
 
 namespace CXXCoreAudio {
 

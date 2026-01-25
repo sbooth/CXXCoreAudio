@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CATimeStamp.hpp"
+#include "CATimeStamp.hpp"
 
 // MARK: Comparison
 

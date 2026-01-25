@@ -5,12 +5,12 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#import "CAChannelLayout.hpp"
+#include "CAChannelLayout.hpp"
 
-#import <AudioToolbox/AudioFormat.h>
+#include <AudioToolbox/AudioFormat.h>
 
-#import <cstring>
-#import <new>
+#include <cstring>
+#include <new>
 
 namespace {
 
