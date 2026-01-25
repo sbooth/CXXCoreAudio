@@ -257,11 +257,12 @@ constexpr const char *GetChannelLayoutTagName(AudioChannelLayoutTag layoutTag) n
     case kAudioChannelLayoutTag_MPEG_7_1_D:
         return "MPEG 7.1 D";
 
-    case kAudioChannelLayoutTag_BeginReserved ... kAudioChannelLayoutTag_EndReserved:
-        return "Reserved";
-
     default:
         break;
+    }
+
+    if (layoutTag >= kAudioChannelLayoutTag_BeginReserved && layoutTag <= kAudioChannelLayoutTag_EndReserved) {
+        return "Reserved";
     }
 
     switch (layoutTag & 0xFFFF0000) {
