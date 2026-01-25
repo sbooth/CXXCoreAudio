@@ -7,19 +7,19 @@
 
 #pragma once
 
+#include <CXXCoreAudio/malloc_ptr.hpp>
+
 #include <CoreAudioTypes/CoreAudioTypes.h>
 #include <CoreFoundation/CFString.h>
-
-#include <cstdlib>
-#include <utility>
-#include <vector>
 
 #ifdef __OBJC__
 #import <AVFAudio/AVFAudio.h>
 #import <Foundation/NSString.h>
 #endif /* __OBJC__ */
 
-#include <CXXCoreAudio/malloc_ptr.hpp>
+#include <cstdlib>
+#include <utility>
+#include <vector>
 
 namespace CXXCoreAudio {
 
