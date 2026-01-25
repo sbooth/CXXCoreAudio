@@ -186,8 +186,9 @@ CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
 cxx_cf::CFString CXXCoreAudio::CopyAudioStreamBasicDescriptionFormatDescription(
       const AudioStreamBasicDescription& streamDescription) noexcept {
     cxx_cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
-    if (!result)
+    if (!result) {
         return nullptr;
+    }
 
     // Channels and sample rate
     CFStringAppendFormat(result, nullptr, CFSTR("%u ch @ %g Hz, "), streamDescription.mChannelsPerFrame,

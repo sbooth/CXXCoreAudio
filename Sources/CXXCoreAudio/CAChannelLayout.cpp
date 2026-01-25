@@ -483,10 +483,11 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
                     CFArrayAppendValue(array, coordinateString.get());
                 }
             } else {
-                if (const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName)
+                if (const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName) {
                     CFArrayAppendValue(array, channelName.get());
-                else
+                } else {
                     CFArrayAppendValue(array, CFSTR("?"));
+                }
             }
         }
 
