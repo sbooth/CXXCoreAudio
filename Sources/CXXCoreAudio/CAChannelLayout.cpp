@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CAChannelLayout.hpp"
+#include "CXXCoreAudio/CAChannelLayout.hpp"
 
 #include <AudioToolbox/AudioFormat.h>
 

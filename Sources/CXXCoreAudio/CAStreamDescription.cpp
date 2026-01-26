@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CAStreamDescription.hpp"
+#include "CXXCoreAudio/CAStreamDescription.hpp"
 
 #include <AudioToolbox/AudioFormat.h>
 

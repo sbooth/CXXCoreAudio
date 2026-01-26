@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CARingBuffer.hpp"
+#include "CXXCoreAudio/CARingBuffer.hpp"
 
 #include <algorithm>
 #include <cassert>
