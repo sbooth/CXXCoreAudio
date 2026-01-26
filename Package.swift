@@ -21,9 +21,6 @@ let package = Package(
     targets: [
         .target(
             name: "CXXCoreAudio",
-            cxxSettings: [
-                .headerSearchPath("include/CXXCoreAudio"),
-            ],
             linkerSettings: [
                 .linkedFramework("CoreAudio"),
                 .linkedFramework("AudioToolbox"),

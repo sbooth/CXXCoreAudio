@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CAAudioBuffer.hpp"
+#include "CXXCoreAudio/CAAudioBuffer.hpp"
 
 #include <algorithm>
 #include <cstdlib>

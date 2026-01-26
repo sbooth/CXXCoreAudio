@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "AudioRingBuffer.hpp"
+#include "CXXCoreAudio/AudioRingBuffer.hpp"
 
 #include <cstdlib>
 #include <limits>
