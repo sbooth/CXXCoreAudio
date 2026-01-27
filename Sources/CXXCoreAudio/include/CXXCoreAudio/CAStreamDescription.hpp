@@ -41,21 +41,21 @@ std::optional<CACommonPCMFormat> identifyCommonPCMFormat(const AudioStreamBasicD
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable copyAudioStreamBasicDescriptionFormatName(
-      const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+        const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
 CFStringRef _Nullable copyAudioStreamBasicDescriptionFormatDescription(
-      const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+        const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 NSString *_Nullable audioStreamBasicDescriptionFormatName(
-      const AudioStreamBasicDescription &streamDescription) noexcept;
+        const AudioStreamBasicDescription &streamDescription) noexcept;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
-      const AudioStreamBasicDescription &streamDescription) noexcept;
+        const AudioStreamBasicDescription &streamDescription) noexcept;
 #endif /* __OBJC__ */
 
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
@@ -227,12 +227,12 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
 
 #ifdef __OBJC__
 inline NSString *_Nullable audioStreamBasicDescriptionFormatName(
-      const AudioStreamBasicDescription &streamDescription) noexcept {
+        const AudioStreamBasicDescription &streamDescription) noexcept {
     return (__bridge_transfer NSString *)copyAudioStreamBasicDescriptionFormatName(streamDescription);
 }
 
 inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
-      const AudioStreamBasicDescription &streamDescription) noexcept {
+        const AudioStreamBasicDescription &streamDescription) noexcept {
     return (__bridge_transfer NSString *)copyAudioStreamBasicDescriptionFormatDescription(streamDescription);
 }
 #endif /* __OBJC__ */
@@ -240,7 +240,7 @@ inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
 // MARK: Construction and Destruction
 
 inline CAStreamDescription::CAStreamDescription(const AudioStreamBasicDescription &other) noexcept
-        : AudioStreamBasicDescription(other) {}
+    : AudioStreamBasicDescription(other) {}
 
 inline CAStreamDescription &CAStreamDescription::operator=(const AudioStreamBasicDescription &other) noexcept {
     AudioStreamBasicDescription::operator=(other);

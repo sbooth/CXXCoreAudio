@@ -85,7 +85,7 @@ namespace CXXCoreAudio {
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
 /// @note The caller is responsible for releasing the returned string.
 [[nodiscard]] CFStringRef _Nullable copyAudioChannelLayoutDescription(
-      const AudioChannelLayout *_Nullable channelLayout) noexcept CF_RETURNS_RETAINED;
+        const AudioChannelLayout *_Nullable channelLayout) noexcept CF_RETURNS_RETAINED;
 
 #ifdef __OBJC__
 /// Returns true if two the AVAudioChannelLayout objects are equivalent.
@@ -107,7 +107,7 @@ namespace CXXCoreAudio {
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
 [[nodiscard]] NSString *_Nullable audioChannelLayoutDescription(
-      const AudioChannelLayout *_Nullable channelLayout) noexcept;
+        const AudioChannelLayout *_Nullable channelLayout) noexcept;
 #endif /* __OBJC__ */
 
 /// A class simplifying use of the variable-length AudioChannelLayout structure.
