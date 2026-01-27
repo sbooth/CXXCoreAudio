@@ -16,8 +16,7 @@
 namespace {
 
 /// Returns the number of leading 0-bits in x, starting at the most significant bit position.
-template <typename T>
-constexpr int clz(T x) noexcept {
+template <typename T> constexpr int clz(T x) noexcept {
     static_assert(std::is_unsigned_v<T>, "Only unsigned types supported");
     if (x == 0) {
         return sizeof(T) * CHAR_BIT;
@@ -36,8 +35,7 @@ constexpr int clz(T x) noexcept {
 /// Calculates and returns the smallest integral power of two not less than x.
 /// @param x A value on the closed interval [0, 2147483648].
 /// @return The smallest integral power of two not less than x.
-template <typename T>
-constexpr T bit_ceil(T x) noexcept {
+template <typename T> constexpr T bit_ceil(T x) noexcept {
     static_assert(std::is_unsigned_v<T>, "Only unsigned types supported");
     if (x < 2) {
         return 1;
@@ -51,7 +49,7 @@ constexpr T bit_ceil(T x) noexcept {
 
 // MARK: Construction and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, SizeType minFrameCapacity) {
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription &format, SizeType minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
@@ -64,15 +62,14 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription
     }
 }
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
-  : buffers_{std::exchange(other.buffers_, nullptr)},
-    capacity_{std::exchange(other.capacity_, 0)},
-    capacityMask_{std::exchange(other.capacityMask_, 0)},
-    writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)},
-    readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
-    format_{std::exchange(other.format_, {})} {}
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
+    : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)},
+      capacityMask_{std::exchange(other.capacityMask_, 0)},
+      writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)},
+      readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
+      format_{std::exchange(other.format_, {})} {}
 
-CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer&& other) noexcept {
+CXXCoreAudio::AudioRingBuffer &CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
     if (this != &other) [[likely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -88,13 +85,11 @@ CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRin
     return *this;
 }
 
-CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept {
-    std::free(buffers_);
-}
+CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept { std::free(buffers_); }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& format,
+bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &format,
                                              SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
@@ -108,12 +103,12 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& 
     const auto maxAudioBufferFrameCount = std::numeric_limits<UInt32>::max() / format.mBytesPerFrame;
     /// Values larger than this will exceed the maximum allocation size
     const auto maxAllocationFrameCount =
-          ((std::numeric_limits<std::size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) /
-          format.mBytesPerFrame;
+            ((std::numeric_limits<std::size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) /
+            format.mBytesPerFrame;
 
     /// The maximum size per channel buffer in audio frames
     const auto maxChannelBufferFrameSize =
-          std::min(static_cast<std::size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
+            std::min(static_cast<std::size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
 
     // Round to nearest power of two
     const auto channelBufferFrameSize = bit_ceil(minFrameCapacity);

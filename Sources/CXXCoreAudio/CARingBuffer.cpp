@@ -34,7 +34,7 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept {
 
 // MARK: Construction and Destruction
 
-CXXCoreAudio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription& format, uint32_t size) {
+CXXCoreAudio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription &format, uint32_t size) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
@@ -47,22 +47,21 @@ CXXCoreAudio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription& form
     }
 }
 
-CXXCoreAudio::CARingBuffer::CARingBuffer(CARingBuffer&& other) noexcept
-  : buffers_{std::exchange(other.buffers_, nullptr)},
-    capacity_{std::exchange(other.capacity_, 0)},
-    capacityMask_{std::exchange(other.capacityMask_, 0)},
-    timeBoundsQueueCounter_{other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed)},
-    format_{std::exchange(other.format_, {})} {
+CXXCoreAudio::CARingBuffer::CARingBuffer(CARingBuffer &&other) noexcept
+    : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)},
+      capacityMask_{std::exchange(other.capacityMask_, 0)},
+      timeBoundsQueueCounter_{other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed)},
+      format_{std::exchange(other.format_, {})} {
     for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
         timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
         timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
         timeBoundsQueue_[i].updateCounter_.store(
-              other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed),
-              std::memory_order_relaxed);
+                other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed),
+                std::memory_order_relaxed);
     }
 }
 
-CXXCoreAudio::CARingBuffer& CXXCoreAudio::CARingBuffer::operator=(CARingBuffer&& other) noexcept {
+CXXCoreAudio::CARingBuffer &CXXCoreAudio::CARingBuffer::operator=(CARingBuffer &&other) noexcept {
     if (this != &other) [[unlikely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -72,8 +71,8 @@ CXXCoreAudio::CARingBuffer& CXXCoreAudio::CARingBuffer::operator=(CARingBuffer&&
             timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
             timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
             timeBoundsQueue_[i].updateCounter_.store(
-                  other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed),
-                  std::memory_order_relaxed);
+                    other.timeBoundsQueue_[i].updateCounter_.exchange(0, std::memory_order_relaxed),
+                    std::memory_order_relaxed);
         }
         timeBoundsQueueCounter_.store(other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed),
                                       std::memory_order_relaxed);
@@ -82,13 +81,11 @@ CXXCoreAudio::CARingBuffer& CXXCoreAudio::CARingBuffer::operator=(CARingBuffer&&
     return *this;
 }
 
-CXXCoreAudio::CARingBuffer::~CARingBuffer() noexcept {
-    std::free(buffers_);
-}
+CXXCoreAudio::CARingBuffer::~CARingBuffer() noexcept { std::free(buffers_); }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::CARingBuffer::allocate(const AudioStreamBasicDescription& format, uint32_t size) noexcept {
+bool CXXCoreAudio::CARingBuffer::allocate(const AudioStreamBasicDescription &format, uint32_t size) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
@@ -101,11 +98,11 @@ bool CXXCoreAudio::CARingBuffer::allocate(const AudioStreamBasicDescription& for
     const auto maxAudioBufferFrameCount = std::numeric_limits<UInt32>::max() / format.mBytesPerFrame;
     /// Values larger than this will exceed the maximum allocation size
     const auto maxAllocationFrameCount =
-          ((std::numeric_limits<size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) / format.mBytesPerFrame;
+            ((std::numeric_limits<size_t>::max() / format.mChannelsPerFrame) - sizeof(void *)) / format.mBytesPerFrame;
 
     /// The maximum size per channel buffer in audio frames
     const auto maxChannelBufferFrameSize =
-          std::min(static_cast<size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
+            std::min(static_cast<size_t>(maxAudioBufferFrameCount), maxAllocationFrameCount);
 
     // Round to nearest power of two
     const auto channelBufferFrameSize = bit_ceil(size);
@@ -180,16 +177,14 @@ void CXXCoreAudio::CARingBuffer::reset() noexcept {
     timeBoundsQueueCounter_.store(0, std::memory_order_relaxed);
 }
 
-uint32_t CXXCoreAudio::CARingBuffer::capacity() const noexcept {
-    return capacityMask_;
-}
+uint32_t CXXCoreAudio::CARingBuffer::capacity() const noexcept { return capacityMask_; }
 
-bool CXXCoreAudio::CARingBuffer::getTimeBounds(int64_t& startTime, int64_t& endTime) const noexcept {
+bool CXXCoreAudio::CARingBuffer::getTimeBounds(int64_t &startTime, int64_t &endTime) const noexcept {
     for (auto i = 0; i < 8; ++i) {
         const auto currentCounter = timeBoundsQueueCounter_.load(std::memory_order_acquire);
         const auto currentIndex = currentCounter & sTimeBoundsQueueMask;
 
-        const TimeBounds& bounds = timeBoundsQueue_[currentIndex];
+        const TimeBounds &bounds = timeBoundsQueue_[currentIndex];
         if (const auto counter = bounds.updateCounter_.load(std::memory_order_acquire); counter == currentCounter) {
             startTime = bounds.startTime_;
             endTime = bounds.endTime_;
@@ -223,13 +218,13 @@ bool CXXCoreAudio::CARingBuffer::write(const AudioBufferList *const bufferList, 
     /// Returns the ring buffer's starting sample time.
     const auto startTime = [&]() noexcept -> int64_t {
         return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & sTimeBoundsQueueMask]
-              .startTime_;
+                .startTime_;
     };
 
     /// Returns the buffer's ring ending sample time.
     const auto endTime = [&]() noexcept -> int64_t {
         return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & sTimeBoundsQueueMask]
-              .endTime_;
+                .endTime_;
     };
 
     /// Sets the ring buffer's start and end sample times.
@@ -254,7 +249,7 @@ bool CXXCoreAudio::CARingBuffer::write(const AudioBufferList *const bufferList, 
     } else {
         // Advance the start time past the region about to be overwritten
         const int64_t newStart =
-              endWrite - static_cast<int64_t>(capacity_); // one buffer of time behind the write position
+                endWrite - static_cast<int64_t>(capacity_); // one buffer of time behind the write position
         const int64_t newEnd = std::max(newStart, endTime());
         setTimeBounds(newStart, newEnd);
     }
@@ -328,7 +323,7 @@ bool CXXCoreAudio::CARingBuffer::read(AudioBufferList *const bufferList, uint32_
     const auto endRead0 = endRead;
 
     /// Constrains start and end to valid timestamps in the buffer.
-    const auto clampTimesToBounds = [&](int64_t& start, int64_t& end) noexcept -> bool {
+    const auto clampTimesToBounds = [&](int64_t &start, int64_t &end) noexcept -> bool {
         int64_t startTime, endTime;
         if (!getTimeBounds(startTime, endTime)) [[unlikely]] {
             return false;
