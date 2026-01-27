@@ -32,49 +32,40 @@ struct CAValueRange final : public AudioValueRange {
     [[nodiscard]] Float64 clamp(Float64 value) const noexcept;
 
     /// Returns true if this value range intersects other.
-    [[nodiscard]] bool intersects(const AudioValueRange& other) const noexcept;
+    [[nodiscard]] bool intersects(const AudioValueRange &other) const noexcept;
 
     /// Returns true if this value range contains other.
-    [[nodiscard]] bool contains(const AudioValueRange& other) const noexcept;
+    [[nodiscard]] bool contains(const AudioValueRange &other) const noexcept;
 
     /// Returns true if this value range is equal to another.
-    [[nodiscard]] bool operator==(const AudioValueRange& other) const noexcept;
+    [[nodiscard]] bool operator==(const AudioValueRange &other) const noexcept;
 
     /// Returns true if this value range is not equal to another.
-    [[nodiscard]] bool operator!=(const AudioValueRange& other) const noexcept;
+    [[nodiscard]] bool operator!=(const AudioValueRange &other) const noexcept;
 };
 
 // MARK: - Implementation -
 
-inline CAValueRange::CAValueRange(Float64 minimum, Float64 maximum) noexcept
-  : AudioValueRange{minimum, maximum} {}
+inline CAValueRange::CAValueRange(Float64 minimum, Float64 maximum) noexcept : AudioValueRange{minimum, maximum} {}
 
-inline bool CAValueRange::isValid() const noexcept {
-    return mMaximum >= mMinimum;
-}
+inline bool CAValueRange::isValid() const noexcept { return mMaximum >= mMinimum; }
 
-inline bool CAValueRange::contains(Float64 value) const noexcept {
-    return value >= mMinimum && value <= mMaximum;
-}
+inline bool CAValueRange::contains(Float64 value) const noexcept { return value >= mMinimum && value <= mMaximum; }
 
-inline Float64 CAValueRange::clamp(Float64 value) const noexcept {
-    return std::clamp(value, mMinimum, mMaximum);
-}
+inline Float64 CAValueRange::clamp(Float64 value) const noexcept { return std::clamp(value, mMinimum, mMaximum); }
 
-inline bool CAValueRange::intersects(const AudioValueRange& other) const noexcept {
+inline bool CAValueRange::intersects(const AudioValueRange &other) const noexcept {
     return mMinimum <= other.mMaximum && other.mMinimum <= mMaximum;
 }
 
-inline bool CAValueRange::contains(const AudioValueRange& other) const noexcept {
+inline bool CAValueRange::contains(const AudioValueRange &other) const noexcept {
     return mMinimum <= other.mMinimum && other.mMaximum <= mMaximum;
 }
 
-inline bool CAValueRange::operator==(const AudioValueRange& other) const noexcept {
+inline bool CAValueRange::operator==(const AudioValueRange &other) const noexcept {
     return mMinimum == other.mMinimum && mMaximum == other.mMaximum;
 }
 
-inline bool CAValueRange::operator!=(const AudioValueRange& other) const noexcept {
-    return !operator==(other);
-}
+inline bool CAValueRange::operator!=(const AudioValueRange &other) const noexcept { return !operator==(other); }
 
 } /* namespace CXXCoreAudio */

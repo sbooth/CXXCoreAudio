@@ -49,7 +49,7 @@ template <typename T> constexpr T bit_ceil(T x) noexcept {
 
 // MARK: Construction and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription& format, SizeType minFrameCapacity) {
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription &format, SizeType minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
@@ -62,20 +62,19 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription
     }
 }
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer&& other) noexcept
-  : buffers_{std::exchange(other.buffers_, nullptr)},
-    capacity_{std::exchange(other.capacity_, 0)},
-    capacityMask_{std::exchange(other.capacityMask_, 0)},
-    writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)},
-    readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
-    format_{std::exchange(other.format_, {})} {}
+CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
+        : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)},
+          capacityMask_{std::exchange(other.capacityMask_, 0)},
+          writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)},
+          readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
+          format_{std::exchange(other.format_, {})} {}
 
-CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer&& other) noexcept {
+CXXCoreAudio::AudioRingBuffer &CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
     if (this != &other) [[likely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
 
-        capacity_     = std::exchange(other.capacity_, 0);
+        capacity_ = std::exchange(other.capacity_, 0);
         capacityMask_ = std::exchange(other.capacityMask_, 0);
 
         writePosition_.store(other.writePosition_.exchange(0, std::memory_order_relaxed), std::memory_order_relaxed);
@@ -86,14 +85,12 @@ CXXCoreAudio::AudioRingBuffer& CXXCoreAudio::AudioRingBuffer::operator=(AudioRin
     return *this;
 }
 
-CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept {
-    std::free(buffers_);
-}
+CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept { std::free(buffers_); }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& format,
-                                             SizeType                           minFrameCapacity) noexcept {
+bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &format,
+                                             SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
@@ -122,7 +119,7 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& 
     deallocate();
 
     const auto channelBufferByteSize = channelBufferFrameSize * format.mBytesPerFrame;
-    const auto allocationSize        = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
+    const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
 
     auto allocation = std::malloc(allocationSize);
     if (!allocation) [[unlikely]] {
@@ -135,14 +132,14 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription& 
     // Assign the channel buffers
     auto address = reinterpret_cast<uintptr_t>(allocation);
 
-    buffers_  = reinterpret_cast<void **>(address);
-    address  += format.mChannelsPerFrame * sizeof(void *);
+    buffers_ = reinterpret_cast<void **>(address);
+    address += format.mChannelsPerFrame * sizeof(void *);
     for (UInt32 i = 0; i < format.mChannelsPerFrame; ++i) {
-        buffers_[i]  = reinterpret_cast<void *>(address);
-        address     += channelBufferByteSize;
+        buffers_[i] = reinterpret_cast<void *>(address);
+        address += channelBufferByteSize;
     }
 
-    capacity_     = channelBufferFrameSize;
+    capacity_ = channelBufferFrameSize;
     capacityMask_ = channelBufferFrameSize - 1;
 
     writePosition_.store(0, std::memory_order_relaxed);
@@ -158,7 +155,7 @@ void CXXCoreAudio::AudioRingBuffer::deallocate() noexcept {
         std::free(buffers_);
         buffers_ = nullptr;
 
-        capacity_     = 0;
+        capacity_ = 0;
         capacityMask_ = 0;
 
         writePosition_.store(0, std::memory_order_relaxed);

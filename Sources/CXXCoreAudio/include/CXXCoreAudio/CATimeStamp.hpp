@@ -39,22 +39,22 @@ struct CATimeStamp final : public AudioTimeStamp {
 
     /// Creates a time stamp copied from a Core Audio time stamp.
     /// @param other The desired time stamp.
-    explicit CATimeStamp(const AudioTimeStamp& other) noexcept;
+    explicit CATimeStamp(const AudioTimeStamp &other) noexcept;
 
     /// Copy constructor
-    CATimeStamp(const CATimeStamp& other) noexcept = default;
+    CATimeStamp(const CATimeStamp &other) noexcept = default;
 
     /// Move constructor
-    CATimeStamp(CATimeStamp&& other) noexcept = default;
+    CATimeStamp(CATimeStamp &&other) noexcept = default;
 
     /// Assignment operator
-    CATimeStamp& operator=(const CATimeStamp& other) noexcept = default;
+    CATimeStamp &operator=(const CATimeStamp &other) noexcept = default;
 
     /// Assignment operator
-    CATimeStamp& operator=(const AudioTimeStamp& other) noexcept;
+    CATimeStamp &operator=(const AudioTimeStamp &other) noexcept;
 
     /// Move assignment operator
-    CATimeStamp& operator=(CATimeStamp&& other) noexcept = default;
+    CATimeStamp &operator=(CATimeStamp &&other) noexcept = default;
 
     /// Destructor
     ~CATimeStamp() noexcept = default;
@@ -62,22 +62,22 @@ struct CATimeStamp final : public AudioTimeStamp {
     // MARK: Comparison
 
     /// Returns true if other is equal to this.
-    [[nodiscard]] bool operator==(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator==(const AudioTimeStamp &other) const noexcept;
 
     /// Returns true if other is not equal to this.
-    [[nodiscard]] bool operator!=(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator!=(const AudioTimeStamp &other) const noexcept;
 
     /// Returns true if other is less than this.
-    [[nodiscard]] bool operator<(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator<(const AudioTimeStamp &other) const noexcept;
 
     /// Returns true if other is less than or equal to this.
-    [[nodiscard]] bool operator<=(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator<=(const AudioTimeStamp &other) const noexcept;
 
     /// Returns true if other is greater than or equal to this.
-    [[nodiscard]] bool operator>=(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator>=(const AudioTimeStamp &other) const noexcept;
 
     /// Returns true if other is greater than this.
-    [[nodiscard]] bool operator>(const AudioTimeStamp& other) const noexcept;
+    [[nodiscard]] bool operator>(const AudioTimeStamp &other) const noexcept;
 
     // MARK: Flags
 
@@ -107,50 +107,41 @@ struct CATimeStamp final : public AudioTimeStamp {
 
 // MARK: Construction and Destruction
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
-  : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mFlags      = kAudioTimeStampSampleTimeValid;
+    mFlags = kAudioTimeStampSampleTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept
-  : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept : AudioTimeStamp{} {
     mHostTime = hostTime;
-    mFlags    = kAudioTimeStampHostTimeValid;
+    mFlags = kAudioTimeStampHostTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept
-  : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mHostTime   = hostTime;
-    mFlags      = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
+    mHostTime = hostTime;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
 }
 
-inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept
-  : AudioTimeStamp{} {
+inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mHostTime   = hostTime;
+    mHostTime = hostTime;
     mRateScalar = rateScalar;
-    mFlags      = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
+    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
 }
 
-inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept
-  : AudioTimeStamp(other) {}
+inline CATimeStamp::CATimeStamp(const AudioTimeStamp &other) noexcept : AudioTimeStamp(other) {}
 
-inline CATimeStamp& CATimeStamp::operator=(const AudioTimeStamp& other) noexcept {
+inline CATimeStamp &CATimeStamp::operator=(const AudioTimeStamp &other) noexcept {
     AudioTimeStamp::operator=(other);
     return *this;
 }
 
 // MARK: Flags
 
-inline CATimeStamp::operator bool() const noexcept {
-    return isValid();
-}
+inline CATimeStamp::operator bool() const noexcept { return isValid(); }
 
-inline bool CATimeStamp::isValid() const noexcept {
-    return mFlags != kAudioTimeStampNothingValid;
-}
+inline bool CATimeStamp::isValid() const noexcept { return mFlags != kAudioTimeStampNothingValid; }
 
 inline bool CATimeStamp::sampleTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampSampleTimeValid) == kAudioTimeStampSampleTimeValid;
