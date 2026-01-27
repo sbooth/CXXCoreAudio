@@ -111,7 +111,7 @@ constexpr bool isPrintableASCII(unsigned char c) noexcept {
 /// Creates a string representation of a four-character code.
 CFStringRef _Nullable createFourCharCodeString(UInt32 fourcc) noexcept CF_RETURNS_RETAINED {
     union {
-        UInt32 ui32;
+        UInt32        ui32;
         unsigned char str[4];
     } u;
     u.ui32 = OSSwapHostToBigInt32(fourcc);
@@ -173,10 +173,10 @@ CXXCoreAudio::identifyCommonPCMFormat(const AudioStreamBasicDescription& streamD
 
 CFStringRef
 CXXCoreAudio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept {
-    CFStringRef name = nullptr;
-    UInt32 dataSize = sizeof name;
-    OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
-                                             &streamDescription, &dataSize, &name);
+    CFStringRef name     = nullptr;
+    UInt32      dataSize = sizeof name;
+    OSStatus    result   = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
+                                                  &streamDescription, &dataSize, &name);
     if (result != noErr) {
         return nullptr;
     }
@@ -377,9 +377,9 @@ bool CXXCoreAudio::CAStreamDescription::getNonInterleavedEquivalent(
     }
     format = *this;
     if (isInterleaved()) {
-        format.mFormatFlags |= kAudioFormatFlagIsNonInterleaved;
+        format.mFormatFlags    |= kAudioFormatFlagIsNonInterleaved;
         format.mBytesPerPacket /= mChannelsPerFrame;
-        format.mBytesPerFrame /= mChannelsPerFrame;
+        format.mBytesPerFrame  /= mChannelsPerFrame;
     }
     return true;
 }
@@ -390,9 +390,9 @@ bool CXXCoreAudio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasi
     }
     format = *this;
     if (!isInterleaved()) {
-        format.mFormatFlags &= ~kAudioFormatFlagIsNonInterleaved;
+        format.mFormatFlags    &= ~kAudioFormatFlagIsNonInterleaved;
         format.mBytesPerPacket *= mChannelsPerFrame;
-        format.mBytesPerFrame *= mChannelsPerFrame;
+        format.mBytesPerFrame  *= mChannelsPerFrame;
     }
     return true;
 }

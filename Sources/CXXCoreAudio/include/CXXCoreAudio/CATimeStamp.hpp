@@ -110,28 +110,28 @@ struct CATimeStamp final : public AudioTimeStamp {
 inline CATimeStamp::CATimeStamp(Float64 sampleTime) noexcept
   : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mFlags = kAudioTimeStampSampleTimeValid;
+    mFlags      = kAudioTimeStampSampleTimeValid;
 }
 
 inline CATimeStamp::CATimeStamp(UInt64 hostTime) noexcept
   : AudioTimeStamp{} {
     mHostTime = hostTime;
-    mFlags = kAudioTimeStampHostTimeValid;
+    mFlags    = kAudioTimeStampHostTimeValid;
 }
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime) noexcept
   : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mHostTime = hostTime;
-    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
+    mHostTime   = hostTime;
+    mFlags      = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid;
 }
 
 inline CATimeStamp::CATimeStamp(Float64 sampleTime, UInt64 hostTime, Float64 rateScalar) noexcept
   : AudioTimeStamp{} {
     mSampleTime = sampleTime;
-    mHostTime = hostTime;
+    mHostTime   = hostTime;
     mRateScalar = rateScalar;
-    mFlags = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
+    mFlags      = kAudioTimeStampSampleTimeValid | kAudioTimeStampHostTimeValid | kAudioTimeStampRateScalarValid;
 }
 
 inline CATimeStamp::CATimeStamp(const AudioTimeStamp& other) noexcept
