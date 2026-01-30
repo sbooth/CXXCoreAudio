@@ -636,8 +636,7 @@ core_audio::ChannelLayout::~ChannelLayout() noexcept { reset(); }
 
 // MARK: Functionality
 
-bool core_audio::ChannelLayout::mapToLayout(const ChannelLayout &outputLayout,
-                                              std::vector<SInt32> &channelMap) const {
+bool core_audio::ChannelLayout::mapToLayout(const ChannelLayout &outputLayout, std::vector<SInt32> &channelMap) const {
     // No valid map exists for empty/unknown layouts
     if (!channelLayout_ || !outputLayout.channelLayout_) {
         return false;

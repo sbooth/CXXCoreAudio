@@ -341,9 +341,7 @@ inline bool ChannelLayout::isEqual(const AudioChannelLayout *_Nullable other) co
     return audioChannelLayoutsAreEqual(channelLayout_, other);
 }
 
-inline bool ChannelLayout::isEqual(const ChannelLayout &other) const noexcept {
-    return isEqual(other.channelLayout_);
-}
+inline bool ChannelLayout::isEqual(const ChannelLayout &other) const noexcept { return isEqual(other.channelLayout_); }
 
 inline bool ChannelLayout::operator==(const AudioChannelLayout *_Nullable other) const noexcept {
     return isEqual(other);

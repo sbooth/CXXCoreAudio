@@ -67,7 +67,7 @@ struct StreamDescription final : public AudioStreamBasicDescription {
 
     /// Creates a stream description for the specified common PCM format.
     StreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame,
-                        bool isInterleaved) noexcept;
+                      bool isInterleaved) noexcept;
 
     /// Creates a copy of an existing stream description.
     StreamDescription(const StreamDescription &other) noexcept = default;
@@ -276,9 +276,7 @@ inline UInt32 StreamDescription::interleavedChannelCount() const noexcept {
     return isInterleaved() ? mChannelsPerFrame : 1;
 }
 
-inline UInt32 StreamDescription::channelStreamCount() const noexcept {
-    return isInterleaved() ? 1 : mChannelsPerFrame;
-}
+inline UInt32 StreamDescription::channelStreamCount() const noexcept { return isInterleaved() ? 1 : mChannelsPerFrame; }
 
 inline UInt32 StreamDescription::channelCount() const noexcept { return mChannelsPerFrame; }
 

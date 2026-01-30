@@ -343,7 +343,7 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
 }
 
 core_audio::StreamDescription::StreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate,
-                                                     UInt32 channelsPerFrame, bool isInterleaved) noexcept
+                                                 UInt32 channelsPerFrame, bool isInterleaved) noexcept
     : AudioStreamBasicDescription{} {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"

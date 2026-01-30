@@ -84,8 +84,7 @@ core_audio::BufferList &core_audio::BufferList::operator=(BufferList &&other) no
 
 core_audio::BufferList::~BufferList() noexcept { std::free(bufferList_); }
 
-core_audio::BufferList::BufferList(const AudioStreamBasicDescription &format, UInt32 frameCapacity)
-    : BufferList{} {
+core_audio::BufferList::BufferList(const AudioStreamBasicDescription &format, UInt32 frameCapacity) : BufferList{} {
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) {
         throw std::invalid_argument("invalid format");
     }
@@ -170,7 +169,7 @@ bool core_audio::BufferList::inferFrameLength() {
 // MARK: Buffer Utilities
 
 UInt32 core_audio::BufferList::insert(const BufferList &buffer, UInt32 readOffset, UInt32 frameLength,
-                                         UInt32 writeOffset) noexcept {
+                                      UInt32 writeOffset) noexcept {
     if (format_ != buffer.format_) {
         // throw std::invalid_argument("invalid audio format");
         return 0;
@@ -270,7 +269,7 @@ UInt32 core_audio::BufferList::insertSilence(UInt32 offset, UInt32 frameLength) 
 // MARK: AudioBufferList Management
 
 bool core_audio::BufferList::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription &format,
-                                      UInt32 frameCapacity, UInt32 frameLength) noexcept {
+                                   UInt32 frameCapacity, UInt32 frameLength) noexcept {
     if (!bufferList) {
         return false;
     }
