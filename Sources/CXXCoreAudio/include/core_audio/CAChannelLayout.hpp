@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <CXXCoreAudio/malloc_ptr.hpp>
+#include <core_audio/malloc_ptr.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 #include <CoreFoundation/CFString.h>
@@ -21,7 +21,7 @@
 #include <utility>
 #include <vector>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 // MARK: AudioChannelLayout Helper Functions
 
@@ -421,4 +421,4 @@ inline AudioChannelLayout *_Nullable CAChannelLayout::release() noexcept {
     return std::exchange(channelLayout_, nullptr);
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

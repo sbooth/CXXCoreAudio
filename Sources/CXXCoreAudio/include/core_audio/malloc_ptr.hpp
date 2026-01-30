@@ -10,7 +10,7 @@
 #include <cstdlib>
 #include <memory>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A std::unique_ptr deleter using std::free.
 struct free_deleter {
@@ -21,4 +21,4 @@ struct free_deleter {
 template <typename T, typename = std::enable_if_t<std::is_trivially_copyable_v<T>>>
 using malloc_ptr = std::unique_ptr<T, free_deleter>;
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

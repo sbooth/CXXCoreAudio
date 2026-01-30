@@ -9,7 +9,7 @@
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A class extending the functionality of an AudioTimeStamp structure.
 struct CATimeStamp final : public AudioTimeStamp {
@@ -163,4 +163,4 @@ inline bool CATimeStamp::smpteTimeIsValid() const noexcept {
     return (mFlags & kAudioTimeStampSMPTETimeValid) == kAudioTimeStampSMPTETimeValid;
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

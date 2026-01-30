@@ -19,7 +19,7 @@
 #include <cstring>
 #include <optional>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// Common PCM audio formats.
 enum class CACommonPCMFormat {
@@ -261,7 +261,7 @@ inline bool CAStreamDescription::operator!=(const AudioStreamBasicDescription &o
 // MARK: Format Information
 
 inline std::optional<CACommonPCMFormat> CAStreamDescription::identifyCommonPCMFormat() const noexcept {
-    return CXXCoreAudio::identifyCommonPCMFormat(*this);
+    return core_audio::identifyCommonPCMFormat(*this);
 }
 
 inline bool CAStreamDescription::isNonInterleaved() const noexcept {
@@ -390,4 +390,4 @@ inline NSString *_Nullable CAStreamDescription::formatDescription() const noexce
 }
 #endif /* __OBJC__ */
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

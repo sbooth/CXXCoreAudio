@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CXXCoreAudio/AudioRingBuffer.hpp"
+#include "core_audio/AudioRingBuffer.hpp"
 
 #include <cstdlib>
 #include <limits>
@@ -49,7 +49,7 @@ template <typename T> constexpr T bit_ceil(T x) noexcept {
 
 // MARK: Construction and Destruction
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription &format, SizeType minFrameCapacity) {
+core_audio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription &format, SizeType minFrameCapacity) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
@@ -62,14 +62,14 @@ CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(const AudioStreamBasicDescription
     }
 }
 
-CXXCoreAudio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
+core_audio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
     : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)},
       capacityMask_{std::exchange(other.capacityMask_, 0)},
       writePosition_{other.writePosition_.exchange(0, std::memory_order_relaxed)},
       readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
       format_{std::exchange(other.format_, {})} {}
 
-CXXCoreAudio::AudioRingBuffer &CXXCoreAudio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
+core_audio::AudioRingBuffer &core_audio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
     if (this != &other) [[likely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -85,12 +85,12 @@ CXXCoreAudio::AudioRingBuffer &CXXCoreAudio::AudioRingBuffer::operator=(AudioRin
     return *this;
 }
 
-CXXCoreAudio::AudioRingBuffer::~AudioRingBuffer() noexcept { std::free(buffers_); }
+core_audio::AudioRingBuffer::~AudioRingBuffer() noexcept { std::free(buffers_); }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &format,
-                                             SizeType minFrameCapacity) noexcept {
+bool core_audio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &format,
+                                           SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
@@ -150,7 +150,7 @@ bool CXXCoreAudio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &
     return true;
 }
 
-void CXXCoreAudio::AudioRingBuffer::deallocate() noexcept {
+void core_audio::AudioRingBuffer::deallocate() noexcept {
     if (buffers_) [[likely]] {
         std::free(buffers_);
         buffers_ = nullptr;

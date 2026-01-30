@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CXXCoreAudio/CAStreamDescription.hpp"
+#include "core_audio/CAStreamDescription.hpp"
 
 #include <AudioToolbox/AudioFormat.h>
 
@@ -125,8 +125,8 @@ CFStringRef _Nullable createFourCharCodeString(UInt32 fourcc) noexcept CF_RETURN
 
 } /* namespace */
 
-std::optional<CXXCoreAudio::CACommonPCMFormat>
-CXXCoreAudio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept {
+std::optional<core_audio::CACommonPCMFormat>
+core_audio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept {
     if (streamDescription.mFramesPerPacket != 1 ||
         streamDescription.mBytesPerFrame != streamDescription.mBytesPerPacket ||
         streamDescription.mChannelsPerFrame == 0) {
@@ -170,7 +170,7 @@ CXXCoreAudio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamD
 }
 
 CFStringRef
-CXXCoreAudio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept {
+core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept {
     CFStringRef name = nullptr;
     UInt32 dataSize = sizeof name;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
@@ -181,7 +181,7 @@ CXXCoreAudio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDe
     return name;
 }
 
-CFStringRef CXXCoreAudio::copyAudioStreamBasicDescriptionFormatDescription(
+CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         const AudioStreamBasicDescription &streamDescription) noexcept {
     CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
 
@@ -342,8 +342,8 @@ CFStringRef CXXCoreAudio::copyAudioStreamBasicDescriptionFormatDescription(
     return result;
 }
 
-CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate,
-                                                       UInt32 channelsPerFrame, bool isInterleaved) noexcept
+core_audio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate,
+                                                     UInt32 channelsPerFrame, bool isInterleaved) noexcept
     : AudioStreamBasicDescription{} {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
@@ -368,8 +368,7 @@ CXXCoreAudio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonP
 #pragma clang diagnostic pop
 }
 
-bool CXXCoreAudio::CAStreamDescription::getNonInterleavedEquivalent(
-        AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::CAStreamDescription::getNonInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM() || mChannelsPerFrame == 0) {
         return false;
     }
@@ -382,7 +381,7 @@ bool CXXCoreAudio::CAStreamDescription::getNonInterleavedEquivalent(
     return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM()) {
         return false;
     }
@@ -395,7 +394,7 @@ bool CXXCoreAudio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasi
     return true;
 }
 
-bool CXXCoreAudio::CAStreamDescription::getStandardEquivalent(AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::CAStreamDescription::getStandardEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM()) {
         return false;
     }

@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <CXXCoreAudio/CAStreamDescription.hpp>
+#include <core_audio/CAStreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -18,7 +18,7 @@
 #include <cstring>
 #include <limits>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A lock-free SPSC audio ring buffer supporting non-interleaved audio.
 ///
@@ -218,8 +218,8 @@ inline bool AudioRingBuffer::isEmpty() const noexcept {
 
 // MARK: Writing and Reading Audio
 
-inline CXXCoreAudio::AudioRingBuffer::SizeType
-CXXCoreAudio::AudioRingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
+inline core_audio::AudioRingBuffer::SizeType
+core_audio::AudioRingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
     if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -263,8 +263,8 @@ CXXCoreAudio::AudioRingBuffer::write(const AudioBufferList *const _Nonnull buffe
     return framesToWrite;
 }
 
-inline CXXCoreAudio::AudioRingBuffer::SizeType
-CXXCoreAudio::AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
+inline core_audio::AudioRingBuffer::SizeType
+core_audio::AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
     if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -322,7 +322,7 @@ CXXCoreAudio::AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, 
 
 // MARK: Discarding Audio
 
-inline CXXCoreAudio::AudioRingBuffer::SizeType CXXCoreAudio::AudioRingBuffer::skip(SizeType frameCount) noexcept {
+inline core_audio::AudioRingBuffer::SizeType core_audio::AudioRingBuffer::skip(SizeType frameCount) noexcept {
     if (frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -359,4 +359,4 @@ inline AudioRingBuffer::SizeType AudioRingBuffer::drain() noexcept {
     return framesAvailable;
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

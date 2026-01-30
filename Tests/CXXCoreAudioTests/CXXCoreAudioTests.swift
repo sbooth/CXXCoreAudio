@@ -10,21 +10,21 @@ import Testing
 
 @Suite struct CXXCoreAudioTests {
     @Test func timeStamp() async {
-        let ts = CXXCoreAudio.CATimeStamp(22050.0)
+        let ts = core_audio.CATimeStamp(22050.0)
         #expect(ts.isValid())
         #expect(ts.sampleTimeIsValid())
         #expect(!ts.hostTimeIsValid())
     }
 
     @Test func valueRange() async {
-        let vr = CXXCoreAudio.CAValueRange()
+        let vr = core_audio.CAValueRange()
         #expect(vr.isValid())
         #expect(vr.contains(0))
         #expect(!vr.contains(1))
     }
 
     @Test func streamDescription() async {
-        let fmt = CXXCoreAudio.CAStreamDescription(.float32, 44100, 2, false)
+        let fmt = core_audio.CAStreamDescription(.float32, 44100, 2, false)
         #expect(fmt.isPCM() == true)
         #expect(fmt.isFloat() == true)
         #expect(fmt.isInteger() == false)
@@ -35,28 +35,28 @@ import Testing
     }
 
     @Test func channelLayout() async {
-        let empty = CXXCoreAudio.CAChannelLayout()
+        let empty = core_audio.CAChannelLayout()
         #expect(!empty.__convertToBool())
         #expect(empty.size() == 0)
         #expect(empty.channelCount() == 0)
-        let stereo = CXXCoreAudio.CAChannelLayout.Stereo
+        let stereo = core_audio.CAChannelLayout.Stereo
         #expect(stereo.channelCount() == 2)
     }
 
     @Test func audioBuffer() async {
-        let empty = CXXCoreAudio.CAAudioBuffer()
+        let empty = core_audio.CAAudioBuffer()
         #expect(empty.frameLength() == 0)
         #expect(empty.frameCapacity() == 0)
     }
 
     @Test func ringBuffer() async {
-        let empty = CXXCoreAudio.AudioRingBuffer()
+        let empty = core_audio.AudioRingBuffer()
         #expect(empty.__convertToBool() == false)
         #expect(empty.capacity() == 0)
         #expect(empty.availableFrames() == 0)
         #expect(empty.freeSpace() == empty.capacity())
 
-        var rb = CXXCoreAudio.AudioRingBuffer()
+        var rb = core_audio.AudioRingBuffer()
         let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
         #expect(rb.allocate(std2ch, 512) == true)
         #expect(rb.__convertToBool() == true)
@@ -72,7 +72,7 @@ import Testing
     }
 
     @Test func tsRingBuffer() async {
-        let empty = CXXCoreAudio.CARingBuffer()
+        let empty = core_audio.CARingBuffer()
         #expect(empty.capacity() == 0)
         #expect(empty.unusedSpace() == empty.capacity())
         var start: Int64 = 0, end: Int64 = 0
@@ -80,7 +80,7 @@ import Testing
         #expect(start == 0)
         #expect(end == 0)
 
-        var rb = CXXCoreAudio.CARingBuffer()
+        var rb = core_audio.CARingBuffer()
         let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
         #expect(rb.allocate(std2ch, 512) == true)
         #expect(rb.capacity() == 511)

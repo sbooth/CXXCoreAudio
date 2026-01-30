@@ -7,13 +7,13 @@
 
 #pragma once
 
-#include <CXXCoreAudio/CAStreamDescription.hpp>
+#include <core_audio/CAStreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
 #include <atomic>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A timestamped SPSC ring buffer supporting non-interleaved audio based on Apple's CARingBuffer.
 ///
@@ -180,4 +180,4 @@ inline uint32_t CARingBuffer::frameByteOffset(int64_t frameNumber) const noexcep
     return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */
