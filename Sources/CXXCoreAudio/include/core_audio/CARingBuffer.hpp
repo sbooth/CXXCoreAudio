@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <core_audio/CAStreamDescription.hpp>
+#include <core_audio/StreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -109,7 +109,7 @@ class CARingBuffer final {
     [[nodiscard]] uint32_t unusedSpace() const noexcept;
 
     /// Returns the format of the audio in this ring buffer.
-    [[nodiscard]] const CAStreamDescription &format() const noexcept;
+    [[nodiscard]] const StreamDescription &format() const noexcept;
 
     // MARK: Writing and Reading Audio
 
@@ -169,12 +169,12 @@ class CARingBuffer final {
     static_assert(std::atomic_uint64_t::is_always_lock_free, "Lock-free std::atomic_uint64_t required");
 
     /// The format of the audio this buffer contains.
-    CAStreamDescription format_{};
+    StreamDescription format_{};
 };
 
 // MARK: - Implementation -
 
-inline const CAStreamDescription &CARingBuffer::format() const noexcept { return format_; }
+inline const StreamDescription &CARingBuffer::format() const noexcept { return format_; }
 
 inline uint32_t CARingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
     return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;

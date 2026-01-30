@@ -10,21 +10,21 @@ import Testing
 
 @Suite struct CXXCoreAudioTests {
     @Test func timeStamp() async {
-        let ts = core_audio.CATimeStamp(22050.0)
+        let ts = core_audio.TimeStamp(22050.0)
         #expect(ts.isValid())
         #expect(ts.sampleTimeIsValid())
         #expect(!ts.hostTimeIsValid())
     }
 
     @Test func valueRange() async {
-        let vr = core_audio.CAValueRange()
+        let vr = core_audio.ValueRange()
         #expect(vr.isValid())
         #expect(vr.contains(0))
         #expect(!vr.contains(1))
     }
 
     @Test func streamDescription() async {
-        let fmt = core_audio.CAStreamDescription(.float32, 44100, 2, false)
+        let fmt = core_audio.StreamDescription(.float32, 44100, 2, false)
         #expect(fmt.isPCM() == true)
         #expect(fmt.isFloat() == true)
         #expect(fmt.isInteger() == false)
@@ -35,16 +35,16 @@ import Testing
     }
 
     @Test func channelLayout() async {
-        let empty = core_audio.CAChannelLayout()
+        let empty = core_audio.ChannelLayout()
         #expect(!empty.__convertToBool())
         #expect(empty.size() == 0)
         #expect(empty.channelCount() == 0)
-        let stereo = core_audio.CAChannelLayout.Stereo
+        let stereo = core_audio.ChannelLayout.Stereo
         #expect(stereo.channelCount() == 2)
     }
 
     @Test func audioBuffer() async {
-        let empty = core_audio.CAAudioBuffer()
+        let empty = core_audio.BufferList()
         #expect(empty.frameLength() == 0)
         #expect(empty.frameCapacity() == 0)
     }

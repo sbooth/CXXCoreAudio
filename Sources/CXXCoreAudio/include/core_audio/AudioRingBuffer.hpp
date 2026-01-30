@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <core_audio/CAStreamDescription.hpp>
+#include <core_audio/StreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -97,7 +97,7 @@ class AudioRingBuffer final {
     /// Returns the format of the audio stored in the buffer.
     /// @note This method is safe to call from both producer and consumer.
     /// @return The audio format of the buffer.
-    [[nodiscard]] const CAStreamDescription &format() const noexcept;
+    [[nodiscard]] const StreamDescription &format() const noexcept;
 
     /// Returns the capacity of the buffer.
     /// @note This method is safe to call from both producer and consumer.
@@ -175,7 +175,7 @@ class AudioRingBuffer final {
     static_assert(AtomicSizeType::is_always_lock_free, "Lock-free AtomicSizeType required");
 
     /// The format of the audio this buffer contains.
-    CAStreamDescription format_{};
+    StreamDescription format_{};
 };
 
 // MARK: - Implementation -
@@ -186,7 +186,7 @@ inline AudioRingBuffer::operator bool() const noexcept { return buffers_ != null
 
 // MARK: Buffer Information
 
-inline const CAStreamDescription &AudioRingBuffer::format() const noexcept { return format_; }
+inline const StreamDescription &AudioRingBuffer::format() const noexcept { return format_; }
 
 inline AudioRingBuffer::SizeType AudioRingBuffer::capacity() const noexcept { return capacity_; }
 

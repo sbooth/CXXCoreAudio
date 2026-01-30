@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "core_audio/CAStreamDescription.hpp"
+#include "core_audio/StreamDescription.hpp"
 
 #include <AudioToolbox/AudioFormat.h>
 
@@ -125,7 +125,7 @@ CFStringRef _Nullable createFourCharCodeString(UInt32 fourcc) noexcept CF_RETURN
 
 } /* namespace */
 
-std::optional<core_audio::CACommonPCMFormat>
+std::optional<core_audio::CommonPCMFormat>
 core_audio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept {
     if (streamDescription.mFramesPerPacket != 1 ||
         streamDescription.mBytesPerFrame != streamDescription.mBytesPerPacket ||
@@ -152,17 +152,17 @@ core_audio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDes
         }
 
         if (streamDescription.mBitsPerChannel == 16) {
-            return CACommonPCMFormat::int16;
+            return CommonPCMFormat::int16;
         }
         if (streamDescription.mBitsPerChannel == 32) {
-            return CACommonPCMFormat::int32;
+            return CommonPCMFormat::int32;
         }
     } else if ((streamDescription.mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat) {
         if (streamDescription.mBitsPerChannel == 32) {
-            return CACommonPCMFormat::float32;
+            return CommonPCMFormat::float32;
         }
         if (streamDescription.mBitsPerChannel == 64) {
-            return CACommonPCMFormat::float64;
+            return CommonPCMFormat::float64;
         }
     }
 
@@ -192,16 +192,16 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
     // Shorter description for common formats
     if (const auto commonPCMFormat = identifyCommonPCMFormat(streamDescription); commonPCMFormat.has_value()) {
         switch (commonPCMFormat.value()) {
-        case CACommonPCMFormat::int16:
+        case CommonPCMFormat::int16:
             CFStringAppendCString(result, "Int16, ", kCFStringEncodingASCII);
             break;
-        case CACommonPCMFormat::int32:
+        case CommonPCMFormat::int32:
             CFStringAppendCString(result, "Int32, ", kCFStringEncodingASCII);
             break;
-        case CACommonPCMFormat::float32:
+        case CommonPCMFormat::float32:
             CFStringAppendCString(result, "Float32, ", kCFStringEncodingASCII);
             break;
-        case CACommonPCMFormat::float64:
+        case CommonPCMFormat::float64:
             CFStringAppendCString(result, "Float64, ", kCFStringEncodingASCII);
             break;
         }
@@ -342,25 +342,25 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
     return result;
 }
 
-core_audio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate,
+core_audio::StreamDescription::StreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate,
                                                      UInt32 channelsPerFrame, bool isInterleaved) noexcept
     : AudioStreamBasicDescription{} {
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-anon-enum-enum-conversion"
     switch (commonPCMFormat) {
-    case CACommonPCMFormat::float32:
+    case CommonPCMFormat::float32:
         FillOutASBDForLPCM(*this, sampleRate, channelsPerFrame, 32, 32, true,
                            kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian, !isInterleaved);
         break;
-    case CACommonPCMFormat::float64:
+    case CommonPCMFormat::float64:
         FillOutASBDForLPCM(*this, sampleRate, channelsPerFrame, 64, 64, true,
                            kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian, !isInterleaved);
         break;
-    case CACommonPCMFormat::int16:
+    case CommonPCMFormat::int16:
         FillOutASBDForLPCM(*this, sampleRate, channelsPerFrame, 16, 16, false,
                            kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian, !isInterleaved);
         break;
-    case CACommonPCMFormat::int32:
+    case CommonPCMFormat::int32:
         FillOutASBDForLPCM(*this, sampleRate, channelsPerFrame, 32, 32, false,
                            kAudioFormatFlagIsBigEndian == kAudioFormatFlagsNativeEndian, !isInterleaved);
         break;
@@ -368,7 +368,7 @@ core_audio::CAStreamDescription::CAStreamDescription(CACommonPCMFormat commonPCM
 #pragma clang diagnostic pop
 }
 
-bool core_audio::CAStreamDescription::getNonInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::StreamDescription::getNonInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM() || mChannelsPerFrame == 0) {
         return false;
     }
@@ -381,7 +381,7 @@ bool core_audio::CAStreamDescription::getNonInterleavedEquivalent(AudioStreamBas
     return true;
 }
 
-bool core_audio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::StreamDescription::getInterleavedEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM()) {
         return false;
     }
@@ -394,7 +394,7 @@ bool core_audio::CAStreamDescription::getInterleavedEquivalent(AudioStreamBasicD
     return true;
 }
 
-bool core_audio::CAStreamDescription::getStandardEquivalent(AudioStreamBasicDescription &format) const noexcept {
+bool core_audio::StreamDescription::getStandardEquivalent(AudioStreamBasicDescription &format) const noexcept {
     if (!isPCM()) {
         return false;
     }
