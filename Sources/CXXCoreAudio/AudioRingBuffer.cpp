@@ -69,7 +69,7 @@ core_audio::AudioRingBuffer::AudioRingBuffer(AudioRingBuffer &&other) noexcept
       readPosition_{other.readPosition_.exchange(0, std::memory_order_relaxed)},
       format_{std::exchange(other.format_, {})} {}
 
-core_audio::AudioRingBuffer &core_audio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept {
+auto core_audio::AudioRingBuffer::operator=(AudioRingBuffer &&other) noexcept -> AudioRingBuffer & {
     if (this != &other) [[likely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);

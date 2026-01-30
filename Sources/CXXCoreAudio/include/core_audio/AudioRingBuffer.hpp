@@ -188,11 +188,11 @@ inline AudioRingBuffer::operator bool() const noexcept { return buffers_ != null
 
 inline const StreamDescription &AudioRingBuffer::format() const noexcept { return format_; }
 
-inline AudioRingBuffer::SizeType AudioRingBuffer::capacity() const noexcept { return capacity_; }
+inline auto AudioRingBuffer::capacity() const noexcept -> SizeType { return capacity_; }
 
 // MARK: Buffer Usage
 
-inline AudioRingBuffer::SizeType AudioRingBuffer::freeSpace() const noexcept {
+inline auto AudioRingBuffer::freeSpace() const noexcept -> SizeType {
     const auto writePos = writePosition_.load(std::memory_order_relaxed);
     const auto readPos = readPosition_.load(std::memory_order_acquire);
     return capacity_ - (writePos - readPos);
@@ -204,7 +204,7 @@ inline bool AudioRingBuffer::isFull() const noexcept {
     return (writePos - readPos) == capacity_;
 }
 
-inline AudioRingBuffer::SizeType AudioRingBuffer::availableFrames() const noexcept {
+inline auto AudioRingBuffer::availableFrames() const noexcept -> SizeType {
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
     return writePos - readPos;
@@ -218,8 +218,8 @@ inline bool AudioRingBuffer::isEmpty() const noexcept {
 
 // MARK: Writing and Reading Audio
 
-inline core_audio::AudioRingBuffer::SizeType
-core_audio::AudioRingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
+inline auto AudioRingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept
+        -> SizeType {
     if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -263,8 +263,8 @@ core_audio::AudioRingBuffer::write(const AudioBufferList *const _Nonnull bufferL
     return framesToWrite;
 }
 
-inline core_audio::AudioRingBuffer::SizeType
-core_audio::AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept {
+inline auto AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept
+        -> SizeType {
     if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -322,7 +322,7 @@ core_audio::AudioRingBuffer::read(AudioBufferList *const _Nonnull bufferList, Si
 
 // MARK: Discarding Audio
 
-inline core_audio::AudioRingBuffer::SizeType core_audio::AudioRingBuffer::skip(SizeType frameCount) noexcept {
+inline auto AudioRingBuffer::skip(SizeType frameCount) noexcept -> SizeType {
     if (frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -342,7 +342,7 @@ inline core_audio::AudioRingBuffer::SizeType core_audio::AudioRingBuffer::skip(S
     return framesToSkip;
 }
 
-inline AudioRingBuffer::SizeType AudioRingBuffer::drain() noexcept {
+inline auto AudioRingBuffer::drain() noexcept -> SizeType {
     if (capacity_ == 0) [[unlikely]] {
         return 0;
     }
