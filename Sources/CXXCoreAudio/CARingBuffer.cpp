@@ -206,7 +206,7 @@ uint32_t core_audio::CARingBuffer::unusedSpace() const noexcept {
 // MARK: Writing and Reading Audio
 
 bool core_audio::CARingBuffer::write(const AudioBufferList *const bufferList, uint32_t frameCount,
-                                       int64_t sampleTime) noexcept {
+                                     int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;
     }
@@ -308,7 +308,7 @@ bool core_audio::CARingBuffer::write(const AudioBufferList *const bufferList, ui
 }
 
 bool core_audio::CARingBuffer::read(AudioBufferList *const bufferList, uint32_t frameCount,
-                                      int64_t sampleTime) noexcept {
+                                    int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;
     }

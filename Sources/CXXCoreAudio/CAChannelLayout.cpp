@@ -390,7 +390,7 @@ bool core_audio::audioChannelLayoutsAreEqual(const AudioChannelLayout *lhs, cons
 }
 
 bool core_audio::audioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
-                                                    const AudioChannelLayout *rhs) noexcept {
+                                                  const AudioChannelLayout *rhs) noexcept {
     if (!lhs && !rhs) {
         return true;
     }
@@ -424,8 +424,7 @@ bool core_audio::audioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
     return layoutsEquivalent;
 }
 
-CFStringRef core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout,
-                                                     bool simpleName) noexcept {
+CFStringRef core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout, bool simpleName) noexcept {
     if (!channelLayout) {
         return nullptr;
     }
@@ -527,8 +526,7 @@ CFStringRef core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayo
 
 // Constants
 const core_audio::CAChannelLayout core_audio::CAChannelLayout::Mono = CAChannelLayout(kAudioChannelLayoutTag_Mono);
-const core_audio::CAChannelLayout core_audio::CAChannelLayout::Stereo =
-        CAChannelLayout(kAudioChannelLayoutTag_Stereo);
+const core_audio::CAChannelLayout core_audio::CAChannelLayout::Stereo = CAChannelLayout(kAudioChannelLayoutTag_Stereo);
 
 core_audio::CAChannelLayout core_audio::CAChannelLayout::channelLayoutWithBitmap(AudioChannelBitmap channelBitmap) {
     CAChannelLayout channelLayout{kAudioChannelLayoutTag_UseChannelBitmap};
@@ -639,7 +637,7 @@ core_audio::CAChannelLayout::~CAChannelLayout() noexcept { reset(); }
 // MARK: Functionality
 
 bool core_audio::CAChannelLayout::mapToLayout(const CAChannelLayout &outputLayout,
-                                                std::vector<SInt32> &channelMap) const {
+                                              std::vector<SInt32> &channelMap) const {
     // No valid map exists for empty/unknown layouts
     if (!channelLayout_ || !outputLayout.channelLayout_) {
         return false;

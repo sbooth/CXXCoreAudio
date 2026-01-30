@@ -13,8 +13,8 @@
 #include <new>
 #include <utility>
 
-core_audio::malloc_ptr<AudioBufferList>
-core_audio::allocateAudioBufferList(const AudioStreamBasicDescription &format, UInt32 frameCapacity) noexcept {
+core_audio::malloc_ptr<AudioBufferList> core_audio::allocateAudioBufferList(const AudioStreamBasicDescription &format,
+                                                                            UInt32 frameCapacity) noexcept {
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 ||
         frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame)) {
         return nullptr;
@@ -170,7 +170,7 @@ bool core_audio::CAAudioBuffer::inferFrameLength() {
 // MARK: Buffer Utilities
 
 UInt32 core_audio::CAAudioBuffer::insert(const CAAudioBuffer &buffer, UInt32 readOffset, UInt32 frameLength,
-                                           UInt32 writeOffset) noexcept {
+                                         UInt32 writeOffset) noexcept {
     if (format_ != buffer.format_) {
         // throw std::invalid_argument("invalid audio format");
         return 0;
@@ -270,7 +270,7 @@ UInt32 core_audio::CAAudioBuffer::insertSilence(UInt32 offset, UInt32 frameLengt
 // MARK: AudioBufferList Management
 
 bool core_audio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription &format,
-                                        UInt32 frameCapacity, UInt32 frameLength) noexcept {
+                                      UInt32 frameCapacity, UInt32 frameLength) noexcept {
     if (!bufferList) {
         return false;
     }

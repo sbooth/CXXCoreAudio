@@ -90,7 +90,7 @@ core_audio::AudioRingBuffer::~AudioRingBuffer() noexcept { std::free(buffers_); 
 // MARK: Buffer Management
 
 bool core_audio::AudioRingBuffer::allocate(const AudioStreamBasicDescription &format,
-                                             SizeType minFrameCapacity) noexcept {
+                                           SizeType minFrameCapacity) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
