@@ -11,7 +11,7 @@
 
 #include <algorithm>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A class extending the functionality of an AudioValueRange structure.
 struct CAValueRange final : public AudioValueRange {
@@ -68,4 +68,4 @@ inline bool CAValueRange::operator==(const AudioValueRange &other) const noexcep
 
 inline bool CAValueRange::operator!=(const AudioValueRange &other) const noexcept { return !operator==(other); }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

@@ -7,14 +7,14 @@
 
 #pragma once
 
-#include <CXXCoreAudio/CAStreamDescription.hpp>
-#include <CXXCoreAudio/malloc_ptr.hpp>
+#include <core_audio/CAStreamDescription.hpp>
+#include <core_audio/malloc_ptr.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
 #include <algorithm>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// Allocates and returns a variable-length AudioBufferList structure in a single allocation.
 /// @note The allocation is performed using std::malloc.
@@ -326,4 +326,4 @@ inline const AudioBufferList *_Nullable CAAudioBuffer::operator->() const noexce
 
 inline CAAudioBuffer::operator const AudioBufferList *const _Nullable() const noexcept { return bufferList_; }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

@@ -5,11 +5,11 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CXXCoreAudio/CATimeStamp.hpp"
+#include "core_audio/CATimeStamp.hpp"
 
 // MARK: Comparison
 
-bool CXXCoreAudio::CATimeStamp::operator==(const AudioTimeStamp &other) const noexcept {
+bool core_audio::CATimeStamp::operator==(const AudioTimeStamp &other) const noexcept {
     if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime == other.mSampleTime;
     }
@@ -22,9 +22,9 @@ bool CXXCoreAudio::CATimeStamp::operator==(const AudioTimeStamp &other) const no
     return false;
 }
 
-bool CXXCoreAudio::CATimeStamp::operator!=(const AudioTimeStamp &other) const noexcept { return !operator==(other); }
+bool core_audio::CATimeStamp::operator!=(const AudioTimeStamp &other) const noexcept { return !operator==(other); }
 
-bool CXXCoreAudio::CATimeStamp::operator<(const AudioTimeStamp &other) const noexcept {
+bool core_audio::CATimeStamp::operator<(const AudioTimeStamp &other) const noexcept {
     if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime < other.mSampleTime;
     }
@@ -37,11 +37,11 @@ bool CXXCoreAudio::CATimeStamp::operator<(const AudioTimeStamp &other) const noe
     return false;
 }
 
-bool CXXCoreAudio::CATimeStamp::operator<=(const AudioTimeStamp &other) const noexcept {
+bool core_audio::CATimeStamp::operator<=(const AudioTimeStamp &other) const noexcept {
     return operator<(other) || operator==(other);
 }
 
-bool CXXCoreAudio::CATimeStamp::operator>(const AudioTimeStamp &other) const noexcept {
+bool core_audio::CATimeStamp::operator>(const AudioTimeStamp &other) const noexcept {
     if (sampleTimeIsValid() && (other.mFlags & kAudioTimeStampSampleTimeValid)) {
         return mSampleTime > other.mSampleTime;
     }
@@ -54,6 +54,6 @@ bool CXXCoreAudio::CATimeStamp::operator>(const AudioTimeStamp &other) const noe
     return false;
 }
 
-bool CXXCoreAudio::CATimeStamp::operator>=(const AudioTimeStamp &other) const noexcept {
+bool core_audio::CATimeStamp::operator>=(const AudioTimeStamp &other) const noexcept {
     return operator>(other) || operator==(other);
 }
