@@ -81,7 +81,7 @@ namespace core_audio {
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
 [[nodiscard]] cf::CFString copyAudioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
-                                                          bool simpleName = false) noexcept;
+                                                      bool simpleName = false) noexcept;
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
 [[nodiscard]] cf::CFString

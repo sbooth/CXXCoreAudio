@@ -42,13 +42,12 @@ std::optional<CommonPCMFormat> identifyCommonPCMFormat(const AudioStreamBasicDes
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
-cf::CFString copyAudioStreamBasicDescriptionFormatName(
-        const AudioStreamBasicDescription &streamDescription) noexcept;
+cf::CFString copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
-cf::CFString copyAudioStreamBasicDescriptionFormatDescription(
-        const AudioStreamBasicDescription &streamDescription) noexcept;
+cf::CFString
+copyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription &streamDescription) noexcept;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
@@ -235,7 +234,7 @@ inline NSString *_Nullable audioStreamBasicDescriptionFormatName(
 }
 
 inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
-      const AudioStreamBasicDescription &streamDescription) noexcept {
+        const AudioStreamBasicDescription &streamDescription) noexcept {
     auto formatDescription = copyAudioStreamBasicDescriptionFormatDescription(streamDescription);
     return (__bridge_transfer NSString *)formatDescription.leak();
 }

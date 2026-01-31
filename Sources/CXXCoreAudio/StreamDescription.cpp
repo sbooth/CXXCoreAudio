@@ -170,7 +170,7 @@ core_audio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDes
 }
 
 cf::CFString
-core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription& streamDescription) noexcept {
+core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept {
     CFStringRef name = nullptr;
     UInt32 dataSize = sizeof name;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_FormatName, sizeof streamDescription,
@@ -182,7 +182,7 @@ core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDesc
 }
 
 cf::CFString core_audio::copyAudioStreamBasicDescriptionFormatDescription(
-      const AudioStreamBasicDescription& streamDescription) noexcept {
+        const AudioStreamBasicDescription &streamDescription) noexcept {
     cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
     if (!result) {
         return nullptr;

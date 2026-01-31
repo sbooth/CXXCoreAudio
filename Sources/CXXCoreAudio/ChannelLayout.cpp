@@ -413,8 +413,7 @@ bool core_audio::audioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
     return layoutsEquivalent;
 }
 
-cf::CFString core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout,
-                                                          bool simpleName) noexcept {
+cf::CFString core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout, bool simpleName) noexcept {
     if (channelLayout == nullptr) {
         return nullptr;
     }
