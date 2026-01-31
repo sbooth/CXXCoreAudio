@@ -72,7 +72,7 @@ import Testing
     }
 
     @Test func tsRingBuffer() async {
-        let empty = core_audio.CARingBuffer()
+        let empty = core_audio.TemporalRingBuffer()
         #expect(empty.capacity() == 0)
         #expect(empty.unusedSpace() == empty.capacity())
         var start: Int64 = 0, end: Int64 = 0
@@ -80,7 +80,7 @@ import Testing
         #expect(start == 0)
         #expect(end == 0)
 
-        var rb = core_audio.CARingBuffer()
+        var rb = core_audio.TemporalRingBuffer()
         let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
         #expect(rb.allocate(std2ch, 512) == true)
         #expect(rb.capacity() == 511)

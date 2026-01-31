@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "core_audio/CARingBuffer.hpp"
+#include "core_audio/TimestampedRingBuffer.hpp"
 
 #include <algorithm>
 #include <cassert>
@@ -34,7 +34,7 @@ constexpr uint32_t bit_ceil(uint32_t x) noexcept {
 
 // MARK: Construction and Destruction
 
-core_audio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription &format, uint32_t size) {
+core_audio::TimestampedRingBuffer::TimestampedRingBuffer(const AudioStreamBasicDescription &format, uint32_t size) {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         throw std::invalid_argument("unsupported audio format");
@@ -47,7 +47,7 @@ core_audio::CARingBuffer::CARingBuffer(const AudioStreamBasicDescription &format
     }
 }
 
-core_audio::CARingBuffer::CARingBuffer(CARingBuffer &&other) noexcept
+core_audio::TimestampedRingBuffer::TimestampedRingBuffer(TimestampedRingBuffer &&other) noexcept
     : buffers_{std::exchange(other.buffers_, nullptr)}, capacity_{std::exchange(other.capacity_, 0)},
       capacityMask_{std::exchange(other.capacityMask_, 0)},
       timeBoundsQueueCounter_{other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed)},
@@ -61,7 +61,7 @@ core_audio::CARingBuffer::CARingBuffer(CARingBuffer &&other) noexcept
     }
 }
 
-core_audio::CARingBuffer &core_audio::CARingBuffer::operator=(CARingBuffer &&other) noexcept {
+core_audio::TimestampedRingBuffer &core_audio::TimestampedRingBuffer::operator=(TimestampedRingBuffer &&other) noexcept {
     if (this != &other) [[unlikely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -81,11 +81,11 @@ core_audio::CARingBuffer &core_audio::CARingBuffer::operator=(CARingBuffer &&oth
     return *this;
 }
 
-core_audio::CARingBuffer::~CARingBuffer() noexcept { std::free(buffers_); }
+core_audio::TimestampedRingBuffer::~TimestampedRingBuffer() noexcept { std::free(buffers_); }
 
 // MARK: Buffer Management
 
-bool core_audio::CARingBuffer::allocate(const AudioStreamBasicDescription &format, uint32_t size) noexcept {
+bool core_audio::TimestampedRingBuffer::allocate(const AudioStreamBasicDescription &format, uint32_t size) noexcept {
     if ((format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0 || format.mBytesPerFrame == 0 ||
         format.mChannelsPerFrame == 0) [[unlikely]] {
         return false;
@@ -149,7 +149,7 @@ bool core_audio::CARingBuffer::allocate(const AudioStreamBasicDescription &forma
     return true;
 }
 
-void core_audio::CARingBuffer::deallocate() noexcept {
+void core_audio::TimestampedRingBuffer::deallocate() noexcept {
     if (buffers_) [[likely]] {
         std::free(buffers_);
         buffers_ = nullptr;
@@ -168,7 +168,7 @@ void core_audio::CARingBuffer::deallocate() noexcept {
     }
 }
 
-void core_audio::CARingBuffer::reset() noexcept {
+void core_audio::TimestampedRingBuffer::reset() noexcept {
     for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
         timeBoundsQueue_[i].startTime_ = 0;
         timeBoundsQueue_[i].endTime_ = 0;
@@ -177,9 +177,9 @@ void core_audio::CARingBuffer::reset() noexcept {
     timeBoundsQueueCounter_.store(0, std::memory_order_relaxed);
 }
 
-uint32_t core_audio::CARingBuffer::capacity() const noexcept { return capacityMask_; }
+uint32_t core_audio::TimestampedRingBuffer::capacity() const noexcept { return capacityMask_; }
 
-bool core_audio::CARingBuffer::getTimeBounds(int64_t &startTime, int64_t &endTime) const noexcept {
+bool core_audio::TimestampedRingBuffer::getTimeBounds(int64_t &startTime, int64_t &endTime) const noexcept {
     for (auto i = 0; i < 8; ++i) {
         const auto currentCounter = timeBoundsQueueCounter_.load(std::memory_order_acquire);
         const auto currentIndex = currentCounter & sTimeBoundsQueueMask;
@@ -195,7 +195,7 @@ bool core_audio::CARingBuffer::getTimeBounds(int64_t &startTime, int64_t &endTim
     return false;
 }
 
-uint32_t core_audio::CARingBuffer::unusedSpace() const noexcept {
+uint32_t core_audio::TimestampedRingBuffer::unusedSpace() const noexcept {
     int64_t start, end;
     if (capacity_ == 0 || !getTimeBounds(start, end)) {
         return 0;
@@ -205,7 +205,7 @@ uint32_t core_audio::CARingBuffer::unusedSpace() const noexcept {
 
 // MARK: Writing and Reading Audio
 
-bool core_audio::CARingBuffer::write(const AudioBufferList *const bufferList, uint32_t frameCount,
+bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const bufferList, uint32_t frameCount,
                                      int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;
@@ -307,7 +307,7 @@ bool core_audio::CARingBuffer::write(const AudioBufferList *const bufferList, ui
     return true;
 }
 
-bool core_audio::CARingBuffer::read(AudioBufferList *const bufferList, uint32_t frameCount,
+bool core_audio::TimestampedRingBuffer::read(AudioBufferList *const bufferList, uint32_t frameCount,
                                     int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;

@@ -18,13 +18,13 @@ namespace core_audio {
 /// A timestamped SPSC ring buffer supporting non-interleaved audio based on Apple's CARingBuffer.
 ///
 /// This class is thread safe when used from one reader thread and one writer thread.
-class CARingBuffer final {
+class TimestampedRingBuffer final {
   public:
     // MARK: Construction and Destruction
 
     /// Creates an empty ring buffer.
     /// @note ``allocate`` must be called before the object may be used.
-    CARingBuffer() noexcept = default;
+    TimestampedRingBuffer() noexcept = default;
 
     /// Creates a ring buffer with the specified buffer size.
     ///
@@ -41,26 +41,26 @@ class CARingBuffer final {
     /// @param size The desired buffer capacity per channel, in audio frames.
     /// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not
     /// supported.
-    CARingBuffer(const AudioStreamBasicDescription &format, uint32_t size);
+    TimestampedRingBuffer(const AudioStreamBasicDescription &format, uint32_t size);
 
     // This class is non-copyable
-    CARingBuffer(const CARingBuffer &) = delete;
+    TimestampedRingBuffer(const TimestampedRingBuffer &) = delete;
 
     /// Creates a ring buffer by moving the contents of another ring buffer.
     /// @note This method is not thread safe for the ring buffer being moved.
     /// @param other The ring buffer to move.
-    CARingBuffer(CARingBuffer &&other) noexcept;
+    TimestampedRingBuffer(TimestampedRingBuffer &&other) noexcept;
 
     // This class is non-assignable
-    CARingBuffer &operator=(const CARingBuffer &) = delete;
+    TimestampedRingBuffer &operator=(const TimestampedRingBuffer &) = delete;
 
     /// Moves the contents of another ring buffer into this ring buffer.
     /// @note This method is not thread safe.
     /// @param other The ring buffer to move.
-    CARingBuffer &operator=(CARingBuffer &&other) noexcept;
+    TimestampedRingBuffer &operator=(TimestampedRingBuffer &&other) noexcept;
 
     /// Destroys the ring buffer and releases all associated resources.
-    ~CARingBuffer() noexcept;
+    ~TimestampedRingBuffer() noexcept;
 
     // MARK: Buffer Management
 
@@ -174,9 +174,9 @@ class CARingBuffer final {
 
 // MARK: - Implementation -
 
-inline const StreamDescription &CARingBuffer::format() const noexcept { return format_; }
+inline const StreamDescription &TimestampedRingBuffer::format() const noexcept { return format_; }
 
-inline uint32_t CARingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
+inline uint32_t TimestampedRingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
     return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
 }
 
