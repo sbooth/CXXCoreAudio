@@ -61,7 +61,8 @@ core_audio::TimestampedRingBuffer::TimestampedRingBuffer(TimestampedRingBuffer &
     }
 }
 
-core_audio::TimestampedRingBuffer &core_audio::TimestampedRingBuffer::operator=(TimestampedRingBuffer &&other) noexcept {
+core_audio::TimestampedRingBuffer &
+core_audio::TimestampedRingBuffer::operator=(TimestampedRingBuffer &&other) noexcept {
     if (this != &other) [[unlikely]] {
         std::free(buffers_);
         buffers_ = std::exchange(other.buffers_, nullptr);
@@ -206,7 +207,7 @@ uint32_t core_audio::TimestampedRingBuffer::unusedSpace() const noexcept {
 // MARK: Writing and Reading Audio
 
 bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const bufferList, uint32_t frameCount,
-                                     int64_t sampleTime) noexcept {
+                                              int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;
     }
@@ -308,7 +309,7 @@ bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const buffe
 }
 
 bool core_audio::TimestampedRingBuffer::read(AudioBufferList *const bufferList, uint32_t frameCount,
-                                    int64_t sampleTime) noexcept {
+                                             int64_t sampleTime) noexcept {
     if (frameCount == 0) [[unlikely]] {
         return true;
     }
