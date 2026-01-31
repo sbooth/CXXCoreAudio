@@ -271,7 +271,6 @@ UInt32 core_audio::BufferList::insertSilence(UInt32 offset, UInt32 frameLength) 
 
 bool core_audio::BufferList::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription &format,
                                    UInt32 frameCapacity, UInt32 frameLength) noexcept {
-    assert(bufferList != nullptr);
     if (bufferList == nullptr) {
         return false;
     }

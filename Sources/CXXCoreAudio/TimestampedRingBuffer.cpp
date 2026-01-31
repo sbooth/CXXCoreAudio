@@ -208,7 +208,6 @@ uint32_t core_audio::TimestampedRingBuffer::unusedSpace() const noexcept {
 
 bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const bufferList, uint32_t frameCount,
                                               int64_t sampleTime) noexcept {
-    assert(bufferList != nullptr);
     if (frameCount == 0) [[unlikely]] {
         return true;
     }
@@ -310,7 +309,6 @@ bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const buffe
 
 bool core_audio::TimestampedRingBuffer::read(AudioBufferList *const bufferList, uint32_t frameCount,
                                              int64_t sampleTime) noexcept {
-    assert(bufferList != nullptr);
     if (frameCount == 0) [[unlikely]] {
         return true;
     }
