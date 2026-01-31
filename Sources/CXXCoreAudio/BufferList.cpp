@@ -22,7 +22,7 @@ core_audio::malloc_ptr<AudioBufferList> core_audio::allocateAudioBufferList(cons
 
     const auto bufferDataSize = frameCapacity * format.mBytesPerFrame;
     const auto bufferCount = (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? format.mChannelsPerFrame : 1;
-    const auto bufferListSize = offsetof(AudioBufferList, mBuffers) + (sizeof(BufferList) * bufferCount);
+    const auto bufferListSize = offsetof(AudioBufferList, mBuffers) + (sizeof(AudioBuffer) * bufferCount);
     const auto allocationSize = bufferListSize + (bufferDataSize * bufferCount);
 
     auto allocation = std::malloc(allocationSize);
