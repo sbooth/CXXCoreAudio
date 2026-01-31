@@ -559,13 +559,13 @@ core_audio::ChannelLayout::ChannelLayout(const ChannelLayout &other) : ChannelLa
 
 core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(const ChannelLayout &other) {
     if (this != &other) {
-        if (channelLayout_ && other.channelLayout_ &&
+        if (channelLayout_ != nullptr && other.channelLayout_ != nullptr &&
             channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions) {
             memcpy(channelLayout_, other.channelLayout_,
                    audioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
         } else {
             auto channelLayout = copyAudioChannelLayout(other.channelLayout_);
-            if (other.channelLayout_ && !channelLayout) {
+            if (other.channelLayout_ != nullptr && channelLayout == nullptr) {
                 throw std::bad_alloc();
             }
             reset(channelLayout.release());
@@ -576,7 +576,7 @@ core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(const ChannelLay
 
 core_audio::ChannelLayout::ChannelLayout(AudioChannelLayoutTag layoutTag)
     : channelLayout_{allocateAudioChannelLayout(0).release()} {
-    if (!channelLayout_) {
+    if (channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
     channelLayout_->mChannelLayoutTag = layoutTag;
@@ -584,7 +584,7 @@ core_audio::ChannelLayout::ChannelLayout(AudioChannelLayoutTag layoutTag)
 
 core_audio::ChannelLayout::ChannelLayout(std::vector<AudioChannelLabel> channelLabels)
     : channelLayout_{allocateAudioChannelLayout(static_cast<UInt32>(channelLabels.size())).release()} {
-    if (!channelLayout_) {
+    if (channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
 
@@ -611,14 +611,14 @@ core_audio::ChannelLayout::ChannelLayout(std::vector<AudioChannelLabel> channelL
 
 core_audio::ChannelLayout::ChannelLayout(const AudioChannelLayout *other)
     : channelLayout_{copyAudioChannelLayout(other).release()} {
-    if (other && !channelLayout_) {
+    if (other != nullptr && channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
 }
 
 core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(const AudioChannelLayout *other) {
     auto channelLayout = copyAudioChannelLayout(other);
-    if (other && !channelLayout) {
+    if (other != nullptr && !channelLayout) {
         throw std::bad_alloc();
     }
     reset(channelLayout.release());
