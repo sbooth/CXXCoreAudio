@@ -213,7 +213,7 @@ bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const buffe
         return true;
     }
 
-    if (frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
+    if (bufferList == nullptr || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
         return false;
     }
 
@@ -315,7 +315,7 @@ bool core_audio::TimestampedRingBuffer::read(AudioBufferList *const bufferList, 
         return true;
     }
 
-    if (frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
+    if (bufferList == nullptr || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
         return false;
     }
 
