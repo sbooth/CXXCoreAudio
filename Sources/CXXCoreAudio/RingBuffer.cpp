@@ -121,7 +121,7 @@ bool core_audio::RingBuffer::allocate(const AudioStreamBasicDescription &format,
     const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
 
     auto allocation = std::malloc(allocationSize);
-    if (!allocation) [[unlikely]] {
+    if (allocation == nullptr) [[unlikely]] {
         return false;
     }
 
