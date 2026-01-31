@@ -52,7 +52,7 @@ core_audio::TimestampedRingBuffer::TimestampedRingBuffer(TimestampedRingBuffer &
       capacityMask_{std::exchange(other.capacityMask_, 0)},
       timeBoundsQueueCounter_{other.timeBoundsQueueCounter_.exchange(0, std::memory_order_relaxed)},
       format_{std::exchange(other.format_, {})} {
-    for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+    for (uint32_t i = 0; i < timeBoundsQueueSize; ++i) {
         timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
         timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
         timeBoundsQueue_[i].updateCounter_.store(
@@ -68,7 +68,7 @@ core_audio::TimestampedRingBuffer::operator=(TimestampedRingBuffer &&other) noex
         buffers_ = std::exchange(other.buffers_, nullptr);
         capacity_ = std::exchange(other.capacity_, 0);
         capacityMask_ = std::exchange(other.capacityMask_, 0);
-        for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+        for (uint32_t i = 0; i < timeBoundsQueueSize; ++i) {
             timeBoundsQueue_[i].startTime_ = std::exchange(other.timeBoundsQueue_[i].startTime_, 0);
             timeBoundsQueue_[i].endTime_ = std::exchange(other.timeBoundsQueue_[i].endTime_, 0);
             timeBoundsQueue_[i].updateCounter_.store(
@@ -140,7 +140,7 @@ bool core_audio::TimestampedRingBuffer::allocate(const AudioStreamBasicDescripti
     format_ = format;
 
     // Zero the time bounds queue
-    for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+    for (uint32_t i = 0; i < timeBoundsQueueSize; ++i) {
         timeBoundsQueue_[i].startTime_ = 0;
         timeBoundsQueue_[i].endTime_ = 0;
         timeBoundsQueue_[i].updateCounter_.store(0, std::memory_order_relaxed);
@@ -158,7 +158,7 @@ void core_audio::TimestampedRingBuffer::deallocate() noexcept {
         capacity_ = 0;
         capacityMask_ = 0;
 
-        for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+        for (uint32_t i = 0; i < timeBoundsQueueSize; ++i) {
             timeBoundsQueue_[i].startTime_ = 0;
             timeBoundsQueue_[i].endTime_ = 0;
             timeBoundsQueue_[i].updateCounter_.store(0, std::memory_order_relaxed);
@@ -170,7 +170,7 @@ void core_audio::TimestampedRingBuffer::deallocate() noexcept {
 }
 
 void core_audio::TimestampedRingBuffer::reset() noexcept {
-    for (uint32_t i = 0; i < sTimeBoundsQueueSize; ++i) {
+    for (uint32_t i = 0; i < timeBoundsQueueSize; ++i) {
         timeBoundsQueue_[i].startTime_ = 0;
         timeBoundsQueue_[i].endTime_ = 0;
         timeBoundsQueue_[i].updateCounter_.store(0, std::memory_order_relaxed);
@@ -183,7 +183,7 @@ uint32_t core_audio::TimestampedRingBuffer::capacity() const noexcept { return c
 bool core_audio::TimestampedRingBuffer::getTimeBounds(int64_t &startTime, int64_t &endTime) const noexcept {
     for (auto i = 0; i < 8; ++i) {
         const auto currentCounter = timeBoundsQueueCounter_.load(std::memory_order_acquire);
-        const auto currentIndex = currentCounter & sTimeBoundsQueueMask;
+        const auto currentIndex = currentCounter & timeBoundsQueueMask;
 
         const TimeBounds &bounds = timeBoundsQueue_[currentIndex];
         if (const auto counter = bounds.updateCounter_.load(std::memory_order_acquire); counter == currentCounter) {
@@ -218,20 +218,19 @@ bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const buffe
 
     /// Returns the ring buffer's starting sample time.
     const auto startTime = [&]() noexcept -> int64_t {
-        return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & sTimeBoundsQueueMask]
+        return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & timeBoundsQueueMask]
                 .startTime_;
     };
 
     /// Returns the buffer's ring ending sample time.
     const auto endTime = [&]() noexcept -> int64_t {
-        return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & sTimeBoundsQueueMask]
-                .endTime_;
+        return timeBoundsQueue_[timeBoundsQueueCounter_.load(std::memory_order_acquire) & timeBoundsQueueMask].endTime_;
     };
 
     /// Sets the ring buffer's start and end sample times.
     const auto setTimeBounds = [&](int64_t startTime, int64_t endTime) noexcept {
         const auto nextCounter = timeBoundsQueueCounter_.load(std::memory_order_acquire) + 1;
-        const auto nextIndex = nextCounter & sTimeBoundsQueueMask;
+        const auto nextIndex = nextCounter & timeBoundsQueueMask;
 
         timeBoundsQueue_[nextIndex].startTime_ = startTime;
         timeBoundsQueue_[nextIndex].endTime_ = endTime;

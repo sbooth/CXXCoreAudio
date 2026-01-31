@@ -157,12 +157,12 @@ class TimestampedRingBuffer final {
     };
 
     /// The number of elements in the time bounds queue.
-    static constexpr uint32_t sTimeBoundsQueueSize{32};
+    static constexpr uint32_t timeBoundsQueueSize{32};
     /// Mask value used to wrap time bounds counters.
-    static constexpr uint32_t sTimeBoundsQueueMask{sTimeBoundsQueueSize - 1};
+    static constexpr uint32_t timeBoundsQueueMask{timeBoundsQueueSize - 1};
 
     /// Array of TimeBounds structures.
-    TimeBounds timeBoundsQueue_[sTimeBoundsQueueSize];
+    TimeBounds timeBoundsQueue_[timeBoundsQueueSize];
 
     /// Monotonically increasing counter incremented when the buffer's time bounds changes.
     std::atomic_uint64_t timeBoundsQueueCounter_{0};
