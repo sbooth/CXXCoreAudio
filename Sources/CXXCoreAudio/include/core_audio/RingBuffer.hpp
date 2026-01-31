@@ -220,7 +220,7 @@ inline bool RingBuffer::isEmpty() const noexcept {
 
 inline auto RingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept
         -> SizeType {
-            assert(bufferList != nullptr);
+    assert(bufferList != nullptr);
     if (frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
