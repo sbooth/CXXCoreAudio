@@ -9,7 +9,7 @@ Assorted C++ classes simplifying common operations in Core Audio.
 | [RingBuffer](Sources/CXXCoreAudio/include/core_audio/RingBuffer.hpp) | A lock-free SPSC audio ring buffer supporting non-interleaved audio. |
 | [StreamDescription](Sources/CXXCoreAudio/include/core_audio/StreamDescription.hpp) | Extends the functionality of an [`AudioStreamBasicDescription`](https://developer.apple.com/documentation/coreaudiotypes/audiostreambasicdescription?language=objc). |
 | [TimeStamp](Sources/CXXCoreAudio/include/core_audio/TimeStamp.hpp) | Extends the functionality of an [`AudioTimeStamp`](https://developer.apple.com/documentation/coreaudiotypes/audiotimestamp?language=objc). |
-| [TimestampedRingBuffer](Sources/CXXCoreAudio/include/core_audio/TimestampedRingBuffer.hpp) | A lock-free timestamped SPSC audio ring buffer supporting non-interleaved audio. |
+| [TimestampedRingBuffer](Sources/CXXCoreAudio/include/core_audio/TimestampedRingBuffer.hpp) | A timestamped audio ring buffer based on Apple's `CARingBuffer`. |
 | [ValueRange](Sources/CXXCoreAudio/include/core_audio/ValueRange.hpp) | Extends the functionality of an [`AudioValueRange`](https://developer.apple.com/documentation/coreaudiotypes/audiovaluerange?language=objc). |
 
 > [!NOTE]
