@@ -5,8 +5,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/sbooth/CXXCFRef",
       "state" : {
-        "revision" : "5876d3105000e926aa6277d8fab25c05e59665fb",
-        "version" : "0.2.0"
+        "revision" : "5c63098edeab59cf79e64978eaada9b56db146a5",
+        "version" : "0.3.0"
       }
     }
   ],

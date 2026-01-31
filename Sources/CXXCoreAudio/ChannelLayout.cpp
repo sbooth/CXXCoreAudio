@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CAChannelLayout.hpp"
+#include "core_audio/ChannelLayout.hpp"
 
 #include <AudioToolbox/AudioFormat.h>
 
@@ -15,7 +15,7 @@
 namespace {
 
 /// Returns the string representation of an AudioChannelLayoutTag.
-constexpr const char *GetChannelLayoutTagName(AudioChannelLayoutTag layoutTag) noexcept {
+constexpr const char *getChannelLayoutTagName(AudioChannelLayoutTag layoutTag) noexcept {
     switch (layoutTag) {
     case kAudioChannelLayoutTag_UseChannelDescriptions:
         return "Use Channel Descriptions";
@@ -257,11 +257,12 @@ constexpr const char *GetChannelLayoutTagName(AudioChannelLayoutTag layoutTag) n
     case kAudioChannelLayoutTag_MPEG_7_1_D:
         return "MPEG 7.1 D";
 
-    case kAudioChannelLayoutTag_BeginReserved ... kAudioChannelLayoutTag_EndReserved:
-        return "Reserved";
-
     default:
         break;
+    }
+
+    if (layoutTag >= kAudioChannelLayoutTag_BeginReserved && layoutTag <= kAudioChannelLayoutTag_EndReserved) {
+        return "Reserved";
     }
 
     switch (layoutTag & 0xFFFF0000) {
@@ -282,7 +283,7 @@ constexpr const char *GetChannelLayoutTagName(AudioChannelLayoutTag layoutTag) n
 }
 
 /// Returns the name of the channel for an AudioChannelLabel.
-cxx_cf::CFString CopyChannelLabelName(AudioChannelLabel channelLabel, bool shortName) noexcept {
+cf::CFString copyChannelLabelName(AudioChannelLabel channelLabel, bool shortName) noexcept {
     const auto property = shortName ? kAudioFormatProperty_ChannelShortName : kAudioFormatProperty_ChannelName;
     CFStringRef channelName = nullptr;
     UInt32 dataSize = sizeof channelName;
@@ -290,16 +291,16 @@ cxx_cf::CFString CopyChannelLabelName(AudioChannelLabel channelLabel, bool short
     if (result != noErr) {
         return nullptr;
     }
-    return cxx_cf::CFString(channelName);
+    return cf::CFString(channelName);
 }
 
 /// Joins strings from array separated by delimiter.
-cxx_cf::CFString JoinStringArray(CFArrayRef array, CFStringRef delimiter) noexcept {
-    if (!array) {
+cf::CFString joinStringArray(CFArrayRef array, CFStringRef delimiter) noexcept {
+    if (array == nullptr) {
         return nullptr;
     }
 
-    cxx_cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+    cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
     if (!result) {
         return nullptr;
     }
@@ -317,18 +318,18 @@ cxx_cf::CFString JoinStringArray(CFArrayRef array, CFStringRef delimiter) noexce
         }
     }
 
-    return cxx_cf::CFString(result.release());
+    return cf::CFString(result.leak());
 }
 
 } /* namespace */
 
 // MARK: AudioChannelLayout Helper Functions
 
-CXXCoreAudio::malloc_ptr<AudioChannelLayout>
-CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept {
-    const auto layoutSize = AudioChannelLayoutSize(numberChannelDescriptions);
+core_audio::malloc_ptr<AudioChannelLayout>
+core_audio::allocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept {
+    const auto layoutSize = audioChannelLayoutSize(numberChannelDescriptions);
     auto channelLayout = static_cast<AudioChannelLayout *>(std::malloc(layoutSize));
-    if (!channelLayout) {
+    if (channelLayout == nullptr) {
         return nullptr;
     }
     std::memset(channelLayout, 0, layoutSize);
@@ -336,20 +337,20 @@ CXXCoreAudio::AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexc
     return malloc_ptr<AudioChannelLayout>{channelLayout};
 }
 
-CXXCoreAudio::malloc_ptr<AudioChannelLayout>
-CXXCoreAudio::CopyAudioChannelLayout(const AudioChannelLayout *other) noexcept {
-    if (!other) {
+core_audio::malloc_ptr<AudioChannelLayout>
+core_audio::copyAudioChannelLayout(const AudioChannelLayout *other) noexcept {
+    if (other == nullptr) {
         return nullptr;
     }
-    auto channelLayout = AllocateAudioChannelLayout(other->mNumberChannelDescriptions);
+    auto channelLayout = allocateAudioChannelLayout(other->mNumberChannelDescriptions);
     if (channelLayout) {
-        std::memcpy(channelLayout.get(), other, AudioChannelLayoutSize(other->mNumberChannelDescriptions));
+        std::memcpy(channelLayout.get(), other, audioChannelLayoutSize(other->mNumberChannelDescriptions));
     }
     return channelLayout;
 }
 
-UInt32 CXXCoreAudio::AudioChannelLayoutChannelCount(const AudioChannelLayout *channelLayout) noexcept {
-    if (!channelLayout) {
+UInt32 core_audio::audioChannelLayoutChannelCount(const AudioChannelLayout *channelLayout) noexcept {
+    if (channelLayout == nullptr) {
         return 0;
     }
     if (channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions) {
@@ -361,46 +362,46 @@ UInt32 CXXCoreAudio::AudioChannelLayoutChannelCount(const AudioChannelLayout *ch
     return AudioChannelLayoutTag_GetNumberOfChannels(channelLayout->mChannelLayoutTag);
 }
 
-bool CXXCoreAudio::AudioChannelLayoutsAreEqual(const AudioChannelLayout *lhs, const AudioChannelLayout *rhs) noexcept {
-    if (!lhs && !rhs) {
+bool core_audio::audioChannelLayoutsAreEqual(const AudioChannelLayout *lhs, const AudioChannelLayout *rhs) noexcept {
+    if (lhs == nullptr && rhs == nullptr) {
         return true;
     }
-    if ((lhs && !rhs) || (!lhs && rhs)) {
+    if ((lhs != nullptr && rhs == nullptr) || (lhs == nullptr && rhs != nullptr)) {
         return false;
     }
 
-    const auto lsize = AudioChannelLayoutSize(lhs->mNumberChannelDescriptions);
-    const auto rsize = AudioChannelLayoutSize(rhs->mNumberChannelDescriptions);
+    const auto lsize = audioChannelLayoutSize(lhs->mNumberChannelDescriptions);
+    const auto rsize = audioChannelLayoutSize(rhs->mNumberChannelDescriptions);
     if (lsize != rsize) {
         return false;
     }
     return !memcmp(lhs, rhs, lsize);
 }
 
-bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
-                                                    const AudioChannelLayout *rhs) noexcept {
-    if (!lhs && !rhs) {
+bool core_audio::audioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
+                                                  const AudioChannelLayout *rhs) noexcept {
+    if (lhs == nullptr && rhs == nullptr) {
         return true;
     }
-    if (lhs && !rhs) {
+    if (lhs != nullptr && rhs == nullptr) {
         if (const auto tag = lhs->mChannelLayoutTag;
             tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo) {
             return true;
         }
-    } else if (!lhs && rhs) {
+    } else if (lhs == nullptr && rhs != nullptr) {
         if (const auto tag = rhs->mChannelLayoutTag;
             tag == kAudioChannelLayoutTag_Mono || tag == kAudioChannelLayoutTag_Stereo) {
             return true;
         }
     }
 
-    if (!lhs || !rhs) {
+    if (lhs == nullptr || rhs == nullptr) {
         return false;
     }
 
     const AudioChannelLayout *layouts[] = {
-          lhs,
-          rhs,
+            lhs,
+            rhs,
     };
     UInt32 layoutsEquivalent = 0;
     UInt32 propertySize = sizeof layoutsEquivalent;
@@ -412,78 +413,78 @@ bool CXXCoreAudio::AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *lh
     return layoutsEquivalent;
 }
 
-cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutName(const AudioChannelLayout *channelLayout,
+cf::CFString core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout,
                                                           bool simpleName) noexcept {
-    if (!channelLayout) {
+    if (channelLayout == nullptr) {
         return nullptr;
     }
     const auto property =
-          simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName;
+            simpleName ? kAudioFormatProperty_ChannelLayoutSimpleName : kAudioFormatProperty_ChannelLayoutName;
     CFStringRef layoutName = nullptr;
     UInt32 dataSize = sizeof layoutName;
-    OSStatus result = AudioFormatGetProperty(property, static_cast<UInt32>(AudioChannelLayoutSize(channelLayout)),
+    OSStatus result = AudioFormatGetProperty(property, static_cast<UInt32>(audioChannelLayoutSize(channelLayout)),
                                              channelLayout, &dataSize, &layoutName);
     if (result != noErr) {
         return nullptr;
     }
-    return cxx_cf::CFString(layoutName);
+    return cf::CFString(layoutName);
 }
 
-cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept {
-    if (!channelLayout) {
+cf::CFString core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept {
+    if (channelLayout == nullptr) {
         return nullptr;
     }
 
-    cxx_cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+    cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
     if (!result) {
         return nullptr;
     }
 
-    auto layoutName = CopyAudioChannelLayoutName(channelLayout);
+    auto layoutName = copyAudioChannelLayoutName(channelLayout);
 
     if (channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions) {
         // kAudioFormatProperty_ChannelLayoutName returns '!fmt' for kAudioChannelLabel_UseCoordinates
         if (layoutName) {
             CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions, %@"),
                                  channelLayout->mNumberChannelDescriptions, layoutName.get());
-            return cxx_cf::CFString(result.release());
+            return cf::CFString(result.leak());
         }
 
         CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"),
                              channelLayout->mNumberChannelDescriptions);
 
-        cxx_cf::CFMutableArray array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
+        cf::CFMutableArray array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
         if (!array) {
             // Allocation failed; return the partial description without per-channel names
-            return cxx_cf::CFString(result.release());
+            return cf::CFString(result.leak());
         }
 
         const AudioChannelDescription *desc = channelLayout->mChannelDescriptions;
         for (UInt32 i = 0; i < channelLayout->mNumberChannelDescriptions; ++i, ++desc) {
             if (desc->mChannelLabel == kAudioChannelLabel_UseCoordinates) {
-                cxx_cf::CFString coordinateString;
+                cf::CFString coordinateString;
                 if (desc->mChannelFlags & kAudioChannelFlags_RectangularCoordinates) {
-                    coordinateString.reset(
-                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[x: %g, y: %g, z: %g%s]"),
-                                                   desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
-                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                    coordinateString.reset(CFStringCreateWithFormat(
+                            kCFAllocatorDefault, nullptr, CFSTR("[x: %g, y: %g, z: %g%s]"), desc->mCoordinates[0],
+                            desc->mCoordinates[1], desc->mCoordinates[2],
+                            desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
                 } else if (desc->mChannelFlags & kAudioChannelFlags_SphericalCoordinates) {
-                    coordinateString.reset(
-                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[r: %g, θ: %g, φ: %g%s]"),
-                                                   desc->mCoordinates[2], desc->mCoordinates[1], desc->mCoordinates[0],
-                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                    coordinateString.reset(CFStringCreateWithFormat(
+                            kCFAllocatorDefault, nullptr, CFSTR("[r: %g, θ: %g, φ: %g%s]"), desc->mCoordinates[2],
+                            desc->mCoordinates[1], desc->mCoordinates[0],
+                            desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
                 } else {
-                    coordinateString.reset(
-                          CFStringCreateWithFormat(kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"),
-                                                   desc->mCoordinates[0], desc->mCoordinates[1], desc->mCoordinates[2],
-                                                   desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
+                    coordinateString.reset(CFStringCreateWithFormat(
+                            kCFAllocatorDefault, nullptr, CFSTR("[?! %g, %g, %g%s]"), desc->mCoordinates[0],
+                            desc->mCoordinates[1], desc->mCoordinates[2],
+                            desc->mChannelFlags & kAudioChannelFlags_Meters ? " m" : ""));
                 }
 
                 if (coordinateString) {
                     CFArrayAppendValue(array, coordinateString.get());
                 }
             } else {
-                if (const auto channelName = CopyChannelLabelName(desc->mChannelLabel, true); channelName) {
+                if (const auto channelName = copyChannelLabelName(desc->mChannelLabel, true); channelName) {
                     CFArrayAppendValue(array, channelName.get());
                 } else {
                     CFArrayAppendValue(array, CFSTR("?"));
@@ -491,7 +492,7 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
             }
         }
 
-        if (auto channelNamesString = JoinStringArray(array, CFSTR(" ")); channelNamesString) {
+        if (auto channelNamesString = joinStringArray(array, CFSTR(" ")); channelNamesString) {
             CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
         }
     } else if (channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
@@ -502,30 +503,29 @@ cxx_cf::CFString CXXCoreAudio::CopyAudioChannelLayoutDescription(const AudioChan
         }
     } else {
         CFStringAppendFormat(result, nullptr, CFSTR("%s (0x%x, %u ch)"),
-                             GetChannelLayoutTagName(channelLayout->mChannelLayoutTag),
+                             getChannelLayoutTagName(channelLayout->mChannelLayoutTag),
                              channelLayout->mChannelLayoutTag, channelLayout->mChannelLayoutTag & 0xffff);
         if (layoutName) {
             CFStringAppendFormat(result, nullptr, CFSTR(", %@"), layoutName.get());
         }
     }
 
-    return cxx_cf::CFString(result.release());
+    return cf::CFString(result.leak());
 }
 
 // Constants
-const CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::Mono = CAChannelLayout(kAudioChannelLayoutTag_Mono);
-const CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::Stereo =
-      CAChannelLayout(kAudioChannelLayoutTag_Stereo);
+const core_audio::ChannelLayout core_audio::ChannelLayout::Mono = ChannelLayout(kAudioChannelLayoutTag_Mono);
+const core_audio::ChannelLayout core_audio::ChannelLayout::Stereo = ChannelLayout(kAudioChannelLayoutTag_Stereo);
 
-CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::ChannelLayoutWithBitmap(AudioChannelBitmap channelBitmap) {
-    CAChannelLayout channelLayout{kAudioChannelLayoutTag_UseChannelBitmap};
+core_audio::ChannelLayout core_audio::ChannelLayout::channelLayoutWithBitmap(AudioChannelBitmap channelBitmap) {
+    ChannelLayout channelLayout{kAudioChannelLayoutTag_UseChannelBitmap};
     channelLayout.channelLayout_->mChannelBitmap = channelBitmap;
 
     // Attempt to convert the bitmap to a layout tag
     AudioChannelLayoutTag tag;
     UInt32 dataSize = sizeof tag;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_TagForChannelLayout,
-                                             static_cast<UInt32>(AudioChannelLayoutSize(channelLayout.channelLayout_)),
+                                             static_cast<UInt32>(audioChannelLayoutSize(channelLayout.channelLayout_)),
                                              channelLayout.channelLayout_, &dataSize, &tag);
     if (result == noErr) {
         channelLayout.channelLayout_->mChannelLayoutTag = tag;
@@ -535,29 +535,26 @@ CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::ChannelLayoutWithBi
     return channelLayout;
 }
 
-CXXCoreAudio::CAChannelLayout CXXCoreAudio::CAChannelLayout::ChannelLayoutWithTag(AudioChannelLayoutTag layoutTag) {
-    return CAChannelLayout{layoutTag};
+core_audio::ChannelLayout core_audio::ChannelLayout::channelLayoutWithTag(AudioChannelLayoutTag layoutTag) {
+    return ChannelLayout{layoutTag};
 }
 
-CXXCoreAudio::CAChannelLayout
-CXXCoreAudio::CAChannelLayout::ChannelLayoutWithChannelLabels(std::vector<AudioChannelLabel> channelLabels) {
-    return CAChannelLayout{channelLabels};
+core_audio::ChannelLayout
+core_audio::ChannelLayout::channelLayoutWithChannelLabels(std::vector<AudioChannelLabel> channelLabels) {
+    return ChannelLayout{channelLabels};
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(const CAChannelLayout& other)
-  : CAChannelLayout{} {
-    *this = other;
-}
+core_audio::ChannelLayout::ChannelLayout(const ChannelLayout &other) : ChannelLayout{} { *this = other; }
 
-CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CAChannelLayout& other) {
+core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(const ChannelLayout &other) {
     if (this != &other) {
-        if (channelLayout_ && other.channelLayout_ &&
+        if (channelLayout_ != nullptr && other.channelLayout_ != nullptr &&
             channelLayout_->mNumberChannelDescriptions == other.channelLayout_->mNumberChannelDescriptions) {
             memcpy(channelLayout_, other.channelLayout_,
-                   AudioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
+                   audioChannelLayoutSize(other.channelLayout_->mNumberChannelDescriptions));
         } else {
-            auto channelLayout = CopyAudioChannelLayout(other.channelLayout_);
-            if (other.channelLayout_ && !channelLayout) {
+            auto channelLayout = copyAudioChannelLayout(other.channelLayout_);
+            if (other.channelLayout_ != nullptr && channelLayout == nullptr) {
                 throw std::bad_alloc();
             }
             reset(channelLayout.release());
@@ -566,17 +563,17 @@ CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const CA
     return *this;
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(AudioChannelLayoutTag layoutTag)
-  : channelLayout_{AllocateAudioChannelLayout(0).release()} {
-    if (!channelLayout_) {
+core_audio::ChannelLayout::ChannelLayout(AudioChannelLayoutTag layoutTag)
+    : channelLayout_{allocateAudioChannelLayout(0).release()} {
+    if (channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
     channelLayout_->mChannelLayoutTag = layoutTag;
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> channelLabels)
-  : channelLayout_{AllocateAudioChannelLayout(static_cast<UInt32>(channelLabels.size())).release()} {
-    if (!channelLayout_) {
+core_audio::ChannelLayout::ChannelLayout(std::vector<AudioChannelLabel> channelLabels)
+    : channelLayout_{allocateAudioChannelLayout(static_cast<UInt32>(channelLabels.size())).release()} {
+    if (channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
 
@@ -589,10 +586,10 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> ch
     AudioChannelLayoutTag tag;
     UInt32 dataSize = sizeof tag;
     OSStatus result = AudioFormatGetProperty(kAudioFormatProperty_TagForChannelLayout,
-                                             static_cast<UInt32>(AudioChannelLayoutSize(channelLayout_)),
+                                             static_cast<UInt32>(audioChannelLayoutSize(channelLayout_)),
                                              channelLayout_, &dataSize, &tag);
     if (result == noErr) {
-        auto channelLayout = AllocateAudioChannelLayout(0);
+        auto channelLayout = allocateAudioChannelLayout(0);
         if (!channelLayout) {
             throw std::bad_alloc();
         }
@@ -601,46 +598,42 @@ CXXCoreAudio::CAChannelLayout::CAChannelLayout(std::vector<AudioChannelLabel> ch
     }
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(const AudioChannelLayout *other)
-  : channelLayout_{CopyAudioChannelLayout(other).release()} {
-    if (other && !channelLayout_) {
+core_audio::ChannelLayout::ChannelLayout(const AudioChannelLayout *other)
+    : channelLayout_{copyAudioChannelLayout(other).release()} {
+    if (other != nullptr && channelLayout_ == nullptr) {
         throw std::bad_alloc();
     }
 }
 
-CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(const AudioChannelLayout *other) {
-    auto channelLayout = CopyAudioChannelLayout(other);
-    if (other && !channelLayout) {
+core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(const AudioChannelLayout *other) {
+    auto channelLayout = copyAudioChannelLayout(other);
+    if (other != nullptr && !channelLayout) {
         throw std::bad_alloc();
     }
     reset(channelLayout.release());
     return *this;
 }
 
-CXXCoreAudio::CAChannelLayout::CAChannelLayout(CAChannelLayout&& other) noexcept
-  : channelLayout_{other.release()} {}
+core_audio::ChannelLayout::ChannelLayout(ChannelLayout &&other) noexcept : channelLayout_{other.release()} {}
 
-CXXCoreAudio::CAChannelLayout& CXXCoreAudio::CAChannelLayout::operator=(CAChannelLayout&& other) noexcept {
+core_audio::ChannelLayout &core_audio::ChannelLayout::operator=(ChannelLayout &&other) noexcept {
     reset(other.release());
     return *this;
 }
 
-CXXCoreAudio::CAChannelLayout::~CAChannelLayout() noexcept {
-    reset();
-}
+core_audio::ChannelLayout::~ChannelLayout() noexcept { reset(); }
 
 // MARK: Functionality
 
-bool CXXCoreAudio::CAChannelLayout::MapToLayout(const CAChannelLayout& outputLayout,
-                                                std::vector<SInt32>& channelMap) const {
+bool core_audio::ChannelLayout::mapToLayout(const ChannelLayout &outputLayout, std::vector<SInt32> &channelMap) const {
     // No valid map exists for empty/unknown layouts
-    if (!channelLayout_ || !outputLayout.channelLayout_) {
+    if (channelLayout_ == nullptr || outputLayout.channelLayout_ == nullptr) {
         return false;
     }
 
     const AudioChannelLayout *layouts[] = {channelLayout_, outputLayout.channelLayout_};
 
-    const auto outputChannelCount = outputLayout.ChannelCount();
+    const auto outputChannelCount = outputLayout.channelCount();
     if (outputChannelCount == 0) {
         return false;
     }

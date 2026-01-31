@@ -7,13 +7,13 @@
 
 module CXXCoreAudio {
     requires cplusplus17
-    header "CXXCoreAudio/AudioRingBuffer.hpp"
-    header "CXXCoreAudio/CAAudioBuffer.hpp"
-    header "CXXCoreAudio/CAChannelLayout.hpp"
-    header "CXXCoreAudio/CARingBuffer.hpp"
-    header "CXXCoreAudio/CAStreamDescription.hpp"
-    header "CXXCoreAudio/CATimeStamp.hpp"
-    header "CXXCoreAudio/CAValueRange.hpp"
-    header "CXXCoreAudio/malloc_ptr.hpp"
+    header "core_audio/BufferList.hpp"
+    header "core_audio/ChannelLayout.hpp"
+    header "core_audio/RingBuffer.hpp"
+    header "core_audio/StreamDescription.hpp"
+    header "core_audio/TimeStamp.hpp"
+    header "core_audio/TimestampedRingBuffer.hpp"
+    header "core_audio/ValueRange.hpp"
+    header "core_audio/malloc_ptr.hpp"
     export *
 }

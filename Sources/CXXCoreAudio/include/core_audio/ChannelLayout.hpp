@@ -7,9 +7,9 @@
 
 #pragma once
 
-#include <CXXCoreAudio/malloc_ptr.hpp>
+#include <core_audio/malloc_ptr.hpp>
 
-#include <cxx_cf/CFRef.hpp>
+#include <cf/CFRef.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 #include <CoreFoundation/CFString.h>
@@ -23,7 +23,7 @@
 #include <utility>
 #include <vector>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 // MARK: AudioChannelLayout Helper Functions
 
@@ -32,32 +32,32 @@ namespace CXXCoreAudio {
 /// @note The allocation is performed using std::malloc.
 /// @param numberChannelDescriptions The number of channel descriptions that will be stored in the channel layout.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] malloc_ptr<AudioChannelLayout> AllocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> allocateAudioChannelLayout(UInt32 numberChannelDescriptions) noexcept;
 
 /// Allocates and returns a copy of a variable-length AudioChannelLayout structure.
 /// @note The allocation is performed using std::malloc.
 /// @param other The AudioChannelLayout to copy.
 /// @return An AudioChannelLayout struct or null if memory could not be allocated.
-[[nodiscard]] malloc_ptr<AudioChannelLayout> CopyAudioChannelLayout(const AudioChannelLayout *_Nullable other) noexcept;
+[[nodiscard]] malloc_ptr<AudioChannelLayout> copyAudioChannelLayout(const AudioChannelLayout *_Nullable other) noexcept;
 
 /// Returns the size required to hold a variable-length AudioChannelLayout structure with the specified number of
 /// channel descriptions.
 /// @return The required size in bytes.
-[[nodiscard]] constexpr size_t AudioChannelLayoutSize(UInt32 numberChannelDescriptions) noexcept;
+[[nodiscard]] constexpr size_t audioChannelLayoutSize(UInt32 numberChannelDescriptions) noexcept;
 
 /// Returns the size of a variable-length AudioChannelLayout structure.
 /// @return The size of the channel layout in bytes.
-[[nodiscard]] size_t AudioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept;
+[[nodiscard]] size_t audioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept;
 
 /// Returns the number of channels contained in an audio channel layout.
-[[nodiscard]] UInt32 AudioChannelLayoutChannelCount(const AudioChannelLayout *_Nullable channelLayout) noexcept;
+[[nodiscard]] UInt32 audioChannelLayoutChannelCount(const AudioChannelLayout *_Nullable channelLayout) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equal.
 ///
 /// This function performs a bitwise comparison based on the number of channel descriptions.
 /// @note Two equivalent channel layouts may not be equal.
 /// @return true if the AudioChannelLayout structs are equal, false if not.
-[[nodiscard]] bool AudioChannelLayoutsAreEqual(const AudioChannelLayout *_Nullable lhs,
+[[nodiscard]] bool audioChannelLayoutsAreEqual(const AudioChannelLayout *_Nullable lhs,
                                                const AudioChannelLayout *_Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equivalent.
@@ -68,24 +68,24 @@ namespace CXXCoreAudio {
 /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
 /// @note Two equivalent channel layouts may not be equal.
 /// @return true if the AudioChannelLayout structs are equivalent, false if not.
-[[nodiscard]] bool AudioChannelLayoutsAreEquivalent(const AudioChannelLayout *_Nullable lhs,
+[[nodiscard]] bool audioChannelLayoutsAreEquivalent(const AudioChannelLayout *_Nullable lhs,
                                                     const AudioChannelLayout *_Nullable rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are equal.
-[[nodiscard]] bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept;
+[[nodiscard]] bool operator==(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept;
 
 /// Returns true if two AudioChannelLayout structures are not equal.
-[[nodiscard]] bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept;
+[[nodiscard]] bool operator!=(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept;
 
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-[[nodiscard]] cxx_cf::CFString CopyAudioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
+[[nodiscard]] cf::CFString copyAudioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
                                                           bool simpleName = false) noexcept;
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
-[[nodiscard]] cxx_cf::CFString
-CopyAudioChannelLayoutDescription(const AudioChannelLayout *_Nullable channelLayout) noexcept;
+[[nodiscard]] cf::CFString
+copyAudioChannelLayoutDescription(const AudioChannelLayout *_Nullable channelLayout) noexcept;
 
 #ifdef __OBJC__
 /// Returns true if two the AVAudioChannelLayout objects are equivalent.
@@ -96,28 +96,28 @@ CopyAudioChannelLayoutDescription(const AudioChannelLayout *_Nullable channelLay
 /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
 /// @note Two equivalent channel layouts may not be equal.
 /// @return true if the AudioChannelLayout structs are equivalent, false if not.
-[[nodiscard]] bool AVAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout *_Nullable lhs,
+[[nodiscard]] bool avAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout *_Nullable lhs,
                                                       AVAudioChannelLayout *_Nullable rhs) noexcept;
 
 /// Returns the name of the channel layout described by an AudioChannelLayout structure.
 ///
 /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-[[nodiscard]] NSString *_Nullable AudioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
+[[nodiscard]] NSString *_Nullable audioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
                                                          bool simpleName = false) noexcept;
 
 /// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
-[[nodiscard]] NSString *_Nullable AudioChannelLayoutDescription(
-      const AudioChannelLayout *_Nullable channelLayout) noexcept;
+[[nodiscard]] NSString *_Nullable audioChannelLayoutDescription(
+        const AudioChannelLayout *_Nullable channelLayout) noexcept;
 #endif /* __OBJC__ */
 
 /// A class simplifying use of the variable-length AudioChannelLayout structure.
-class CAChannelLayout final {
+class ChannelLayout final {
   public:
     /// Mono layout.
-    static const CAChannelLayout Mono;
+    static const ChannelLayout Mono;
 
     /// Stereo layout.
-    static const CAChannelLayout Stereo;
+    static const ChannelLayout Stereo;
 
     // MARK: Factory Methods
 
@@ -125,59 +125,59 @@ class CAChannelLayout final {
     /// @note The channel bitmap will be converted to a layout tag if possible.
     /// @param channelBitmap The channel bitmap for the channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    static CAChannelLayout ChannelLayoutWithBitmap(AudioChannelBitmap channelBitmap);
+    static ChannelLayout channelLayoutWithBitmap(AudioChannelBitmap channelBitmap);
 
     /// Creates and returns a channel layout with the specified layout tag.
     /// @param layoutTag The layout tag for the channel layout
     /// @throw std::bad_alloc if memory could not be allocated.
-    static CAChannelLayout ChannelLayoutWithTag(AudioChannelLayoutTag layoutTag);
+    static ChannelLayout channelLayoutWithTag(AudioChannelLayoutTag layoutTag);
 
     /// Creates and returns a channel layout with the specified channel labels.
     /// @note The channel labels will be converted to a layout tag if possible.
     /// @param channelLabels The channel labels for the channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    static CAChannelLayout ChannelLayoutWithChannelLabels(std::vector<AudioChannelLabel> channelLabels);
+    static ChannelLayout channelLayoutWithChannelLabels(std::vector<AudioChannelLabel> channelLabels);
 
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty channel layout.
-    CAChannelLayout() noexcept = default;
+    ChannelLayout() noexcept = default;
 
     /// Creates a channel layout with the specified layout tag.
     /// @param layoutTag The layout tag for the channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    explicit CAChannelLayout(AudioChannelLayoutTag layoutTag);
+    explicit ChannelLayout(AudioChannelLayoutTag layoutTag);
 
     /// Creates a channel layout.
     /// @note The channel labels will be converted to a layout tag if possible.
     /// @param channelLabels The channel labels for the channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    explicit CAChannelLayout(std::vector<AudioChannelLabel> channelLabels);
+    explicit ChannelLayout(std::vector<AudioChannelLabel> channelLabels);
 
     /// Creates a copy of a channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout(const CAChannelLayout& other);
+    ChannelLayout(const ChannelLayout &other);
 
     /// Creates a channel layout with a copy of an AudioChannelLayout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout(const AudioChannelLayout *_Nullable other);
+    ChannelLayout(const AudioChannelLayout *_Nullable other);
 
     /// Replaces the channel layout with a copy of a channel layout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout& operator=(const CAChannelLayout& other);
+    ChannelLayout &operator=(const ChannelLayout &other);
 
     /// Replaces the channel layout with a copy of an AudioChannelLayout.
     /// @throw std::bad_alloc if memory could not be allocated.
-    CAChannelLayout& operator=(const AudioChannelLayout *_Nullable other);
+    ChannelLayout &operator=(const AudioChannelLayout *_Nullable other);
 
     /// Creates a channel layout by moving the contents of another.
-    CAChannelLayout(CAChannelLayout&& other) noexcept;
+    ChannelLayout(ChannelLayout &&other) noexcept;
 
     /// Replaces the channel layout with the moved contents of another.
-    CAChannelLayout& operator=(CAChannelLayout&& other) noexcept;
+    ChannelLayout &operator=(ChannelLayout &&other) noexcept;
 
     /// Destroys the channel layout and releases all associated resources.
-    ~CAChannelLayout() noexcept;
+    ~ChannelLayout() noexcept;
 
     // MARK: Comparison
 
@@ -185,13 +185,13 @@ class CAChannelLayout final {
     ///
     /// This function performs a bitwise comparison based on the number of channel descriptions.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEqual(const AudioChannelLayout *_Nullable other) const noexcept;
+    [[nodiscard]] bool isEqual(const AudioChannelLayout *_Nullable other) const noexcept;
 
     /// Returns true if the channel layout is equal to another channel layout.
     ///
     /// This function performs a bitwise comparison based on the number of channel descriptions.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEqual(const CAChannelLayout& other) const noexcept;
+    [[nodiscard]] bool isEqual(const ChannelLayout &other) const noexcept;
 
     /// Returns true if the channel layout is equal to an AudioChannelLayout.
     [[nodiscard]] bool operator==(const AudioChannelLayout *_Nullable other) const noexcept;
@@ -200,10 +200,10 @@ class CAChannelLayout final {
     [[nodiscard]] bool operator!=(const AudioChannelLayout *_Nullable other) const noexcept;
 
     /// Returns true if the channel layout is equal to another.
-    [[nodiscard]] bool operator==(const CAChannelLayout& other) const noexcept;
+    [[nodiscard]] bool operator==(const ChannelLayout &other) const noexcept;
 
     /// Returns true if the channel layout is not equal to another.
-    [[nodiscard]] bool operator!=(const CAChannelLayout& other) const noexcept;
+    [[nodiscard]] bool operator!=(const ChannelLayout &other) const noexcept;
 
     // MARK: Equivalence
 
@@ -214,7 +214,7 @@ class CAChannelLayout final {
     /// 2) One is empty and the other has a mono or stereo layout tag.
     /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEquivalent(const AudioChannelLayout *_Nullable other) const noexcept;
+    [[nodiscard]] bool isEquivalent(const AudioChannelLayout *_Nullable other) const noexcept;
 
     /// Returns true if the channel layout is equivalent to another channel layout.
     ///
@@ -223,24 +223,24 @@ class CAChannelLayout final {
     /// 2) One is empty and the other has a mono or stereo layout tag.
     /// 3) kAudioFormatProperty_AreChannelLayoutsEquivalent is true.
     /// @note Two equivalent channel layouts may not be equal.
-    [[nodiscard]] bool IsEquivalent(const CAChannelLayout& other) const noexcept;
+    [[nodiscard]] bool isEquivalent(const ChannelLayout &other) const noexcept;
 
     // MARK: Functionality
 
     /// Returns the number of channels contained in this channel layout.
-    [[nodiscard]] UInt32 ChannelCount() const noexcept;
+    [[nodiscard]] UInt32 channelCount() const noexcept;
 
     /// Creates a channel map for remapping audio from this channel layout.
     /// @param outputLayout The output channel layout
     /// @param channelMap A std::vector to receive the channel map on success
     /// @return true on success, false otherwise
     /// @throw std::bad_alloc if memory could not be allocated.
-    bool MapToLayout(const CAChannelLayout& outputLayout, std::vector<SInt32>& channelMap) const;
+    bool mapToLayout(const ChannelLayout &outputLayout, std::vector<SInt32> &channelMap) const;
 
     // MARK: AudioChannelLayout access
 
     /// Returns the size in bytes of the managed AudioChannelLayout struct.
-    [[nodiscard]] size_t Size() const noexcept;
+    [[nodiscard]] size_t size() const noexcept;
 
     /// A channel layout is empty when the managed AudioChannelLayout struct is null.
     [[nodiscard]] explicit operator bool() const noexcept;
@@ -256,22 +256,22 @@ class CAChannelLayout final {
     /// Returns the name of this channel layout.
     ///
     /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-    [[nodiscard]] cxx_cf::CFString CopyLayoutName(bool simpleName = false) const noexcept;
+    [[nodiscard]] cf::CFString copyLayoutName(bool simpleName = false) const noexcept;
 
     /// Returns a string representation of this channel layout
     ///
     /// This is the value of kAudioFormatProperty_ChannelLayoutName or kAudioFormatProperty_ChannelLayoutSimpleName.
-    [[nodiscard]] cxx_cf::CFString CopyLayoutDescription() const noexcept;
+    [[nodiscard]] cf::CFString copyLayoutDescription() const noexcept;
 
 #ifdef __OBJC__
     /// Returns an AVAudioChannelLayout object initialized with the managed AudioChannelLayout struct.
     [[nodiscard]] operator AVAudioChannelLayout *_Nullable() const noexcept;
 
     /// Returns the name of this channel layout.
-    [[nodiscard]] NSString *_Nullable LayoutName(bool simpleName = false) const noexcept;
+    [[nodiscard]] NSString *_Nullable layoutName(bool simpleName = false) const noexcept;
 
     /// Returns a string representation of this channel layout.
-    [[nodiscard]] NSString *_Nullable LayoutDescription() const noexcept;
+    [[nodiscard]] NSString *_Nullable layoutDescription() const noexcept;
 #endif /* __OBJC__ */
 
     /// Returns the managed AudioChannelLayout struct.
@@ -283,7 +283,7 @@ class CAChannelLayout final {
 
     /// Swaps the managed AudioChannelLayout struct with the managed AudioChannelLayout struct from another audio
     /// channel layout.
-    void swap(CAChannelLayout& other) noexcept;
+    void swap(ChannelLayout &other) noexcept;
 
     /// Releases ownership of the managed AudioChannelLayout struct and returns it.
     /// @note The caller assumes responsibility for deallocating the returned AudioChannelLayout struct using std::free.
@@ -296,144 +296,126 @@ class CAChannelLayout final {
 
 // MARK: - Implementation -
 
-constexpr size_t AudioChannelLayoutSize(UInt32 numberChannelDescriptions) noexcept {
+constexpr size_t audioChannelLayoutSize(UInt32 numberChannelDescriptions) noexcept {
     return offsetof(AudioChannelLayout, mChannelDescriptions) +
            (numberChannelDescriptions * sizeof(AudioChannelDescription));
 }
 
-inline size_t AudioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept {
-    if (!channelLayout) {
+inline size_t audioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept {
+    if (channelLayout == nullptr) {
         return 0;
     }
-    return AudioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
+    return audioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
 }
 
-inline bool operator==(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept {
-    return AudioChannelLayoutsAreEqual(&lhs, &rhs);
+inline bool operator==(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept {
+    return audioChannelLayoutsAreEqual(&lhs, &rhs);
 }
 
-inline bool operator!=(const AudioChannelLayout& lhs, const AudioChannelLayout& rhs) noexcept {
+inline bool operator!=(const AudioChannelLayout &lhs, const AudioChannelLayout &rhs) noexcept {
     return !operator==(lhs, rhs);
 }
 
 #ifdef __OBJC__
-inline bool AVAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout *_Nullable lhs,
+inline bool avAudioChannelLayoutsAreEquivalent(AVAudioChannelLayout *_Nullable lhs,
                                                AVAudioChannelLayout *_Nullable rhs) noexcept {
-    return AudioChannelLayoutsAreEquivalent(lhs.layout, rhs.layout);
+    return audioChannelLayoutsAreEquivalent(lhs.layout, rhs.layout);
 }
 
-inline NSString *_Nullable AudioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
+inline NSString *_Nullable audioChannelLayoutName(const AudioChannelLayout *_Nullable channelLayout,
                                                   bool simpleName) noexcept {
-    auto layoutName = CopyAudioChannelLayoutName(channelLayout, simpleName);
-    return (__bridge_transfer NSString *)layoutName.release();
+    auto layoutName = copyAudioChannelLayoutName(channelLayout, simpleName);
+    return (__bridge_transfer NSString *)layoutName.leak();
 }
 
-/// Returns a string representation of the channel layout described by an AudioChannelLayout structure.
-inline NSString *_Nullable AudioChannelLayoutDescription(const AudioChannelLayout *_Nullable channelLayout) noexcept {
-    auto layoutDescription = CopyAudioChannelLayoutDescription(channelLayout);
-    return (__bridge_transfer NSString *)layoutDescription.release();
+inline NSString *_Nullable audioChannelLayoutDescription(const AudioChannelLayout *_Nullable channelLayout) noexcept {
+    auto layoutDescription = copyAudioChannelLayoutDescription(channelLayout);
+    return (__bridge_transfer NSString *)layoutDescription.leak();
 }
 #endif /* __OBJC__ */
 
 // MARK: Comparison
 
-inline bool CAChannelLayout::IsEqual(const AudioChannelLayout *_Nullable other) const noexcept {
-    return AudioChannelLayoutsAreEqual(channelLayout_, other);
+inline bool ChannelLayout::isEqual(const AudioChannelLayout *_Nullable other) const noexcept {
+    return audioChannelLayoutsAreEqual(channelLayout_, other);
 }
 
-inline bool CAChannelLayout::IsEqual(const CAChannelLayout& other) const noexcept {
-    return IsEqual(other.channelLayout_);
+inline bool ChannelLayout::isEqual(const ChannelLayout &other) const noexcept { return isEqual(other.channelLayout_); }
+
+inline bool ChannelLayout::operator==(const AudioChannelLayout *_Nullable other) const noexcept {
+    return isEqual(other);
 }
 
-inline bool CAChannelLayout::operator==(const AudioChannelLayout *_Nullable other) const noexcept {
-    return IsEqual(other);
-}
-
-inline bool CAChannelLayout::operator!=(const AudioChannelLayout *_Nullable other) const noexcept {
+inline bool ChannelLayout::operator!=(const AudioChannelLayout *_Nullable other) const noexcept {
     return !operator==(other);
 }
 
-inline bool CAChannelLayout::operator==(const CAChannelLayout& other) const noexcept {
+inline bool ChannelLayout::operator==(const ChannelLayout &other) const noexcept {
     return operator==(other.channelLayout_);
 }
 
-inline bool CAChannelLayout::operator!=(const CAChannelLayout& other) const noexcept {
+inline bool ChannelLayout::operator!=(const ChannelLayout &other) const noexcept {
     return !operator==(other.channelLayout_);
 }
 
 // MARK: Equivalence
 
-inline bool CAChannelLayout::IsEquivalent(const AudioChannelLayout *_Nullable other) const noexcept {
-    return AudioChannelLayoutsAreEquivalent(channelLayout_, other);
+inline bool ChannelLayout::isEquivalent(const AudioChannelLayout *_Nullable other) const noexcept {
+    return audioChannelLayoutsAreEquivalent(channelLayout_, other);
 }
 
-inline bool CAChannelLayout::IsEquivalent(const CAChannelLayout& other) const noexcept {
-    return IsEquivalent(other.channelLayout_);
+inline bool ChannelLayout::isEquivalent(const ChannelLayout &other) const noexcept {
+    return isEquivalent(other.channelLayout_);
 }
 
 // MARK: Functionality
 
-inline UInt32 CAChannelLayout::ChannelCount() const noexcept {
-    return AudioChannelLayoutChannelCount(channelLayout_);
-}
+inline UInt32 ChannelLayout::channelCount() const noexcept { return audioChannelLayoutChannelCount(channelLayout_); }
 
 // MARK: AudioChannelLayout access
 
-/// Returns the size in bytes of the managed AudioChannelLayout struct.
-inline size_t CAChannelLayout::Size() const noexcept {
-    return AudioChannelLayoutSize(channelLayout_);
-}
+inline size_t ChannelLayout::size() const noexcept { return audioChannelLayoutSize(channelLayout_); }
 
-inline CAChannelLayout::operator bool() const noexcept {
-    return channelLayout_ != nullptr;
-}
+inline ChannelLayout::operator bool() const noexcept { return channelLayout_ != nullptr; }
 
-inline const AudioChannelLayout *_Nullable CAChannelLayout::operator->() const noexcept {
-    return channelLayout_;
-}
+inline const AudioChannelLayout *_Nullable ChannelLayout::operator->() const noexcept { return channelLayout_; }
 
-inline CAChannelLayout::operator const AudioChannelLayout *const _Nullable() const noexcept {
-    return channelLayout_;
-}
+inline ChannelLayout::operator const AudioChannelLayout *const _Nullable() const noexcept { return channelLayout_; }
 
 // MARK: Channel Layout Name and Description
 
-inline cxx_cf::CFString CAChannelLayout::CopyLayoutName(bool simpleName) const noexcept {
-    return CopyAudioChannelLayoutName(channelLayout_, simpleName);
+inline cf::CFString ChannelLayout::copyLayoutName(bool simpleName) const noexcept {
+    return copyAudioChannelLayoutName(channelLayout_, simpleName);
 }
 
-inline cxx_cf::CFString CAChannelLayout::CopyLayoutDescription() const noexcept {
-    return CopyAudioChannelLayoutDescription(channelLayout_);
+inline cf::CFString ChannelLayout::copyLayoutDescription() const noexcept {
+    return copyAudioChannelLayoutDescription(channelLayout_);
 }
 
 #ifdef __OBJC__
-inline CAChannelLayout::operator AVAudioChannelLayout *_Nullable() const noexcept {
+inline ChannelLayout::operator AVAudioChannelLayout *_Nullable() const noexcept {
     return [[AVAudioChannelLayout alloc] initWithLayout:channelLayout_];
 }
 
-inline NSString *_Nullable CAChannelLayout::LayoutName(bool simpleName) const noexcept {
-    return AudioChannelLayoutName(channelLayout_, simpleName);
+inline NSString *_Nullable ChannelLayout::layoutName(bool simpleName) const noexcept {
+    return audioChannelLayoutName(channelLayout_, simpleName);
 }
 
-inline NSString *_Nullable CAChannelLayout::LayoutDescription() const noexcept {
-    return AudioChannelLayoutDescription(channelLayout_);
+inline NSString *_Nullable ChannelLayout::layoutDescription() const noexcept {
+    return audioChannelLayoutDescription(channelLayout_);
 }
 #endif /* __OBJC__ */
 
-inline const AudioChannelLayout *_Nullable CAChannelLayout::get() const noexcept {
-    return channelLayout_;
-}
+inline const AudioChannelLayout *_Nullable ChannelLayout::get() const noexcept { return channelLayout_; }
 
-inline void CAChannelLayout::reset(AudioChannelLayout *_Nullable channelLayout) noexcept {
+inline void ChannelLayout::reset(AudioChannelLayout *_Nullable channelLayout) noexcept {
     std::free(std::exchange(channelLayout_, channelLayout));
 }
 
-inline void CAChannelLayout::swap(CAChannelLayout& other) noexcept {
-    std::swap(channelLayout_, other.channelLayout_);
-}
+inline void ChannelLayout::swap(ChannelLayout &other) noexcept { std::swap(channelLayout_, other.channelLayout_); }
 
-inline AudioChannelLayout *_Nullable CAChannelLayout::release() noexcept {
+inline AudioChannelLayout *_Nullable ChannelLayout::release() noexcept {
     return std::exchange(channelLayout_, nullptr);
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */

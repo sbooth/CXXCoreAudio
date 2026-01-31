@@ -5,7 +5,7 @@
 // Part of https://github.com/sbooth/CXXCoreAudio
 //
 
-#include "CAAudioBuffer.hpp"
+#include "core_audio/BufferList.hpp"
 
 #include <algorithm>
 #include <cstdlib>
@@ -13,8 +13,8 @@
 #include <new>
 #include <utility>
 
-CXXCoreAudio::malloc_ptr<AudioBufferList>
-CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept {
+core_audio::malloc_ptr<AudioBufferList> core_audio::allocateAudioBufferList(const AudioStreamBasicDescription &format,
+                                                                            UInt32 frameCapacity) noexcept {
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 ||
         frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame)) {
         return nullptr;
@@ -26,7 +26,7 @@ CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format,
     const auto allocationSize = bufferListSize + (bufferDataSize * bufferCount);
 
     auto allocation = std::malloc(allocationSize);
-    if (!allocation) {
+    if (allocation == nullptr) {
         return nullptr;
     }
 
@@ -41,7 +41,7 @@ CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format,
 
     for (UInt32 i = 0; i < bufferCount; ++i) {
         abl->mBuffers[i].mNumberChannels =
-              (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : format.mChannelsPerFrame;
+                (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved) ? 1 : format.mChannelsPerFrame;
         abl->mBuffers[i].mDataByteSize = bufferDataSize;
         abl->mBuffers[i].mData = reinterpret_cast<void *>(address + bufferListSize + (bufferDataSize * i));
     }
@@ -50,30 +50,29 @@ CXXCoreAudio::AllocateAudioBufferList(const AudioStreamBasicDescription& format,
 }
 
 #if false
-CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const CAAudioBuffer& other)
-  : CAAudioBuffer{other.format_, other.frameCapacity_} {
-    Insert(other, 0);
+core_audio::BufferList::BufferList(const BufferList& other)
+    : BufferList{other.format_, other.frameCapacity_} {
+      insert(other, 0);
 }
 #endif
 
-CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(CAAudioBuffer&& other) noexcept
-  : bufferList_{std::exchange(other.bufferList_, nullptr)},
-    format_{std::exchange(other.format_, {})},
-    frameCapacity_{std::exchange(other.frameCapacity_, 0)},
-    frameLength_{std::exchange(other.frameLength_, 0)} {}
+core_audio::BufferList::BufferList(BufferList &&other) noexcept
+    : bufferList_{std::exchange(other.bufferList_, nullptr)}, format_{std::exchange(other.format_, {})},
+      frameCapacity_{std::exchange(other.frameCapacity_, 0)}, frameLength_{std::exchange(other.frameLength_, 0)} {}
 
 #if false
-CXXCoreAudio::CAAudioBuffer& CXXCoreAudio::CAAudioBuffer::operator=(const CAAudioBuffer& other) {
-    if(this != &other) {
-        if(!Allocate(other.format_, other.frameCapacity_))
+core_audio::BufferList &core_audio::BufferList::operator=(const BufferList& other) {
+    if (this != &other) {
+        if (!allocate(other.format_, other.frameCapacity_)) {
             throw std::bad_alloc();
-        Insert(other, 0);
+        }
+        insert(other, 0);
     }
     return *this;
 }
 #endif
 
-CXXCoreAudio::CAAudioBuffer& CXXCoreAudio::CAAudioBuffer::operator=(CAAudioBuffer&& other) noexcept {
+core_audio::BufferList &core_audio::BufferList::operator=(BufferList &&other) noexcept {
     if (this != &other) {
         std::free(bufferList_);
         bufferList_ = std::exchange(other.bufferList_, nullptr);
@@ -84,34 +83,32 @@ CXXCoreAudio::CAAudioBuffer& CXXCoreAudio::CAAudioBuffer::operator=(CAAudioBuffe
     return *this;
 }
 
-CXXCoreAudio::CAAudioBuffer::~CAAudioBuffer() noexcept {
-    std::free(bufferList_);
-}
+core_audio::BufferList::~BufferList() noexcept { std::free(bufferList_); }
 
-CXXCoreAudio::CAAudioBuffer::CAAudioBuffer(const AudioStreamBasicDescription& format, UInt32 frameCapacity)
-  : CAAudioBuffer{} {
+core_audio::BufferList::BufferList(const AudioStreamBasicDescription &format, UInt32 frameCapacity) : BufferList{} {
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) {
         throw std::invalid_argument("invalid format");
     }
     if (frameCapacity == 0 || frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame)) {
         throw std::invalid_argument("invalid frame capacity");
     }
-    if (!Allocate(format, frameCapacity)) {
+
+    if (!allocate(format, frameCapacity)) {
         throw std::bad_alloc();
     }
 }
 
 // MARK: Buffer Management
 
-bool CXXCoreAudio::CAAudioBuffer::Allocate(const AudioStreamBasicDescription& format, UInt32 frameCapacity) noexcept {
+bool core_audio::BufferList::allocate(const AudioStreamBasicDescription &format, UInt32 frameCapacity) noexcept {
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0 || frameCapacity == 0 ||
         frameCapacity > (std::numeric_limits<UInt32>::max() / format.mBytesPerFrame)) {
         return false;
     }
 
-    Deallocate();
+    deallocate();
 
-    auto bufferList = AllocateAudioBufferList(format, frameCapacity);
+    auto bufferList = allocateAudioBufferList(format, frameCapacity);
     if (!bufferList) {
         return false;
     }
@@ -124,20 +121,20 @@ bool CXXCoreAudio::CAAudioBuffer::Allocate(const AudioStreamBasicDescription& fo
     return true;
 }
 
-void CXXCoreAudio::CAAudioBuffer::Deallocate() noexcept {
+void core_audio::BufferList::deallocate() noexcept {
     if (bufferList_) {
         std::free(bufferList_);
         bufferList_ = nullptr;
 
-        format_.Reset();
+        format_.reset();
 
         frameCapacity_ = 0;
         frameLength_ = 0;
     }
 }
 
-bool CXXCoreAudio::CAAudioBuffer::SetFrameLength(UInt32 frameLength) noexcept {
-    if (!bufferList_ || frameLength > frameCapacity_) {
+bool core_audio::BufferList::setFrameLength(UInt32 frameLength) noexcept {
+    if (bufferList_ == nullptr || frameLength > frameCapacity_) {
         return false;
     }
     frameLength_ = frameLength;
@@ -147,8 +144,8 @@ bool CXXCoreAudio::CAAudioBuffer::SetFrameLength(UInt32 frameLength) noexcept {
     return true;
 }
 
-bool CXXCoreAudio::CAAudioBuffer::InferFrameLength() {
-    if (!bufferList_ || format_.mBytesPerFrame == 0) {
+bool core_audio::BufferList::inferFrameLength() {
+    if (bufferList_ == nullptr || format_.mBytesPerFrame == 0) {
         return false;
     }
 
@@ -172,8 +169,8 @@ bool CXXCoreAudio::CAAudioBuffer::InferFrameLength() {
 
 // MARK: Buffer Utilities
 
-UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 readOffset, UInt32 frameLength,
-                                           UInt32 writeOffset) noexcept {
+UInt32 core_audio::BufferList::insert(const BufferList &buffer, UInt32 readOffset, UInt32 frameLength,
+                                      UInt32 writeOffset) noexcept {
     if (format_ != buffer.format_) {
         // throw std::invalid_argument("invalid audio format");
         return 0;
@@ -185,7 +182,7 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 r
     }
 
     const auto framesToInsert =
-          std::min(frameCapacity_ - frameLength_, std::min(frameLength, buffer.frameLength_ - readOffset));
+            std::min(frameCapacity_ - frameLength_, std::min(frameLength, buffer.frameLength_ - readOffset));
     const auto framesToMove = frameLength_ - writeOffset;
     if (framesToMove) {
         const auto moveToOffset = writeOffset + framesToInsert;
@@ -200,20 +197,20 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Insert(const CAAudioBuffer& buffer, UInt32 r
     if (framesToInsert) {
         for (UInt32 i = 0; i < buffer.bufferList_->mNumberBuffers; ++i) {
             std::memcpy(
-                  reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(bufferList_->mBuffers[i].mData) +
-                                           (writeOffset * format_.mBytesPerFrame)),
-                  reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(buffer.bufferList_->mBuffers[i].mData) +
-                                                 (readOffset * format_.mBytesPerFrame)),
-                  framesToInsert * format_.mBytesPerFrame);
+                    reinterpret_cast<void *>(reinterpret_cast<uintptr_t>(bufferList_->mBuffers[i].mData) +
+                                             (writeOffset * format_.mBytesPerFrame)),
+                    reinterpret_cast<const void *>(reinterpret_cast<uintptr_t>(buffer.bufferList_->mBuffers[i].mData) +
+                                                   (readOffset * format_.mBytesPerFrame)),
+                    framesToInsert * format_.mBytesPerFrame);
         }
 
-        SetFrameLength(frameLength_ + framesToInsert);
+        setFrameLength(frameLength_ + framesToInsert);
     }
 
     return framesToInsert;
 }
 
-UInt32 CXXCoreAudio::CAAudioBuffer::Trim(UInt32 offset, UInt32 frameLength) noexcept {
+UInt32 core_audio::BufferList::trim(UInt32 offset, UInt32 frameLength) noexcept {
     if (offset > frameLength_ || frameLength == 0) {
         return 0;
     }
@@ -230,12 +227,12 @@ UInt32 CXXCoreAudio::CAAudioBuffer::Trim(UInt32 offset, UInt32 frameLength) noex
         }
     }
 
-    SetFrameLength(frameLength_ - framesToTrim);
+    setFrameLength(frameLength_ - framesToTrim);
     return framesToTrim;
 }
 
-UInt32 CXXCoreAudio::CAAudioBuffer::InsertSilence(UInt32 offset, UInt32 frameLength) noexcept {
-    if (!(format_.IsFloat() || format_.IsSignedInteger())) {
+UInt32 core_audio::BufferList::insertSilence(UInt32 offset, UInt32 frameLength) noexcept {
+    if (!(format_.isFloat() || format_.isSignedInteger())) {
         // throw std::logic_error("Inserting silence for unsigned integer samples not supported");
         return 0;
     }
@@ -264,7 +261,7 @@ UInt32 CXXCoreAudio::CAAudioBuffer::InsertSilence(UInt32 offset, UInt32 frameLen
             std::memset(reinterpret_cast<void *>(s), 0, framesToZero * format_.mBytesPerFrame);
         }
 
-        SetFrameLength(frameLength_ + framesToZero);
+        setFrameLength(frameLength_ + framesToZero);
     }
 
     return framesToZero;
@@ -272,9 +269,9 @@ UInt32 CXXCoreAudio::CAAudioBuffer::InsertSilence(UInt32 offset, UInt32 frameLen
 
 // MARK: AudioBufferList Management
 
-bool CXXCoreAudio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription& format,
-                                        UInt32 frameCapacity, UInt32 frameLength) noexcept {
-    if (!bufferList) {
+bool core_audio::BufferList::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription &format,
+                                   UInt32 frameCapacity, UInt32 frameLength) noexcept {
+    if (bufferList == nullptr) {
         return false;
     }
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) {
@@ -287,8 +284,8 @@ bool CXXCoreAudio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const Audio
         return false;
     }
     if (bufferList->mNumberBuffers != (format.mFormatFlags & kAudioFormatFlagIsNonInterleaved)
-              ? format.mChannelsPerFrame
-              : 1) {
+                ? format.mChannelsPerFrame
+                : 1) {
         return false;
     }
 
@@ -306,8 +303,8 @@ bool CXXCoreAudio::CAAudioBuffer::adopt(AudioBufferList *bufferList, const Audio
     return true;
 }
 
-AudioBufferList *CXXCoreAudio::CAAudioBuffer::release() noexcept {
-    format_.Reset();
+AudioBufferList *core_audio::BufferList::release() noexcept {
+    format_.reset();
     frameCapacity_ = 0;
     frameLength_ = 0;
     return std::exchange(bufferList_, nullptr);

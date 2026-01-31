@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <CXXCoreAudio/CAStreamDescription.hpp>
+#include <core_audio/StreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -18,28 +18,28 @@
 #include <cstring>
 #include <limits>
 
-namespace CXXCoreAudio {
+namespace core_audio {
 
 /// A lock-free SPSC audio ring buffer supporting non-interleaved audio.
 ///
 /// This class is thread safe when used with a single producer and a single consumer.
-class AudioRingBuffer final {
+class RingBuffer final {
   public:
     /// Unsigned integer type.
-    using size_type = std::size_t;
+    using SizeType = std::size_t;
     /// Atomic unsigned integer type.
-    using atomic_size_type = std::atomic<size_type>;
+    using AtomicSizeType = std::atomic<SizeType>;
 
     /// The minimum supported buffer capacity in audio frames.
-    static constexpr size_type min_capacity = size_type{2};
+    static constexpr SizeType minCapacity = SizeType{2};
     /// The maximum supported buffer capacity in audio frames.
-    static constexpr size_type max_capacity = size_type{1} << (std::numeric_limits<size_type>::digits - 1);
+    static constexpr SizeType maxCapacity = SizeType{1} << (std::numeric_limits<SizeType>::digits - 1);
 
-    // MARK: Creation and Destruction
+    // MARK: Construction and Destruction
 
     /// Creates an empty ring buffer.
-    /// @note ``Allocate`` must be called before the object may be used.
-    AudioRingBuffer() noexcept = default;
+    /// @note ``allocate`` must be called before the object may be used.
+    RingBuffer() noexcept = default;
 
     /// Creates a ring buffer with the specified format and minimum audio frame capacity.
     ///
@@ -50,26 +50,26 @@ class AudioRingBuffer final {
     /// @param minFrameCapacity The desired minimum capacity in audio frames.
     /// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer capacity is not
     /// supported.
-    AudioRingBuffer(const AudioStreamBasicDescription& format, size_type minFrameCapacity);
+    RingBuffer(const AudioStreamBasicDescription &format, SizeType minFrameCapacity);
 
     // This class is non-copyable
-    AudioRingBuffer(const AudioRingBuffer&) = delete;
+    RingBuffer(const RingBuffer &) = delete;
 
     /// Creates a ring buffer by moving the contents of another ring buffer.
     /// @note This method is not thread safe for the ring buffer being moved.
     /// @param other The ring buffer to move.
-    AudioRingBuffer(AudioRingBuffer&& other) noexcept;
+    RingBuffer(RingBuffer &&other) noexcept;
 
     // This class is non-assignable
-    AudioRingBuffer& operator=(const AudioRingBuffer&) = delete;
+    RingBuffer &operator=(const RingBuffer &) = delete;
 
     /// Moves the contents of another ring buffer into this ring buffer.
     /// @note This method is not thread safe.
     /// @param other The ring buffer to move.
-    AudioRingBuffer& operator=(AudioRingBuffer&& other) noexcept;
+    RingBuffer &operator=(RingBuffer &&other) noexcept;
 
     /// Destroys the ring buffer and releases all associated resources.
-    ~AudioRingBuffer() noexcept;
+    ~RingBuffer() noexcept;
 
     // MARK: Buffer Management
 
@@ -83,11 +83,11 @@ class AudioRingBuffer final {
     /// @param minFrameCapacity The desired minimum capacity in audio frames.
     /// @return true on success, false if memory could not be allocated, the audio format is not supported, or the
     /// buffer capacity is not supported.
-    bool Allocate(const AudioStreamBasicDescription& format, size_type minFrameCapacity) noexcept;
+    bool allocate(const AudioStreamBasicDescription &format, SizeType minFrameCapacity) noexcept;
 
     /// Frees any space allocated for audio data.
     /// @note This method is not thread safe.
-    void Deallocate() noexcept;
+    void deallocate() noexcept;
 
     /// Returns true if the buffer has allocated space for audio data.
     [[nodiscard]] explicit operator bool() const noexcept;
@@ -97,34 +97,34 @@ class AudioRingBuffer final {
     /// Returns the format of the audio stored in the buffer.
     /// @note This method is safe to call from both producer and consumer.
     /// @return The audio format of the buffer.
-    [[nodiscard]] const CAStreamDescription& Format() const noexcept;
+    [[nodiscard]] const StreamDescription &format() const noexcept;
 
     /// Returns the capacity of the buffer.
     /// @note This method is safe to call from both producer and consumer.
     /// @return The buffer capacity in audio frames.
-    [[nodiscard]] size_type Capacity() const noexcept;
+    [[nodiscard]] SizeType capacity() const noexcept;
 
     // MARK: Buffer Usage
 
     /// Returns the amount of free space in the buffer.
     /// @note The result of this method is only accurate when called from the producer.
     /// @return The number of audio frames of free space available for writing.
-    [[nodiscard]] size_type FreeSpace() const noexcept;
+    [[nodiscard]] SizeType freeSpace() const noexcept;
 
     /// Returns true if the buffer is full.
     /// @note The result of this method is only accurate when called from the producer.
     /// @return true if the buffer is full.
-    [[nodiscard]] bool IsFull() const noexcept;
+    [[nodiscard]] bool isFull() const noexcept;
 
     /// Returns the amount of audio in the buffer.
     /// @note The result of this method is only accurate when called from the consumer.
     /// @return The number of audio frames available for reading.
-    [[nodiscard]] size_type AvailableFrames() const noexcept;
+    [[nodiscard]] SizeType availableFrames() const noexcept;
 
     /// Returns true if the buffer is empty.
     /// @note The result of this method is only accurate when called from the consumer.
     /// @return true if the buffer contains no data.
-    [[nodiscard]] bool IsEmpty() const noexcept;
+    [[nodiscard]] bool isEmpty() const noexcept;
 
     // MARK: Writing and Reading Audio
 
@@ -133,7 +133,7 @@ class AudioRingBuffer final {
     /// @param bufferList An audio buffer list containing the data to copy.
     /// @param frameCount The desired number of audio frames to write.
     /// @return The number of audio frames actually written.
-    size_type Write(const AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept;
+    SizeType write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept;
 
     /// Reads audio and advances the read position.
     ///
@@ -143,7 +143,7 @@ class AudioRingBuffer final {
     /// @param bufferList An audio buffer list to receive the data.
     /// @param frameCount The desired number of audio frames to read.
     /// @return The number of audio frames actually read.
-    size_type Read(AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept;
+    SizeType read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept;
 
     // MARK: Discarding Audio
 
@@ -151,72 +151,66 @@ class AudioRingBuffer final {
     /// @note This method is only safe to call from the consumer.
     /// @param frameCount The desired number of audio frames to skip.
     /// @return The number of audio frames actually skipped.
-    size_type Skip(size_type frameCount) noexcept;
+    SizeType skip(SizeType frameCount) noexcept;
 
     /// Advances the read position to the write position, emptying the buffer.
     /// @note This method is only safe to call from the consumer.
     /// @return The number of audio frames discarded.
-    size_type Drain() noexcept;
+    SizeType drain() noexcept;
 
   private:
     /// The memory buffers holding the data, consisting of channel pointers and buffers allocated in one chunk.
     void *_Nonnull *_Nullable buffers_{nullptr};
 
     /// The per-channel capacity of ``buffers_`` in audio frames.
-    size_type capacity_{0};
+    SizeType capacity_{0};
     /// The per-channel capacity of ``buffers_`` in audio frames minus one.
-    size_type capacityMask_{0};
+    SizeType capacityMask_{0};
 
     /// The free-running write location.
-    atomic_size_type writePosition_{0};
+    AtomicSizeType writePosition_{0};
     /// The free-running read location.
-    atomic_size_type readPosition_{0};
+    AtomicSizeType readPosition_{0};
 
-    static_assert(atomic_size_type::is_always_lock_free, "Lock-free atomic_size_type required");
+    static_assert(AtomicSizeType::is_always_lock_free, "Lock-free AtomicSizeType required");
 
     /// The format of the audio this buffer contains.
-    CAStreamDescription format_{};
+    StreamDescription format_{};
 };
 
 // MARK: - Implementation -
 
 // MARK: Buffer Management
 
-inline AudioRingBuffer::operator bool() const noexcept {
-    return buffers_ != nullptr;
-}
+inline RingBuffer::operator bool() const noexcept { return buffers_ != nullptr; }
 
 // MARK: Buffer Information
 
-inline const CAStreamDescription& AudioRingBuffer::Format() const noexcept {
-    return format_;
-}
+inline const StreamDescription &RingBuffer::format() const noexcept { return format_; }
 
-inline AudioRingBuffer::size_type AudioRingBuffer::Capacity() const noexcept {
-    return capacity_;
-}
+inline auto RingBuffer::capacity() const noexcept -> SizeType { return capacity_; }
 
 // MARK: Buffer Usage
 
-inline AudioRingBuffer::size_type AudioRingBuffer::FreeSpace() const noexcept {
+inline auto RingBuffer::freeSpace() const noexcept -> SizeType {
     const auto writePos = writePosition_.load(std::memory_order_relaxed);
     const auto readPos = readPosition_.load(std::memory_order_acquire);
     return capacity_ - (writePos - readPos);
 }
 
-inline bool AudioRingBuffer::IsFull() const noexcept {
+inline bool RingBuffer::isFull() const noexcept {
     const auto writePos = writePosition_.load(std::memory_order_relaxed);
     const auto readPos = readPosition_.load(std::memory_order_acquire);
     return (writePos - readPos) == capacity_;
 }
 
-inline AudioRingBuffer::size_type AudioRingBuffer::AvailableFrames() const noexcept {
+inline auto RingBuffer::availableFrames() const noexcept -> SizeType {
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
     return writePos - readPos;
 }
 
-inline bool AudioRingBuffer::IsEmpty() const noexcept {
+inline bool RingBuffer::isEmpty() const noexcept {
     const auto writePos = writePosition_.load(std::memory_order_acquire);
     const auto readPos = readPosition_.load(std::memory_order_relaxed);
     return writePos == readPos;
@@ -224,9 +218,9 @@ inline bool AudioRingBuffer::IsEmpty() const noexcept {
 
 // MARK: Writing and Reading Audio
 
-inline CXXCoreAudio::AudioRingBuffer::size_type
-CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept {
-    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
+inline auto RingBuffer::write(const AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept
+        -> SizeType {
+    if (bufferList == nullptr || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
 
@@ -269,9 +263,8 @@ CXXCoreAudio::AudioRingBuffer::Write(const AudioBufferList *const _Nonnull buffe
     return framesToWrite;
 }
 
-inline CXXCoreAudio::AudioRingBuffer::size_type
-CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList *const _Nonnull bufferList, size_type frameCount) noexcept {
-    if (!bufferList || frameCount == 0 || capacity_ == 0) [[unlikely]] {
+inline auto RingBuffer::read(AudioBufferList *const _Nonnull bufferList, SizeType frameCount) noexcept -> SizeType {
+    if (bufferList == nullptr || frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
 
@@ -328,7 +321,7 @@ CXXCoreAudio::AudioRingBuffer::Read(AudioBufferList *const _Nonnull bufferList, 
 
 // MARK: Discarding Audio
 
-inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::Skip(size_type frameCount) noexcept {
+inline auto RingBuffer::skip(SizeType frameCount) noexcept -> SizeType {
     if (frameCount == 0 || capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -348,7 +341,7 @@ inline CXXCoreAudio::AudioRingBuffer::size_type CXXCoreAudio::AudioRingBuffer::S
     return framesToSkip;
 }
 
-inline AudioRingBuffer::size_type AudioRingBuffer::Drain() noexcept {
+inline auto RingBuffer::drain() noexcept -> SizeType {
     if (capacity_ == 0) [[unlikely]] {
         return 0;
     }
@@ -365,4 +358,4 @@ inline AudioRingBuffer::size_type AudioRingBuffer::Drain() noexcept {
     return framesAvailable;
 }
 
-} /* namespace CXXCoreAudio */
+} /* namespace core_audio */
