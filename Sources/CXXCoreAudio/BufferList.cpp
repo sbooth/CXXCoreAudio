@@ -26,7 +26,7 @@ core_audio::malloc_ptr<AudioBufferList> core_audio::allocateAudioBufferList(cons
     const auto allocationSize = bufferListSize + (bufferDataSize * bufferCount);
 
     auto allocation = std::malloc(allocationSize);
-    if (!allocation) {
+    if (allocation == nullptr) {
         return nullptr;
     }
 
@@ -62,8 +62,8 @@ core_audio::BufferList::BufferList(BufferList &&other) noexcept
 
 #if false
 core_audio::BufferList &core_audio::BufferList::operator=(const BufferList& other) {
-    if(this != &other) {
-        if(!allocate(other.format_, other.frameCapacity_)) {
+    if (this != &other) {
+        if (!allocate(other.format_, other.frameCapacity_)) {
             throw std::bad_alloc();
         }
         insert(other, 0);
@@ -134,7 +134,7 @@ void core_audio::BufferList::deallocate() noexcept {
 }
 
 bool core_audio::BufferList::setFrameLength(UInt32 frameLength) noexcept {
-    if (!bufferList_ || frameLength > frameCapacity_) {
+    if (bufferList_ == nullptr || frameLength > frameCapacity_) {
         return false;
     }
     frameLength_ = frameLength;
@@ -145,7 +145,7 @@ bool core_audio::BufferList::setFrameLength(UInt32 frameLength) noexcept {
 }
 
 bool core_audio::BufferList::inferFrameLength() {
-    if (!bufferList_ || format_.mBytesPerFrame == 0) {
+    if (bufferList_ == nullptr || format_.mBytesPerFrame == 0) {
         return false;
     }
 
@@ -271,7 +271,7 @@ UInt32 core_audio::BufferList::insertSilence(UInt32 offset, UInt32 frameLength) 
 
 bool core_audio::BufferList::adopt(AudioBufferList *bufferList, const AudioStreamBasicDescription &format,
                                    UInt32 frameCapacity, UInt32 frameLength) noexcept {
-    if (!bufferList) {
+    if (bufferList == nullptr) {
         return false;
     }
     if (format.mBytesPerFrame == 0 || format.mChannelsPerFrame == 0) {

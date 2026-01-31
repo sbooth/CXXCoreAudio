@@ -117,7 +117,7 @@ bool core_audio::TimestampedRingBuffer::allocate(const AudioStreamBasicDescripti
     const auto allocationSize = (channelBufferByteSize + sizeof(void *)) * format.mChannelsPerFrame;
 
     auto allocation = std::malloc(allocationSize);
-    if (!allocation) [[unlikely]] {
+    if (allocation == nullptr) [[unlikely]] {
         return false;
     }
 
@@ -212,7 +212,7 @@ bool core_audio::TimestampedRingBuffer::write(const AudioBufferList *const buffe
         return true;
     }
 
-    if (!bufferList || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
+    if (bufferList == nullptr || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
         return false;
     }
 
@@ -313,7 +313,7 @@ bool core_audio::TimestampedRingBuffer::read(AudioBufferList *const bufferList, 
         return true;
     }
 
-    if (!bufferList || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
+    if (bufferList == nullptr || frameCount > capacity_ || sampleTime < 0) [[unlikely]] {
         return false;
     }
 

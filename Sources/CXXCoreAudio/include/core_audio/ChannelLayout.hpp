@@ -304,7 +304,7 @@ constexpr size_t audioChannelLayoutSize(UInt32 numberChannelDescriptions) noexce
 }
 
 inline size_t audioChannelLayoutSize(const AudioChannelLayout *_Nullable channelLayout) noexcept {
-    if (!channelLayout) {
+    if (channelLayout == nullptr) {
         return 0;
     }
     return audioChannelLayoutSize(channelLayout->mNumberChannelDescriptions);
