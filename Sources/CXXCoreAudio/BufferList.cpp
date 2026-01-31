@@ -50,9 +50,9 @@ core_audio::malloc_ptr<AudioBufferList> core_audio::allocateAudioBufferList(cons
 }
 
 #if false
-core_audio::CAAudioBuffer::CAAudioBuffer(const CAAudioBuffer& other)
-  : CAAudioBuffer{other.format_, other.frameCapacity_} {
-    insert(other, 0);
+core_audio::BufferList::BufferList(const BufferList& other)
+    : BufferList{other.format_, other.frameCapacity_} {
+      insert(other, 0);
 }
 #endif
 
@@ -61,10 +61,11 @@ core_audio::BufferList::BufferList(BufferList &&other) noexcept
       frameCapacity_{std::exchange(other.frameCapacity_, 0)}, frameLength_{std::exchange(other.frameLength_, 0)} {}
 
 #if false
-core_audio::CAAudioBuffer& core_audio::CAAudioBuffer::operator=(const CAAudioBuffer& other) {
+core_audio::BufferList &core_audio::BufferList::operator=(const BufferList& other) {
     if(this != &other) {
-        if(!Allocate(other.format_, other.frameCapacity_))
+        if(!allocate(other.format_, other.frameCapacity_)) {
             throw std::bad_alloc();
+        }
         insert(other, 0);
     }
     return *this;
