@@ -7,7 +7,7 @@
 
 #pragma once
 
-#include <core_audio/CAStreamDescription.hpp>
+#include <core_audio/StreamDescription.hpp>
 
 #include <CoreAudioTypes/CoreAudioTypes.h>
 
@@ -18,13 +18,13 @@ namespace core_audio {
 /// A timestamped SPSC ring buffer supporting non-interleaved audio based on Apple's CARingBuffer.
 ///
 /// This class is thread safe when used from one reader thread and one writer thread.
-class CARingBuffer final {
+class TimestampedRingBuffer final {
   public:
     // MARK: Construction and Destruction
 
     /// Creates an empty ring buffer.
     /// @note ``allocate`` must be called before the object may be used.
-    CARingBuffer() noexcept = default;
+    TimestampedRingBuffer() noexcept = default;
 
     /// Creates a ring buffer with the specified buffer size.
     ///
@@ -41,26 +41,26 @@ class CARingBuffer final {
     /// @param size The desired buffer capacity per channel, in audio frames.
     /// @throw std::bad_alloc if memory could not be allocated or std::invalid_argument if the buffer size is not
     /// supported.
-    CARingBuffer(const AudioStreamBasicDescription &format, uint32_t size);
+    TimestampedRingBuffer(const AudioStreamBasicDescription &format, uint32_t size);
 
     // This class is non-copyable
-    CARingBuffer(const CARingBuffer &) = delete;
+    TimestampedRingBuffer(const TimestampedRingBuffer &) = delete;
 
     /// Creates a ring buffer by moving the contents of another ring buffer.
     /// @note This method is not thread safe for the ring buffer being moved.
     /// @param other The ring buffer to move.
-    CARingBuffer(CARingBuffer &&other) noexcept;
+    TimestampedRingBuffer(TimestampedRingBuffer &&other) noexcept;
 
     // This class is non-assignable
-    CARingBuffer &operator=(const CARingBuffer &) = delete;
+    TimestampedRingBuffer &operator=(const TimestampedRingBuffer &) = delete;
 
     /// Moves the contents of another ring buffer into this ring buffer.
     /// @note This method is not thread safe.
     /// @param other The ring buffer to move.
-    CARingBuffer &operator=(CARingBuffer &&other) noexcept;
+    TimestampedRingBuffer &operator=(TimestampedRingBuffer &&other) noexcept;
 
     /// Destroys the ring buffer and releases all associated resources.
-    ~CARingBuffer() noexcept;
+    ~TimestampedRingBuffer() noexcept;
 
     // MARK: Buffer Management
 
@@ -109,7 +109,7 @@ class CARingBuffer final {
     [[nodiscard]] uint32_t unusedSpace() const noexcept;
 
     /// Returns the format of the audio in this ring buffer.
-    [[nodiscard]] const CAStreamDescription &format() const noexcept;
+    [[nodiscard]] const StreamDescription &format() const noexcept;
 
     // MARK: Writing and Reading Audio
 
@@ -157,26 +157,26 @@ class CARingBuffer final {
     };
 
     /// The number of elements in the time bounds queue.
-    static constexpr uint32_t sTimeBoundsQueueSize{32};
+    static constexpr uint32_t timeBoundsQueueSize{32};
     /// Mask value used to wrap time bounds counters.
-    static constexpr uint32_t sTimeBoundsQueueMask{sTimeBoundsQueueSize - 1};
+    static constexpr uint32_t timeBoundsQueueMask{timeBoundsQueueSize - 1};
 
     /// Array of TimeBounds structures.
-    TimeBounds timeBoundsQueue_[sTimeBoundsQueueSize];
+    TimeBounds timeBoundsQueue_[timeBoundsQueueSize];
 
     /// Monotonically increasing counter incremented when the buffer's time bounds changes.
     std::atomic_uint64_t timeBoundsQueueCounter_{0};
     static_assert(std::atomic_uint64_t::is_always_lock_free, "Lock-free std::atomic_uint64_t required");
 
     /// The format of the audio this buffer contains.
-    CAStreamDescription format_{};
+    StreamDescription format_{};
 };
 
 // MARK: - Implementation -
 
-inline const CAStreamDescription &CARingBuffer::format() const noexcept { return format_; }
+inline const StreamDescription &TimestampedRingBuffer::format() const noexcept { return format_; }
 
-inline uint32_t CARingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
+inline uint32_t TimestampedRingBuffer::frameByteOffset(int64_t frameNumber) const noexcept {
     return (static_cast<uint64_t>(frameNumber) & capacityMask_) * format_.mBytesPerFrame;
 }
 

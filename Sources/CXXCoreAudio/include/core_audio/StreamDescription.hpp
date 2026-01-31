@@ -22,7 +22,7 @@
 namespace core_audio {
 
 /// Common PCM audio formats.
-enum class CACommonPCMFormat {
+enum class CommonPCMFormat {
     /// Native-endian float.
     float32,
     /// Native-endian double.
@@ -36,7 +36,7 @@ enum class CACommonPCMFormat {
 // MARK: AudioStreamBasicDescription Helper Functions
 
 /// Returns the common PCM format described by an AudioStreamBasicDescription structure or std::nullopt if none.
-std::optional<CACommonPCMFormat> identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept;
+std::optional<CommonPCMFormat> identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDescription) noexcept;
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
@@ -59,30 +59,30 @@ NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
 #endif /* __OBJC__ */
 
 /// A class extending the functionality of an AudioStreamBasicDescription structure.
-struct CAStreamDescription final : public AudioStreamBasicDescription {
+struct StreamDescription final : public AudioStreamBasicDescription {
     // MARK: Construction and Destruction
 
     /// Creates an empty stream description.
-    CAStreamDescription() noexcept = default;
+    StreamDescription() noexcept = default;
 
     /// Creates a stream description for the specified common PCM format.
-    CAStreamDescription(CACommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame,
-                        bool isInterleaved) noexcept;
+    StreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate, UInt32 channelsPerFrame,
+                      bool isInterleaved) noexcept;
 
     /// Creates a copy of an existing stream description.
-    CAStreamDescription(const CAStreamDescription &other) noexcept = default;
+    StreamDescription(const StreamDescription &other) noexcept = default;
 
     /// Creates a stream description copied from an AudioStreamBasicDescription.
-    CAStreamDescription(const AudioStreamBasicDescription &other) noexcept;
+    StreamDescription(const AudioStreamBasicDescription &other) noexcept;
 
     /// Assignment operator
-    CAStreamDescription &operator=(const CAStreamDescription &other) noexcept = default;
+    StreamDescription &operator=(const StreamDescription &other) noexcept = default;
 
     /// Assignment operator
-    CAStreamDescription &operator=(const AudioStreamBasicDescription &other) noexcept;
+    StreamDescription &operator=(const AudioStreamBasicDescription &other) noexcept;
 
     /// Destructor
-    ~CAStreamDescription() noexcept = default;
+    ~StreamDescription() noexcept = default;
 
     // MARK: Comparison
 
@@ -95,7 +95,7 @@ struct CAStreamDescription final : public AudioStreamBasicDescription {
     // MARK: Format Information
 
     /// Returns the common PCM format described by this stream description or std::nullopt if none.
-    [[nodiscard]] std::optional<CACommonPCMFormat> identifyCommonPCMFormat() const noexcept;
+    [[nodiscard]] std::optional<CommonPCMFormat> identifyCommonPCMFormat() const noexcept;
 
     /// Returns true if the kAudioFormatFlagIsNonInterleaved flag is set.
     [[nodiscard]] bool isNonInterleaved() const noexcept;
@@ -239,10 +239,10 @@ inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
 
 // MARK: Construction and Destruction
 
-inline CAStreamDescription::CAStreamDescription(const AudioStreamBasicDescription &other) noexcept
+inline StreamDescription::StreamDescription(const AudioStreamBasicDescription &other) noexcept
     : AudioStreamBasicDescription(other) {}
 
-inline CAStreamDescription &CAStreamDescription::operator=(const AudioStreamBasicDescription &other) noexcept {
+inline StreamDescription &StreamDescription::operator=(const AudioStreamBasicDescription &other) noexcept {
     AudioStreamBasicDescription::operator=(other);
     return *this;
 }
@@ -250,97 +250,95 @@ inline CAStreamDescription &CAStreamDescription::operator=(const AudioStreamBasi
 // MARK: Comparison
 
 /// Returns true if other is equal to this.
-inline bool CAStreamDescription::operator==(const AudioStreamBasicDescription &other) const noexcept {
+inline bool StreamDescription::operator==(const AudioStreamBasicDescription &other) const noexcept {
     return !std::memcmp(this, &other, sizeof(AudioStreamBasicDescription));
 }
 
-inline bool CAStreamDescription::operator!=(const AudioStreamBasicDescription &other) const noexcept {
+inline bool StreamDescription::operator!=(const AudioStreamBasicDescription &other) const noexcept {
     return !operator==(other);
 }
 
 // MARK: Format Information
 
-inline std::optional<CACommonPCMFormat> CAStreamDescription::identifyCommonPCMFormat() const noexcept {
+inline std::optional<CommonPCMFormat> StreamDescription::identifyCommonPCMFormat() const noexcept {
     return core_audio::identifyCommonPCMFormat(*this);
 }
 
-inline bool CAStreamDescription::isNonInterleaved() const noexcept {
+inline bool StreamDescription::isNonInterleaved() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsNonInterleaved) == kAudioFormatFlagIsNonInterleaved;
 }
 
-inline bool CAStreamDescription::isInterleaved() const noexcept {
+inline bool StreamDescription::isInterleaved() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsNonInterleaved) == 0;
 }
 
-inline UInt32 CAStreamDescription::interleavedChannelCount() const noexcept {
+inline UInt32 StreamDescription::interleavedChannelCount() const noexcept {
     return isInterleaved() ? mChannelsPerFrame : 1;
 }
 
-inline UInt32 CAStreamDescription::channelStreamCount() const noexcept {
-    return isInterleaved() ? 1 : mChannelsPerFrame;
-}
+inline UInt32 StreamDescription::channelStreamCount() const noexcept { return isInterleaved() ? 1 : mChannelsPerFrame; }
 
-inline UInt32 CAStreamDescription::channelCount() const noexcept { return mChannelsPerFrame; }
+inline UInt32 StreamDescription::channelCount() const noexcept { return mChannelsPerFrame; }
 
-inline bool CAStreamDescription::isPCM() const noexcept { return mFormatID == kAudioFormatLinearPCM; }
+inline bool StreamDescription::isPCM() const noexcept { return mFormatID == kAudioFormatLinearPCM; }
 
-inline bool CAStreamDescription::isBigEndian() const noexcept {
+inline bool StreamDescription::isBigEndian() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagIsBigEndian;
 }
 
-inline bool CAStreamDescription::isLittleEndian() const noexcept {
+inline bool StreamDescription::isLittleEndian() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsBigEndian) == 0;
 }
 
-inline bool CAStreamDescription::isNativeEndian() const noexcept {
+inline bool StreamDescription::isNativeEndian() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsBigEndian) == kAudioFormatFlagsNativeEndian;
 }
 
-inline bool CAStreamDescription::isFloat() const noexcept {
+inline bool StreamDescription::isFloat() const noexcept {
     return isPCM() && (mFormatFlags & kAudioFormatFlagIsFloat) == kAudioFormatFlagIsFloat;
 }
 
-inline bool CAStreamDescription::isInteger() const noexcept {
+inline bool StreamDescription::isInteger() const noexcept {
     return isPCM() && (mFormatFlags & kAudioFormatFlagIsFloat) == 0;
 }
 
-inline bool CAStreamDescription::isSignedInteger() const noexcept {
+inline bool StreamDescription::isSignedInteger() const noexcept {
     return isPCM() && (mFormatFlags & kAudioFormatFlagIsSignedInteger) == kAudioFormatFlagIsSignedInteger;
 }
 
-inline bool CAStreamDescription::isPacked() const noexcept {
+inline bool StreamDescription::isPacked() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsPacked) == kAudioFormatFlagIsPacked;
 }
 
-inline bool CAStreamDescription::isImplicitlyPacked() const noexcept {
+inline bool StreamDescription::isImplicitlyPacked() const noexcept {
     return ((mBitsPerChannel / 8) * interleavedChannelCount()) == mBytesPerFrame;
 }
 
-inline bool CAStreamDescription::isUnpackedPCM() const noexcept {
+inline bool StreamDescription::isUnpackedPCM() const noexcept {
     return isPCM() && (sampleWordSize() << 3) != mBitsPerChannel;
 }
 
-inline bool CAStreamDescription::isAlignedHigh() const noexcept {
+inline bool StreamDescription::isAlignedHigh() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsAlignedHigh) == kAudioFormatFlagIsAlignedHigh;
 }
 
-inline bool CAStreamDescription::isUnaligned() const noexcept { return isUnpackedPCM() || (mBitsPerChannel & 7) != 0; }
+inline bool StreamDescription::isUnaligned() const noexcept { return isUnpackedPCM() || (mBitsPerChannel & 7) != 0; }
 
-inline UInt32 CAStreamDescription::fractionalBits() const noexcept {
+inline UInt32 StreamDescription::fractionalBits() const noexcept {
     return (mFormatFlags & kLinearPCMFormatFlagsSampleFractionMask) >> kLinearPCMFormatFlagsSampleFractionShift;
 }
 
-inline bool CAStreamDescription::isFixedPoint() const noexcept { return isInteger() && fractionalBits() > 0; }
+inline bool StreamDescription::isFixedPoint() const noexcept { return isInteger() && fractionalBits() > 0; }
 
-inline bool CAStreamDescription::isNonMixable() const noexcept {
+inline bool StreamDescription::isNonMixable() const noexcept {
     return (mFormatFlags & kAudioFormatFlagIsNonMixable) == kAudioFormatFlagIsNonMixable;
 }
 
-inline bool CAStreamDescription::isMixable() const noexcept {
+inline bool StreamDescription::isMixable() const noexcept {
     return isPCM() && (mFormatFlags & kAudioFormatFlagIsNonMixable) == 0;
 }
 
-inline UInt32 CAStreamDescription::sampleWordSize() const noexcept {
+inline UInt32 StreamDescription::sampleWordSize() const noexcept {
     const auto interleavedChannels = interleavedChannelCount();
     if (interleavedChannels == 0 || mBytesPerFrame % interleavedChannels != 0) {
         return 0;
@@ -348,44 +346,44 @@ inline UInt32 CAStreamDescription::sampleWordSize() const noexcept {
     return mBytesPerFrame / interleavedChannels;
 }
 
-inline UInt32 CAStreamDescription::frameCountToByteSize(UInt32 frameCount) const noexcept {
+inline UInt32 StreamDescription::frameCountToByteSize(UInt32 frameCount) const noexcept {
     return frameCount * mBytesPerFrame;
 }
 
-inline UInt32 CAStreamDescription::byteSizeToFrameCount(UInt32 byteSize) const noexcept {
+inline UInt32 StreamDescription::byteSizeToFrameCount(UInt32 byteSize) const noexcept {
     assert(mBytesPerFrame > 0);
     return byteSize / mBytesPerFrame;
 }
 
-inline double CAStreamDescription::packetDuration() const noexcept {
+inline double StreamDescription::packetDuration() const noexcept {
     assert(mSampleRate > 0);
     return (1 / mSampleRate) * mFramesPerPacket;
 }
 
 // MARK: Format transformation
 
-inline void CAStreamDescription::reset() noexcept { std::memset(this, 0, sizeof(AudioStreamBasicDescription)); }
+inline void StreamDescription::reset() noexcept { std::memset(this, 0, sizeof(AudioStreamBasicDescription)); }
 
 // MARK: Format Name and Description
 
-inline CFStringRef _Nullable CAStreamDescription::copyFormatName() const noexcept {
+inline CFStringRef _Nullable StreamDescription::copyFormatName() const noexcept {
     return copyAudioStreamBasicDescriptionFormatName(*this);
 }
 
-inline CFStringRef _Nullable CAStreamDescription::copyFormatDescription() const noexcept {
+inline CFStringRef _Nullable StreamDescription::copyFormatDescription() const noexcept {
     return copyAudioStreamBasicDescriptionFormatDescription(*this);
 }
 
 #ifdef __OBJC__
-inline CAStreamDescription::operator AVAudioFormat *_Nullable() const noexcept {
+inline StreamDescription::operator AVAudioFormat *_Nullable() const noexcept {
     return [[AVAudioFormat alloc] initWithStreamDescription:this];
 }
 
-inline NSString *_Nullable CAStreamDescription::formatName() const noexcept {
+inline NSString *_Nullable StreamDescription::formatName() const noexcept {
     return (__bridge_transfer NSString *)copyFormatName();
 }
 
-inline NSString *_Nullable CAStreamDescription::formatDescription() const noexcept {
+inline NSString *_Nullable StreamDescription::formatDescription() const noexcept {
     return (__bridge_transfer NSString *)copyFormatDescription();
 }
 #endif /* __OBJC__ */
