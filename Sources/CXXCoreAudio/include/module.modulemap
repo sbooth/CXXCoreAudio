@@ -9,7 +9,6 @@ module CXXCoreAudio {
     requires cplusplus17
     header "core_audio/BufferList.hpp"
     header "core_audio/ChannelLayout.hpp"
-    header "core_audio/RingBuffer.hpp"
     header "core_audio/StreamDescription.hpp"
     header "core_audio/TimeStamp.hpp"
     header "core_audio/TimestampedRingBuffer.hpp"
