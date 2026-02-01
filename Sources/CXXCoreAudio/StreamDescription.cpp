@@ -184,6 +184,9 @@ core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDesc
 CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         const AudioStreamBasicDescription &streamDescription) noexcept {
     CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
+    if (result == nullptr) {
+        return nullptr;
+    }
 
     // Channels and sample rate
     CFStringAppendFormat(result, nullptr, CFSTR("%u ch @ %g Hz, "), streamDescription.mChannelsPerFrame,
