@@ -184,6 +184,9 @@ core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDesc
 CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         const AudioStreamBasicDescription &streamDescription) noexcept {
     CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
+    if (result == nullptr) {
+        return nullptr;
+    }
 
     // Channels and sample rate
     CFStringAppendFormat(result, nullptr, CFSTR("%u ch @ %g Hz, "), streamDescription.mChannelsPerFrame,
@@ -284,9 +287,9 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         }
     } else if (streamDescription.mFormatID == kAudioFormatAppleLossless ||
                streamDescription.mFormatID == kAudioFormatFLAC) {
-        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString != nullptr) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC != nullptr) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
@@ -319,9 +322,9 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
 
         CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
     } else {
-        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString != nullptr) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC != nullptr) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
