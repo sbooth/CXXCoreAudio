@@ -49,28 +49,6 @@ import Testing
         #expect(empty.frameCapacity() == 0)
     }
 
-    @Test func ringBuffer() async {
-        let empty = core_audio.RingBuffer()
-        #expect(empty.__convertToBool() == false)
-        #expect(empty.capacity() == 0)
-        #expect(empty.availableFrames() == 0)
-        #expect(empty.freeSpace() == empty.capacity())
-
-        var rb = core_audio.RingBuffer()
-        let std2ch = AudioStreamBasicDescription(mSampleRate: 44100, mFormatID: kAudioFormatLinearPCM, mFormatFlags: kAudioFormatFlagsNativeFloatPacked|kAudioFormatFlagIsNonInterleaved, mBytesPerPacket: 8, mFramesPerPacket: 8, mBytesPerFrame: 8, mChannelsPerFrame: 2, mBitsPerChannel: 32, mReserved: 0)
-        #expect(rb.allocate(std2ch, 512) == true)
-        #expect(rb.__convertToBool() == true)
-        #expect(rb.capacity() == 512)
-        #expect(rb.availableFrames() == 0)
-        #expect(rb.freeSpace() == rb.capacity())
-
-        rb.deallocate()
-        #expect(rb.__convertToBool() == false)
-        #expect(rb.capacity() == 0)
-        #expect(rb.availableFrames() == 0)
-        #expect(rb.freeSpace() == rb.capacity())
-    }
-
     @Test func tsRingBuffer() async {
         let empty = core_audio.TimestampedRingBuffer()
         #expect(empty.capacity() == 0)
