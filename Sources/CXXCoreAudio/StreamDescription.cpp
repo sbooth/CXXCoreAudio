@@ -287,9 +287,9 @@ cf::CFString core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         }
     } else if (streamDescription.mFormatID == kAudioFormatAppleLossless ||
                streamDescription.mFormatID == kAudioFormatFLAC) {
-        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString != nullptr) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC != nullptr) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
@@ -322,9 +322,9 @@ cf::CFString core_audio::copyAudioStreamBasicDescriptionFormatDescription(
 
         CFStringAppendFormat(result, nullptr, CFSTR("%d frames/packet"), streamDescription.mFramesPerPacket);
     } else {
-        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString) {
+        if (CFStringRef formatIDString = getFormatIDName(streamDescription.mFormatID); formatIDString != nullptr) {
             CFStringAppend(result, formatIDString);
-        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC) {
+        } else if (CFStringRef fourCC = createFourCharCodeString(streamDescription.mFormatID); fourCC != nullptr) {
             CFStringAppend(result, fourCC);
             CFRelease(fourCC);
         } else {
