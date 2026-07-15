@@ -1,0 +1,14 @@
+{
+  "pins" : [
+    {
+      "identity" : "cxxcfref",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/sbooth/CXXCFRef",
+      "state" : {
+        "revision" : "5c63098edeab59cf79e64978eaada9b56db146a5",
+        "version" : "0.3.0"
+      }
+    }
+  ],
+  "version" : 2
+}

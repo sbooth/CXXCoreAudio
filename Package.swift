@@ -18,9 +18,15 @@ let package = Package(
             ]
         ),
     ],
+    dependencies: [
+        .package(url: "https://github.com/sbooth/CXXCFRef", .upToNextMinor(from: "0.3.0")),
+    ],
     targets: [
         .target(
             name: "CXXCoreAudio",
+            dependencies: [
+                "CXXCFRef",
+            ],
             linkerSettings: [
                 .linkedFramework("CoreAudio"),
                 .linkedFramework("AudioToolbox"),

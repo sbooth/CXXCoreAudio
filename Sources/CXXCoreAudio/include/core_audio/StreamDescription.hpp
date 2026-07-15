@@ -7,6 +7,8 @@
 
 #pragma once
 
+#include <cf/CFRef.hpp>
+
 #include <CoreAudioTypes/CoreAudioTypes.h>
 #include <CoreFoundation/CFString.h>
 
@@ -40,13 +42,12 @@ std::optional<CommonPCMFormat> identifyCommonPCMFormat(const AudioStreamBasicDes
 
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
-CFStringRef _Nullable copyAudioStreamBasicDescriptionFormatName(
-        const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+cf::CFString copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept;
 
 /// Returns a string representation of the stream format described by an AudioStreamBasicDescription structure.
 /// @note The caller is responsible for releasing the returned string.
-CFStringRef _Nullable copyAudioStreamBasicDescriptionFormatDescription(
-        const AudioStreamBasicDescription &streamDescription) noexcept CF_RETURNS_RETAINED;
+cf::CFString
+copyAudioStreamBasicDescriptionFormatDescription(const AudioStreamBasicDescription &streamDescription) noexcept;
 
 #ifdef __OBJC__
 /// Returns the name of the format described by an AudioStreamBasicDescription structure.
@@ -203,11 +204,11 @@ struct StreamDescription final : public AudioStreamBasicDescription {
     ///
     /// This is the value of kAudioFormatProperty_FormatName.
     /// @note The caller is responsible for releasing the returned string
-    [[nodiscard]] CFStringRef _Nullable copyFormatName() const noexcept CF_RETURNS_RETAINED;
+    [[nodiscard]] cf::CFString copyFormatName() const noexcept;
 
     /// Returns a string representation of this format.
     /// @note The caller is responsible for releasing the returned string.
-    [[nodiscard]] CFStringRef _Nullable copyFormatDescription() const noexcept CF_RETURNS_RETAINED;
+    [[nodiscard]] cf::CFString copyFormatDescription() const noexcept;
 
 #ifdef __OBJC__
     /// Returns an AVAudioFormat object initialized with this format and no channel layout.
@@ -228,12 +229,14 @@ struct StreamDescription final : public AudioStreamBasicDescription {
 #ifdef __OBJC__
 inline NSString *_Nullable audioStreamBasicDescriptionFormatName(
         const AudioStreamBasicDescription &streamDescription) noexcept {
-    return (__bridge_transfer NSString *)copyAudioStreamBasicDescriptionFormatName(streamDescription);
+    auto formatName = copyAudioStreamBasicDescriptionFormatName(streamDescription);
+    return (__bridge_transfer NSString *)formatName.leak();
 }
 
 inline NSString *_Nullable audioStreamBasicDescriptionFormatDescription(
         const AudioStreamBasicDescription &streamDescription) noexcept {
-    return (__bridge_transfer NSString *)copyAudioStreamBasicDescriptionFormatDescription(streamDescription);
+    auto formatDescription = copyAudioStreamBasicDescriptionFormatDescription(streamDescription);
+    return (__bridge_transfer NSString *)formatDescription.leak();
 }
 #endif /* __OBJC__ */
 
@@ -366,11 +369,11 @@ inline void StreamDescription::reset() noexcept { std::memset(this, 0, sizeof(Au
 
 // MARK: Format Name and Description
 
-inline CFStringRef _Nullable StreamDescription::copyFormatName() const noexcept {
+inline cf::CFString StreamDescription::copyFormatName() const noexcept {
     return copyAudioStreamBasicDescriptionFormatName(*this);
 }
 
-inline CFStringRef _Nullable StreamDescription::copyFormatDescription() const noexcept {
+inline cf::CFString StreamDescription::copyFormatDescription() const noexcept {
     return copyAudioStreamBasicDescriptionFormatDescription(*this);
 }
 
@@ -380,11 +383,11 @@ inline StreamDescription::operator AVAudioFormat *_Nullable() const noexcept {
 }
 
 inline NSString *_Nullable StreamDescription::formatName() const noexcept {
-    return (__bridge_transfer NSString *)copyFormatName();
+    return audioStreamBasicDescriptionFormatName(*this);
 }
 
 inline NSString *_Nullable StreamDescription::formatDescription() const noexcept {
-    return (__bridge_transfer NSString *)copyFormatDescription();
+    return audioStreamBasicDescriptionFormatDescription(*this);
 }
 #endif /* __OBJC__ */
 

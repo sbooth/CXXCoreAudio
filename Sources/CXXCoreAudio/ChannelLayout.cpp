@@ -282,19 +282,8 @@ constexpr const char *getChannelLayoutTagName(AudioChannelLayoutTag layoutTag) n
     return nullptr;
 }
 
-/// A std::unique_ptr deleter for CFTypeRef objects.
-struct cf_type_ref_deleter {
-    void operator()(CFTypeRef cf CF_RELEASES_ARGUMENT) { CFRelease(cf); }
-};
-
-/// A std::unique_ptr holding a CFTypeRef object.
-template <typename T> using cf_type_ref_unique_ptr = std::unique_ptr<std::remove_pointer_t<T>, cf_type_ref_deleter>;
-
-/// A std::unique_ptr holding a CFStringRef.
-using cf_string_unique_ptr = cf_type_ref_unique_ptr<CFStringRef>;
-
 /// Returns the name of the channel for an AudioChannelLabel.
-cf_string_unique_ptr copyChannelLabelName(AudioChannelLabel channelLabel, bool shortName) noexcept {
+cf::CFString copyChannelLabelName(AudioChannelLabel channelLabel, bool shortName) noexcept {
     const auto property = shortName ? kAudioFormatProperty_ChannelShortName : kAudioFormatProperty_ChannelName;
     CFStringRef channelName = nullptr;
     UInt32 dataSize = sizeof channelName;
@@ -302,16 +291,16 @@ cf_string_unique_ptr copyChannelLabelName(AudioChannelLabel channelLabel, bool s
     if (result != noErr) {
         return nullptr;
     }
-    return cf_string_unique_ptr{channelName};
+    return cf::CFString(channelName);
 }
 
 /// Joins strings from array separated by delimiter.
-cf_string_unique_ptr joinStringArray(CFArrayRef array, CFStringRef delimiter) noexcept {
+cf::CFString joinStringArray(CFArrayRef array, CFStringRef delimiter) noexcept {
     if (array == nullptr) {
         return nullptr;
     }
 
-    cf_type_ref_unique_ptr<CFMutableStringRef> result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+    cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
     if (!result) {
         return nullptr;
     }
@@ -329,7 +318,7 @@ cf_string_unique_ptr joinStringArray(CFArrayRef array, CFStringRef delimiter) no
         }
     }
 
-    return result;
+    return cf::CFString(result.leak());
 }
 
 } /* namespace */
@@ -424,7 +413,7 @@ bool core_audio::audioChannelLayoutsAreEquivalent(const AudioChannelLayout *lhs,
     return layoutsEquivalent;
 }
 
-CFStringRef core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout, bool simpleName) noexcept {
+cf::CFString core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *channelLayout, bool simpleName) noexcept {
     if (channelLayout == nullptr) {
         return nullptr;
     }
@@ -437,43 +426,42 @@ CFStringRef core_audio::copyAudioChannelLayoutName(const AudioChannelLayout *cha
     if (result != noErr) {
         return nullptr;
     }
-    return layoutName;
+    return cf::CFString(layoutName);
 }
 
-CFStringRef core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept {
+cf::CFString core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayout *channelLayout) noexcept {
     if (channelLayout == nullptr) {
         return nullptr;
     }
 
-    CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
-    if (result == nullptr) {
+    cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+    if (!result) {
         return nullptr;
     }
 
-    cf_string_unique_ptr layoutName{copyAudioChannelLayoutName(channelLayout)};
+    auto layoutName = copyAudioChannelLayoutName(channelLayout);
 
     if (channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelDescriptions) {
         // kAudioFormatProperty_ChannelLayoutName returns '!fmt' for kAudioChannelLabel_UseCoordinates
         if (layoutName) {
             CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions, %@"),
                                  channelLayout->mNumberChannelDescriptions, layoutName.get());
-            return result;
+            return cf::CFString(result.leak());
         }
 
         CFStringAppendFormat(result, nullptr, CFSTR("%u channel descriptions"),
                              channelLayout->mNumberChannelDescriptions);
 
-        cf_type_ref_unique_ptr<CFMutableArrayRef> array{
-                CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
+        cf::CFMutableArray array{CFArrayCreateMutable(kCFAllocatorDefault, 0, &kCFTypeArrayCallBacks)};
         if (!array) {
             // Allocation failed; return the partial description without per-channel names
-            return result;
+            return cf::CFString(result.leak());
         }
 
         const AudioChannelDescription *desc = channelLayout->mChannelDescriptions;
         for (UInt32 i = 0; i < channelLayout->mNumberChannelDescriptions; ++i, ++desc) {
             if (desc->mChannelLabel == kAudioChannelLabel_UseCoordinates) {
-                cf_string_unique_ptr coordinateString{};
+                cf::CFString coordinateString;
                 if (desc->mChannelFlags & kAudioChannelFlags_RectangularCoordinates) {
                     coordinateString.reset(CFStringCreateWithFormat(
                             kCFAllocatorDefault, nullptr, CFSTR("[x: %g, y: %g, z: %g%s]"), desc->mCoordinates[0],
@@ -492,18 +480,18 @@ CFStringRef core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayo
                 }
 
                 if (coordinateString) {
-                    CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(coordinateString.get()));
+                    CFArrayAppendValue(array, coordinateString.get());
                 }
             } else {
                 if (const auto channelName = copyChannelLabelName(desc->mChannelLabel, true); channelName) {
-                    CFArrayAppendValue(array.get(), reinterpret_cast<const void *>(channelName.get()));
+                    CFArrayAppendValue(array, channelName.get());
                 } else {
-                    CFArrayAppendValue(array.get(), CFSTR("?"));
+                    CFArrayAppendValue(array, CFSTR("?"));
                 }
             }
         }
 
-        if (auto channelNamesString = joinStringArray(array.get(), CFSTR(" ")); channelNamesString) {
+        if (auto channelNamesString = joinStringArray(array, CFSTR(" ")); channelNamesString) {
             CFStringAppendFormat(result, nullptr, CFSTR(", %@"), channelNamesString.get());
         }
     } else if (channelLayout->mChannelLayoutTag == kAudioChannelLayoutTag_UseChannelBitmap) {
@@ -521,7 +509,7 @@ CFStringRef core_audio::copyAudioChannelLayoutDescription(const AudioChannelLayo
         }
     }
 
-    return result;
+    return cf::CFString(result.leak());
 }
 
 // Constants

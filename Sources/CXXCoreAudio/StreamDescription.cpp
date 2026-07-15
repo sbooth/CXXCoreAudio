@@ -169,7 +169,7 @@ core_audio::identifyCommonPCMFormat(const AudioStreamBasicDescription &streamDes
     return std::nullopt;
 }
 
-CFStringRef
+cf::CFString
 core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDescription &streamDescription) noexcept {
     CFStringRef name = nullptr;
     UInt32 dataSize = sizeof name;
@@ -178,13 +178,13 @@ core_audio::copyAudioStreamBasicDescriptionFormatName(const AudioStreamBasicDesc
     if (result != noErr) {
         return nullptr;
     }
-    return name;
+    return cf::CFString(name);
 }
 
-CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
+cf::CFString core_audio::copyAudioStreamBasicDescriptionFormatDescription(
         const AudioStreamBasicDescription &streamDescription) noexcept {
-    CFMutableStringRef result = CFStringCreateMutable(kCFAllocatorDefault, 0);
-    if (result == nullptr) {
+    cf::CFMutableString result{CFStringCreateMutable(kCFAllocatorDefault, 0)};
+    if (!result) {
         return nullptr;
     }
 
@@ -215,7 +215,7 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
             CFStringAppendCString(result, "interleaved", kCFStringEncodingASCII);
         }
 
-        return result;
+        return cf::CFString(result.leak());
     }
 
     if (streamDescription.mFormatID == kAudioFormatLinearPCM) {
@@ -342,7 +342,7 @@ CFStringRef core_audio::copyAudioStreamBasicDescriptionFormatDescription(
                              streamDescription.mFramesPerPacket, streamDescription.mBytesPerFrame);
     }
 
-    return result;
+    return cf::CFString(result.leak());
 }
 
 core_audio::StreamDescription::StreamDescription(CommonPCMFormat commonPCMFormat, Float64 sampleRate,
